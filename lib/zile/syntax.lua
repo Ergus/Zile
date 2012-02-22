@@ -68,14 +68,15 @@ local state = {
       ops   = {},
 
       -- parser state for the current line
+      colors    = stack.new (),
       highlight = stack.new (),
+      pats      = stack.new {bp.grammar.patterns},
     }
 
     local bol    = buffer_start_of_line (bp, o)
     local eol    = bol + buffer_line_len (bp, o)
     local region = get_buffer_region (bp, {start = bol, finish = eol})
     local lexer  = {
-      grammar = bp.grammar,
       s       = tostring (region),
       syntax  = bp.syntax[n],
     }
@@ -117,8 +118,8 @@ local function leftmost_match (lexer, i, pats)
   local b, e, caps, matched
 
   for _, v in ipairs (pats) do
-    if v.match then
-      local _b, _e, _caps = rex_exec (v.match, s, i)
+    if v.rex or v.finish then
+      local _b, _e, _caps = rex_exec (v.rex or v.finish, s, i)
       if _b and (not b or _b < b) then
         b, e, caps, matched = _b, _e, _caps, v
       end
@@ -133,28 +134,41 @@ end
 -- queueing color push and pop instructions as we go.
 -- @tparam table lexer syntax highlight matcher stat
 local function parse (lexer)
-  local pats = lexer.grammar.patterns
+  local colors = lexer.syntax.colors
+  local pats   = lexer.syntax.pats
   local b, e, caps, matched
 
   local i = 0
   repeat
-    b, e, caps, matched = leftmost_match (lexer, i, pats)
+    b, e, caps, matched = leftmost_match (lexer, i, pats:top ())
     if b then
-      lexer:push_op ("push", b, matched.attrs)
+      lexer:push_op ("push", b, matched.colors)
       if caps and matched.captures then
-        for k, t in pairs (matched.captures) do
+        for k, v in pairs (matched.captures) do
           -- onig marks zero length captures with first > last
           local first, last = caps[(k * 2) - 1], caps[k * 2]
 
           if first and first < last then
-            lexer:push_op ("push", first, t.attrs)
-            lexer:push_op ("pop",  last,  t.attrs)
+            lexer:push_op ("push", first, v)
+            lexer:push_op ("pop",  last,  v)
           end
         end
       end
-      lexer:push_op ("pop",  e, matched.attrs)
+      lexer:push_op ("pop",  e, matched.colors)
 
       i = e + 1
+
+      -- If there are subexpressions, push those on the pattern stack.
+      if matched.patterns then
+        lexer:push_op ("push", b, colors:push (matched.colors))
+        pats:push (matched.patterns)
+      end
+
+      -- Pop completed subexpressions off the pattern stack
+      if matched.finish then
+        pats:pop ()
+        lexer:push_op ("pop", e, colors:pop ())
+      end
     end
   until b == nil
 end

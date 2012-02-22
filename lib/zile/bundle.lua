@@ -32,6 +32,7 @@
 
 local posix    = require "posix"
 local rex_onig = require "rex_onig"
+local empty    = require "std.table".empty
 
 require "zile.term_curses"
 
@@ -149,6 +150,57 @@ local function scopetoattr (name)
 end
 
 
+--- Calculate attributes for capture elements.
+-- @tparam table captures capture elements
+local function capturestoattr (captures)
+  if not captures then return nil end
+
+  for i, t in pairs (captures) do
+    captures[i] = scopetoattr (t.name)
+  end
+
+  if not empty (captures) then return captures end
+end
+
+
+--- Compile a valid oniguruma match expression.
+-- @string match an oniguruma regular expression string
+-- @treturn userdata compiled expression if valid, otherwise `nil`
+local function compile_rex (match)
+  local ok, rex = pcall (rex_onig.new, match, 0)
+  return ok and rex or nil
+end
+
+
+--- Precompile grammar expressions.
+-- @tparam table patterns a grammar bundle `patterns` sub-table
+-- @treturn table patterns, with match expressions compiled
+local function compile_patterns (patterns)
+  if not patterns then return nil end
+
+  for i, v in ipairs (patterns) do
+    patterns[i] = {
+      rex      = compile_rex (v.match or v.begin),
+      captures = capturestoattr (v.captures or v.beginCaptures),
+      colors   = scopetoattr (v.name),
+      patterns = compile_patterns (v.patterns),
+    }
+
+    -- Append optional sentinel to end of patterns.
+    if v["end"] then
+      patterns[i].patterns = patterns[i].patterns or {}
+
+      table.insert (patterns[i].patterns, {
+        finish   = compile_rex (v["end"]),
+        captures = v.endCaptures and capturestoattr (v.endCaptures) or v.captures,
+      })
+    end
+  end
+
+  return patterns
+end
+
+
 --- Load the grammar description for modename.
 -- @string modename name of a mode with this grammar
 -- @treturn table grammar
@@ -159,22 +211,7 @@ function load_grammar (modename)
     local g = require (fullname)
 
     if g and g.patterns then
-      for _, v in ipairs (g.patterns) do
-        if v.name then
-          v.attrs = scopetoattr (v.name)
-        end
-        if v.captures then
-          for _, t in ipairs (v.captures) do
-            t.attrs = scopetoattr (t.name)
-          end
-        end
-
-        local ok
-        ok, v.match = pcall (rex_onig.new, v.match, 0)
-        if not ok then
-          v.match = nil
-        end
-      end
+      g.patterns = compile_patterns (g.patterns)
     end
   end
 
