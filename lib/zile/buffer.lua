@@ -223,6 +223,7 @@ function buffer_new ()
   bp.gap = 0
   bp.text = FileString (MutableString (""))
   bp.markers = {}
+  bp.syntax = {}
   bp.dir = posix.getcwd () or ""
 
   -- Insert into buffer list.

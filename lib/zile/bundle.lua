@@ -29,6 +29,9 @@
  @module zile.bundle
 ]]
 
+
+local rex_onig = require "rex_onig"
+
 require "zile.term_curses"
 
 local dirsep, pathsep, path_mark =
@@ -109,7 +112,48 @@ local function set_colors (name)
   end
 end
 
+
+--- Load the grammar description for modename.
+-- @string modename name of a mode with this grammar
+-- @treturn table grammar
+function load_grammar (modename)
+  local fullname = "zile.grammar." .. modename
+
+  if package.loaded[fullname] == nil then
+    local g = require (fullname)
+
+    if g and g.patterns then
+      for _, v in ipairs (g.patterns) do
+        if v.name then
+          local key = {}
+	  for w in v.name:gmatch "[^%.]+" do
+            key[#key + 1] = w
+	  end
+
+	  repeat
+            local scope = table.concat (key, ".")
+	    if colors[scope] then
+              v.attrs = colors[scope]
+	      break
+	    end
+	    table.remove (key)
+	  until #key == 0
+        end
+
+        local ok
+        ok, v.match = pcall (rex_onig.new, v.match, 0)
+        if not ok then
+          v.match = nil
+        end
+      end
+    end
+  end
+
+  return package.loaded[fullname]
+end
+
 --- @export
 return {
-  set_colors = set_colors,
+  load_grammar = load_grammar,
+  set_colors   = set_colors,
 }

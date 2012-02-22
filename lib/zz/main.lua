@@ -236,6 +236,9 @@ function main ()
   insert_string ("-- This buffer is for notes you don't want to save.\n-- If you want to create a file, visit that file with C-x C-f,\n-- then enter the text in that file's own buffer.\n\n")
   cur_bp.modified = false
 
+  -- Rehighlight the scratch buffer now that we have a theme loaded.
+  scratch_bp.grammar = load_grammar ("lua")
+
   if not qflag then
     local s = os.getenv ("HOME")
     if s then

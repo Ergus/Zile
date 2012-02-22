@@ -17,6 +17,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+local syntax_attrs = require "zile.syntax".syntax_attrs
+
+
 -- Tidy up the term ready to leave Zile (temporarily or permanently!).
 function term_tidy ()
   term_move (term_height () - 1, 0)
@@ -49,8 +53,20 @@ local function draw_line (line, startcol, wp, o, rp, highlight, cur_tab_width)
   local x = 0
   local bp = wp.bp
   local line_len = buffer_line_len (bp, o)
+  local attrs = syntax_attrs (bp, o)
+
   for i = startcol, math.huge do
-    term_attrset ((highlight and in_region (o, i, rp)) and colors.selection or colors.normal)
+    local this_attr, last_attr
+    if highlight and in_region (o, i, rp) then
+      this_attr = colors.selection
+    else
+      this_attr = attrs and attrs[i] or colors.normal
+    end
+    if this_attr ~= last_attr then
+      term_attrset (this_attr)
+      last_attr = this_attr
+    end
+
     if i >= line_len or x >= wp.ewidth then
       break
     end
@@ -128,7 +144,7 @@ local function draw_status_line (line, wp)
 
   term_move (line, 0)
 
-  local as = string.format ("--%s%2s  %-15s   %s %-9s (Fundamental",
+  local as = string.format ("--%s%2s  %-15s   %s %-9s (Lua",
                             eol_type, make_modeline_flags (wp), wp.bp.name, make_screen_pos (wp),
                             string.format ("(%d,%d)", n + 1, get_goalc (wp.bp, window_o (wp))))
 

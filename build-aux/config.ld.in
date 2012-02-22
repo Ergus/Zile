@@ -14,6 +14,7 @@ file = {
 
   -- Modules
   "../lib/zile/bundle.lua",
+  "../lib/zile/syntax.lua",
   "../lib/zile/zlisp.lua",
   "../lib/zemacs/eval.lua",
   "../lib/zz/eval.lua",

@@ -43,6 +43,17 @@ GNU Zile NEWS                                    -*- outline -*-
     UI on color terminals with a color-capable curses binding (i.e. just
     about any modern system).
 
+  - Beginnings of a syntax highlighting bundle file format. New grammars
+    can be made by mechanically translating existing TextMate Language
+    files, though almost none of TextMate Language file features are
+    supported yet.  Zemacs vs. Zz usage rationale as above.
+
+    Note that, for compatibility with TextMate Language definitions, the
+    highlighter (and thus Zz) now require lrex-oniguruma.  However, this
+    also makes for trivial compatibility with hundreds of existing
+    file formats - subject to mechanical translation of the TextMate
+    sources.
+
   - Beginnings of LDoc generated api documentation of Zile modules.
 
   - Legacy Zemacs tests are migrating to Specl and have significantly

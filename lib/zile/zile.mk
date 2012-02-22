@@ -31,6 +31,7 @@ dist_pkgdata_DATA =				\
 	lib/zile/file.lua			\
 	lib/zile/funcs.lua			\
 	lib/zile/getkey.lua			\
+	lib/zile/grammar/lua-bundle.lua		\
 	lib/zile/history.lua			\
 	lib/zile/keycode.lua			\
 	lib/zile/killring.lua			\
@@ -41,6 +42,7 @@ dist_pkgdata_DATA =				\
 	lib/zile/minibuf.lua			\
 	lib/zile/redisplay.lua			\
 	lib/zile/search.lua			\
+	lib/zile/syntax.lua			\
 	lib/zile/term_curses.lua		\
 	lib/zile/term_minibuf.lua		\
 	lib/zile/term_redisplay.lua		\
