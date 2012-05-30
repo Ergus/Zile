@@ -1,4 +1,4 @@
--- Copyright (c) 2012-214 Free Software Foundation, Inc,
+-- Copyright (c) 2012-2014 Free Software Foundation, Inc,
 --
 -- This file is part of GNU Zile.
 --
@@ -172,6 +172,14 @@ local function compile_rex (match)
 end
 
 
+--- Does match have any back-references?
+-- @string match uncompiled regular expression
+-- @treturn boolean true if any unescaped back-references are found
+local function has_backrefs (match)
+  return (nil ~= match:gsub ("\\[^%d]", ""):find ("\\%d"))
+end
+
+
 --- Precompile grammar expressions.
 -- @tparam table patterns a grammar bundle `patterns` sub-table
 -- @treturn table patterns, with match expressions compiled
@@ -191,8 +199,9 @@ local function compile_patterns (patterns)
       patterns[i].patterns = patterns[i].patterns or {}
 
       table.insert (patterns[i].patterns, {
-        finish   = compile_rex (v["end"]),
+        finish   = has_backrefs (v["end"]) or compile_rex (v["end"]),
         captures = v.endCaptures and capturestoattr (v.endCaptures) or v.captures,
+        match    = has_backrefs (v["end"]) and v["end"],
       })
     end
   end
@@ -246,6 +255,7 @@ end
 
 --- @export
 return {
+  compile_rex            = compile_rex,
   load_file_associations = load_file_associations,
   load_grammar           = load_grammar,
   set_colors             = set_colors,
