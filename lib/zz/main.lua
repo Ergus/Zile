@@ -239,6 +239,8 @@ function main ()
   -- Rehighlight the scratch buffer now that we have a theme loaded.
   scratch_bp.grammar = load_grammar ("lua")
 
+  init_mode_map ()
+
   if not qflag then
     local s = os.getenv ("HOME")
     if s then

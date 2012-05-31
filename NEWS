@@ -54,6 +54,8 @@ GNU Zile NEWS                                    -*- outline -*-
     file formats - subject to mechanical translation of the TextMate
     sources.
 
+  - Syntax highlighting modes for Lua sources and diff/patch files.
+
   - Beginnings of LDoc generated api documentation of Zile modules.
 
   - Legacy Zemacs tests are migrating to Specl and have significantly

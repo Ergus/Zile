@@ -22,6 +22,7 @@ local list    = require "std.list"
 local set     = require "std.set"
 local ripairs = require "std.table".ripairs
 
+local bundle     = require "zile.bundle"
 local FileString = require "zile.FileString"
 
 prog = require "zile.version"
@@ -329,6 +330,14 @@ function save_some_buffers (noask)
   return true
 end
 
+
+local mode_map = nil
+
+function init_mode_map ()
+  mode_map = load_file_associations ()
+end
+
+
 function find_file (filename)
   local bp
   for i = 1, #buffers do
@@ -353,7 +362,16 @@ function find_file (filename)
         s = ""
       end
       bp.text = FileString (s)
-      bp.grammar = load_grammar ("lua")
+
+      -- load grammar associated with file extension
+      local x = filename:match ("%.([^%.]+)$")
+
+      if mode_map and x and mode_map[x] then
+        -- more modes may have been installed since we last looked.
+        init_mode_map ()
+
+        bp.grammar = load_grammar (mode_map[x])
+      end
 
       -- Reset undo history
       bp.next_undop = nil

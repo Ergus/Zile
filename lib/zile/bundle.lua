@@ -30,6 +30,7 @@
 ]]
 
 
+local posix    = require "posix"
 local rex_onig = require "rex_onig"
 
 require "zile.term_curses"
@@ -81,6 +82,20 @@ end
 -- none of the built-in searchers could find anything to load.
 package.loaders[#package.loaders] = function (name)
   return searcher (name, function (name) return name:gsub ("%.lua", "-bundle.lua") end)
+end
+
+
+-- Figure out where we're looking for grammar files.
+local PATH_GRAMMARDIR
+
+for m in package.path:gmatch ("([^" .. esc (pathsep) .. "]+)") do
+  local sentinel = ("zile.grammar.lua-bundle"):gsub ("%.", dirsep)
+  local path = m:gsub (esc (path_mark), sentinel)
+  local fh, err = io.open (path, "r")
+  if fh then
+    PATH_GRAMMARDIR = path:match ("^(.*)" .. dirsep .. "lua%-bundle.*$")
+    break
+  end
 end
 
 
@@ -152,8 +167,35 @@ function load_grammar (modename)
   return package.loaded[fullname]
 end
 
+
+--- Return a map from filename extension to syntax name.
+-- @treturn table filename extension to syntax name
+function load_file_associations ()
+  local auto_mode_alist = {}
+
+  for _, filename in pairs (posix.dir (PATH_GRAMMARDIR)) do
+    local modename = filename:match ("^(.*)%-bundle%.lua$")
+    if modename then
+      local g = load_grammar (modename)
+      if g then
+        if type (g.fileTypes) == "string" then
+          auto_mode_alist[g.fileTypes] = modename
+        elseif type (g.fileTypes) == "table" then
+          for _,v in pairs (g.fileTypes) do
+            auto_mode_alist[v] = modename
+          end
+        end
+      end
+    end
+  end
+
+  return auto_mode_alist
+end
+
+
 --- @export
 return {
-  load_grammar = load_grammar,
-  set_colors   = set_colors,
+  load_file_associations = load_file_associations,
+  load_grammar           = load_grammar,
+  set_colors             = set_colors,
 }

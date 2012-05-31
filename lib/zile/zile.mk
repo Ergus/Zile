@@ -31,6 +31,7 @@ dist_pkgdata_DATA =				\
 	lib/zile/file.lua			\
 	lib/zile/funcs.lua			\
 	lib/zile/getkey.lua			\
+	lib/zile/grammar/diff-bundle.lua	\
 	lib/zile/grammar/lua-bundle.lua		\
 	lib/zile/history.lua			\
 	lib/zile/keycode.lua			\
