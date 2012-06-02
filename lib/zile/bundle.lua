@@ -180,30 +180,44 @@ local function has_backrefs (match)
 end
 
 
+-- Next two functions are mutually recursive.
+local compile_pattern, compile_patterns
+
+
+--- Compile a single oniguruma pattern string.
+-- @string v valid oniguruma pattern string
+-- @treturn table fast pattern lookup table
+function compile_pattern (v)
+  local p = {
+    captures = capturestoattr (v.captures or v.beginCaptures),
+    colors   = scopetoattr (v.name),
+    include  = v.include and v.include:match "^#([%w_]+)$",
+    patterns = compile_patterns (v.patterns),
+    rex      = compile_rex (v.match or v.begin),
+  }
+
+  -- Append optional finish subexpression patterns subtable.
+  if v["end"] then
+    p.patterns = p.patterns or {}
+
+    p.patterns[#p.patterns + 1] = {
+      captures = v.endCaptures and capturestoattr (v.endCaptures) or v.captures,
+      finish   = has_backrefs (v["end"]) or compile_rex (v["end"]),
+      match    = has_backrefs (v["end"]) and v["end"],
+    }
+  end
+
+  return p
+end
+
 --- Precompile grammar expressions.
 -- @tparam table patterns a grammar bundle `patterns` sub-table
 -- @treturn table patterns, with match expressions compiled
-local function compile_patterns (patterns)
+function compile_patterns (patterns)
   if not patterns then return nil end
 
-  for i, v in ipairs (patterns) do
-    patterns[i] = {
-      rex      = compile_rex (v.match or v.begin),
-      captures = capturestoattr (v.captures or v.beginCaptures),
-      colors   = scopetoattr (v.name),
-      patterns = compile_patterns (v.patterns),
-    }
-
-    -- Append optional sentinel to end of patterns.
-    if v["end"] then
-      patterns[i].patterns = patterns[i].patterns or {}
-
-      table.insert (patterns[i].patterns, {
-        finish   = has_backrefs (v["end"]) or compile_rex (v["end"]),
-        captures = v.endCaptures and capturestoattr (v.endCaptures) or v.captures,
-        match    = has_backrefs (v["end"]) and v["end"],
-      })
-    end
+  for k, v in pairs (patterns) do
+    patterns[k] = compile_pattern (v)
   end
 
   return patterns
@@ -220,7 +234,8 @@ function load_grammar (modename)
     local g = require (fullname)
 
     if g and g.patterns then
-      g.patterns = compile_patterns (g.patterns)
+      g.repository = compile_patterns (g.repository)
+      g.patterns   = compile_patterns (g.patterns)
     end
   end
 

@@ -88,6 +88,7 @@ local state = {
     local eol    = bol + buffer_line_len (bp, o)
     local region = get_buffer_region (bp, {start = bol, finish = eol})
     local lexer  = {
+      repo    = bp.grammar.repository,
       s       = tostring (region),
       syntax  = bp.syntax[n],
     }
@@ -163,16 +164,24 @@ end
 -- @treturn table expression capture offsets
 -- @treturn pattern matching pattern
 local function leftmost_match (lexer, i, pats)
-  local s = lexer.s
+  local repo, s = lexer.repo, lexer.s
   local b, e, caps, matched
 
   for _, v in ipairs (pats) do
-    local rex = expand (lexer, v.match) or v.rex or v.finish
+    local _p  = v.include and repo[v.include] or v
+    local rex = expand (lexer, _p.match) or _p.rex or _p.finish
+
+    -- Match next candidate expression.
+    local _b, _e, _caps
     if rex then
-      local _b, _e, _caps = rex_exec (rex, s, i)
-      if _b and (not b or _b < b) then
-        b, e, caps, matched = _b, _e, _caps, v
-      end
+      _b, _e, _caps = rex_exec (rex, s, i)
+    elseif _p.patterns then
+      _b, _e, _caps, _p = leftmost_match (lexer, i, _p.patterns)
+    end
+
+    -- Save candidate if it matched earlier than previous candidate.
+    if _b and (not b or _b < b) then
+      b, e, caps, matched = _b, _e, _caps, _p
     end
   end
 

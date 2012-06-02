@@ -63,10 +63,8 @@
         [0] = { name = 'punctuation.definition.string.end.lua' },
       },
       patterns = {
-        {
-          name = 'constant.character.escape.lua',
-          match = [[\\.]],
-        },
+        { include = '#string_escaped_char' },
+        { include = '#string_placeholder' },
       },
     },
     {
@@ -80,10 +78,8 @@
         [0] = { name = 'punctuation.definition.string.end.lua' },
       },
       patterns = {
-        {
-          name = 'constant.character.escape.lua',
-          match = [[\\.]],
-        },
+        { include = '#string_escaped_char' },
+        { include = '#string_placeholder' },
       },
     },
     {
@@ -154,6 +150,35 @@
       name = 'keyword.operator.lua',
       match = [[\+|-|%|#|\*|\/|\^|==?|~=|<=?|>=?|(?<!\.)\.{2}(?!\.)]],
     },
+  },
+  repository = {
+    string_escaped_char = {
+      name = 'constant.character.escape.lua',
+      match = [[\\.]],
+    },
+    string_placeholder = {
+      patterns = {
+        {
+          name = 'constant.other.placeholder.lua',
+          match = [[(?x)%
+                    (\d+\$)?                        # field (argument #)
+                    [#0\- +']*                      # flags
+                    ((-?\d+)|\*(-?\d+\$)?)?         # minimum field width
+                    (\.((-?\d+)|\*(-?\d+\$)?)?)?    # precision
+                    (h[hlv]?|ll?|v[hl]?|[jtzqL])?   # length modifier
+                    [aAcdeEfgGioOqsuUxX%]           # conversion type
+                  ]],
+        },
+        {
+          name = 'constant.other.escape.lua',
+          match = [=[%[acdglpsuwx\^\$\(\)\.\[\]\*\+\-\?]]=],
+        },
+        {
+          name = 'invalid.illegal.placeholder.lua',
+          match = [[%]],
+        },
+      },
+    }
   },
   scopeName = 'source.lua',
 }
