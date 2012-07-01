@@ -71,6 +71,8 @@ local state = {
   new = function (bp, o)
     local n = offset_to_line (bp, o)
 
+    bp.syntax.dirty = n + 1
+
     bp.syntax[n] = {
       -- Calculate the attributes for each cell of this line using a
       -- stack-machine with color push and pop operations.
@@ -88,6 +90,7 @@ local state = {
     local eol    = bol + buffer_line_len (bp, o)
     local region = get_buffer_region (bp, {start = bol, finish = eol})
     local lexer  = {
+      n       = n,
       repo    = bp.grammar.repository,
       s       = tostring (region),
       syntax  = bp.syntax[n],
@@ -270,9 +273,28 @@ end
 -- @int o character offset into bp
 -- @treturn int attributes
 local function attrs (bp, o)
+  -- Can't highlight without any grammar!
   if not bp.grammar then return nil end
 
-  local lexer = highlight (state.new (bp, o))
+  local dirty = bp.syntax.dirty or 0
+  local n     = offset_to_line (bp, o)
+
+  -- If last calculations are still clean, return them.
+  if n < dirty then return bp.syntax[n].attrs end
+
+  -- otherwise, backtrack to the first dirty line...
+  local ostart, lstart = o, n
+  while lstart >= 0 and lstart > dirty do
+    ostart = buffer_prev_line (bp, ostart)
+    lstart = lstart - 1
+  end
+
+  -- ...and recalculate highlights right up to this line.
+  local lexer
+  repeat
+    lexer  = highlight (state.new (bp, ostart))
+    ostart = buffer_next_line (bp, ostart)
+  until lexer.n >= n
 
   return lexer.syntax.attrs
 end

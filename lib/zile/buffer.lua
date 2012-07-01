@@ -107,6 +107,9 @@ function replace_estr (del, es, bp)
     bp.text:set (bp.pt + math.max (oldgap, newlen) + added_gap, '\0', newlen + bp.gap - math.max (oldgap, newlen) - added_gap)
   end
 
+  -- Syntax highlighting from line of insertion-point needs recalculating.
+  bp.syntax.dirty = offset_to_line (bp, bp.pt)
+
   -- Insert `newlen' chars.
   bp.text:replace (bp.pt, es)
   bp.pt = bp.pt + newlen
