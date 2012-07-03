@@ -33,7 +33,8 @@
 ]]
 
 
-local empty = require "std.table".empty
+local table = require "std.table"
+local clone, empty = table.clone, table.empty
 
 local compile_rex = require "zile.bundle".compile_rex
 
@@ -59,41 +60,67 @@ local metatable = {
     local top = self.syntax.caps:top ()
     if top then return top.caps, top.begin end
   end,
+
+  -- Store the current parser state in the buffer.
+  store = function (self)
+    local bp, syntax = self.bp, self.syntax
+
+    -- Write the highlight attributes for this line.
+    bp.syntax[self.n].attrs = syntax.attrs
+
+    -- Write the current parser state for the start of the next line.
+    bp.syntax[self.n + 1] = {
+      caps      = syntax.caps,
+      colors    = syntax.colors,
+      highlight = syntax.highlight,
+      pats      = syntax.pats,
+    }
+  end,
 }
 
 
 -- Syntax parser state.
 local state = {
-  -- Return a new parser state for the bp line containing offset o.
-  -- @tparam table bp buffer table
-  -- @int o offset into buffer bp
-  -- @treturn table lexer for buffer line containing offset o
-  new = function (bp, o)
-    local n = offset_to_line (bp, o)
-
-    bp.syntax.dirty = n + 1
-
-    bp.syntax[n] = {
-      -- Calculate the attributes for each cell of this line using a
-      -- stack-machine with color push and pop operations.
-      attrs = {},
-      ops   = {},
-
+  -- Initialise parser state for the first line of bp.
+  init = function (bp)
+    bp.syntax[0] = bp.syntax[0] or {
       -- parser state for the current line
       caps      = stack.new {},
       colors    = stack.new (),
       highlight = stack.new (),
       pats      = stack.new {bp.grammar.patterns},
     }
+  end,
+
+  -- Return a new parser state for the bp line containing offset o.
+  -- @tparam table bp buffer table
+  -- @int o offset into buffer bp
+  -- @treturn table lexer for buffer line containing offset o
+  new = function (bp, o)
+    local syntax = bp.syntax
+    local n      = offset_to_line (bp, o)
+
+    syntax.dirty = n + 1
 
     local bol    = buffer_start_of_line (bp, o)
     local eol    = bol + buffer_line_len (bp, o)
     local region = get_buffer_region (bp, {start = bol, finish = eol})
     local lexer  = {
+      bp      = bp,
       n       = n,
-      repo    = bp.grammar.repository,
       s       = tostring (region),
-      syntax  = bp.syntax[n],
+      syntax  = {
+        -- Calculate the attributes for each cell of this line using a
+        -- stack-machine with color push and pop operations.
+        attrs = {},
+        ops   = {},
+
+        -- Take a copy of the parser state for the current line.
+        caps      = clone (syntax[n].caps),
+        colors    = clone (syntax[n].colors),
+        highlight = clone (syntax[n].highlight),
+        pats      = clone (syntax[n].pats),
+      },
     }
 
     return setmetatable (lexer, {__index = metatable})
@@ -167,7 +194,7 @@ end
 -- @treturn table expression capture offsets
 -- @treturn pattern matching pattern
 local function leftmost_match (lexer, i, pats)
-  local repo, s = lexer.repo, lexer.s
+  local repo, s = lexer.bp.grammar.repository, lexer.s
   local b, e, caps, matched
 
   for _, v in ipairs (pats) do
@@ -264,6 +291,9 @@ local function highlight (lexer)
     end
   end
 
+  -- Store the current parser state, so we can restart from here later.
+  lexer:store ()
+
   return lexer
 end
 
@@ -275,6 +305,8 @@ end
 local function attrs (bp, o)
   -- Can't highlight without any grammar!
   if not bp.grammar then return nil end
+
+  state.init (bp)
 
   local dirty = bp.syntax.dirty or 0
   local n     = offset_to_line (bp, o)
