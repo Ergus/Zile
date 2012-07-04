@@ -18,7 +18,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-local syntax_attrs = require "zile.syntax".syntax_attrs
+local syntax_attrs = require "zile.syntax".attrs
 
 
 -- Tidy up the term ready to leave Zile (temporarily or permanently!).

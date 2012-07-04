@@ -33,51 +33,58 @@
 ]]
 
 
+-- Metamethods for syntax parsers state.
+local metatable = {
+  -- Queue a stack operation.
+  -- @string op "push" or "pop"
+  -- @int o offest into line
+  -- @int attr attribute to push or pop
+  push_op = function (self, op, o, attr)
+    if not attr then return nil end
+    local st = self.syntax.ops
+    st[o] = st[o] or stack.new ()
+    st[o]:push { [op] = attr }
+  end,
+}
+
+
 -- Syntax parser state.
-local state = {}
+local state = {
+  -- Return a new parser state for the bp line containing offset o.
+  -- @tparam table bp buffer table
+  -- @int o offset into buffer bp
+  -- @treturn table lexer for buffer line containing offset o
+  new = function (bp, o)
+    local n = offset_to_line (bp, o)
 
+    bp.syntax[n] = {
+      -- Calculate the attributes for each cell of this line using a
+      -- stack-machine with color push and pop operations.
+      attrs = {},
+      ops   = {},
 
---- Queue a stack operation.
--- pushing or popping value v to the stack at offset o.
--- @param st
--- @param op
--- @param o
--- @param v
-local function push_op (st, op, o, v)
-  if not v then return nil end
-  st[o] = st[o] or stack.new ()
-  st[o]:push { [op] = v }
-end
+      -- parser state for the current line
+      highlight = stack.new (),
+    }
 
+    local bol    = buffer_start_of_line (bp, o)
+    local eol    = bol + buffer_line_len (bp, o)
+    local region = get_buffer_region (bp, {start = bol, finish = eol})
+    local lexer  = {
+      grammar = bp.grammar,
+      s       = tostring (region),
+      syntax  = bp.syntax[n],
+    }
 
---- Return a new parser state for the buffer containing offset o.
-function state.new (bp, o)
-  local n = offset_to_line (bp, o)
-
-  bp.syntax[n] = {
-    -- Calculate the attributes for each cell of this line using a
-    -- stack-machine with color push and pop operations.
-    attrs = {},
-    ops   = {},
-  }
-
-  local bol    = buffer_start_of_line (bp, o)
-  local eol    = bol + buffer_line_len (bp, o)
-  local region = get_buffer_region (bp, {start = bol, finish = eol})
-  local lexer  = {
-    grammar = bp.grammar,
-    s       = tostring (region),
-    syntax  = bp.syntax[n],
-  }
-
-  return lexer
-end
+    return setmetatable (lexer, {__index = metatable})
+  end,
+}
 
 
 --- Marshal 0-indexed buffer API into and out-of 1-indexed onig API.
--- @param rex
--- @param s
--- @param i
+-- @tparam userdata rex compiled rex_onig expression
+-- @string s string to match against rex
+-- @param i search start index into s
 -- @treturn int offset of beginning of match
 -- @treturn int oppset of end of match
 local function rex_exec (rex, s, i)
@@ -87,8 +94,8 @@ end
 
 
 --- Find the leftmost matching expression.
--- @param lexer
--- @param i
+-- @tparam table lexer syntax highlight matcher state
+-- @int i search start index
 -- @tparam table pats a list of patterns
 -- @treturn int offset of beginning of match
 -- @treturn int offset of end of match
@@ -112,17 +119,17 @@ end
 
 --- Parse a string from left-to-right for matches against pats,
 -- queueing color push and pop instructions as we go.
--- @param lexer
+-- @tparam table lexer syntax highlight matcher stat
 local function parse (lexer)
-  local ops, pats = lexer.syntax.ops, lexer.grammar.patterns
+  local pats = lexer.grammar.patterns
   local b, e, p
 
   local i = 0
   repeat
     b, e, p = leftmost_match (lexer, i, pats)
     if b then
-      push_op (ops, "push", b, p.attrs)
-      push_op (ops, "pop",  e, p.attrs)
+      lexer:push_op ("push", b, p.attrs)
+      lexer:push_op ("pop",  e, p.attrs)
 
       i = e + 1
     end
@@ -134,18 +141,19 @@ end
 -- @param lexer
 -- @return lexer
 local function highlight (lexer)
-  local highlight = stack.new ()
-
   parse (lexer)
+
+  local attrs, ops = lexer.syntax.attrs, lexer.syntax.ops
+  local highlight  = lexer.syntax.highlight
 
   for i = 0, #lexer.s do
     -- set the color at this position before it can be popped.
-    lexer.syntax.attrs[i] = highlight:top ()
-    for _,v in ipairs (lexer.syntax.ops[i] or {}) do
+    attrs[i] = highlight:top ()
+    for _,v in ipairs (ops[i] or {}) do
       if v.push then
         highlight:push (v.push)
         -- but, override the initial color if a new one is pushed.
-        lexer.syntax.attrs[i] = highlight:top ()
+        attrs[i] = highlight:top ()
 
       elseif v.pop then
         assert (v.pop == highlight:top ())
@@ -162,7 +170,7 @@ end
 -- @tparam buffer bp a buffer
 -- @int o character offset into bp
 -- @treturn int attributes
-local function syntax_attrs (bp, o)
+local function attrs (bp, o)
   if not bp.grammar then return nil end
 
   local lexer = highlight (state.new (bp, o))
@@ -173,5 +181,5 @@ end
 
 --- @export
 return {
-  syntax_attrs = syntax_attrs,
+  attrs = attrs,
 }
