@@ -33,6 +33,10 @@
 ]]
 
 
+-- Syntax parser state.
+local state = {}
+
+
 --- Queue a stack operation.
 -- pushing or popping value v to the stack at offset o.
 -- @param st
@@ -43,6 +47,30 @@ local function push_op (st, op, o, v)
   if not v then return nil end
   st[o] = st[o] or stack.new ()
   st[o]:push { [op] = v }
+end
+
+
+--- Return a new parser state for the buffer containing offset o.
+function state.new (bp, o)
+  local n = offset_to_line (bp, o)
+
+  bp.syntax[n] = {
+    -- Calculate the attributes for each cell of this line using a
+    -- stack-machine with color push and pop operations.
+    attrs = {},
+    ops   = {},
+  }
+
+  local bol    = buffer_start_of_line (bp, o)
+  local eol    = bol + buffer_line_len (bp, o)
+  local region = get_buffer_region (bp, {start = bol, finish = eol})
+  local lexer  = {
+    grammar = bp.grammar,
+    s       = tostring (region),
+    syntax  = bp.syntax[n],
+  }
+
+  return lexer
 end
 
 
@@ -59,13 +87,14 @@ end
 
 
 --- Find the leftmost matching expression.
--- @param s
+-- @param lexer
 -- @param i
 -- @tparam table pats a list of patterns
 -- @treturn int offset of beginning of match
 -- @treturn int offset of end of match
 -- @treturn pattern matching pattern
-local function leftmost_match (s, i, pats)
+local function leftmost_match (lexer, i, pats)
+  local s = lexer.s
   local b, e, p
 
   for _,v in ipairs (pats) do
@@ -81,14 +110,16 @@ local function leftmost_match (s, i, pats)
 end
 
 
--- Parse a string from left-to-right for matches against pats,
+--- Parse a string from left-to-right for matches against pats,
 -- queueing color push and pop instructions as we go.
-local function parse (ops, s, pats)
+-- @param lexer
+local function parse (lexer)
+  local ops, pats = lexer.syntax.ops, lexer.grammar.patterns
   local b, e, p
 
   local i = 0
   repeat
-    b, e, p = leftmost_match (s, i, pats)
+    b, e, p = leftmost_match (lexer, i, pats)
     if b then
       push_op (ops, "push", b, p.attrs)
       push_op (ops, "pop",  e, p.attrs)
@@ -100,22 +131,21 @@ end
 
 
 --- Highlight s according to queued color operations.
--- @param syntax
--- @param s
--- @param grammar
-local function highlight (syntax, s, grammar)
+-- @param lexer
+-- @return lexer
+local function highlight (lexer)
   local highlight = stack.new ()
 
-  parse (syntax.ops, s, grammar.patterns)
+  parse (lexer)
 
-  for i = 0, #s do
+  for i = 0, #lexer.s do
     -- set the color at this position before it can be popped.
-    syntax.attrs[i] = highlight:top ()
-    for _,v in ipairs (syntax.ops[i] or {}) do
+    lexer.syntax.attrs[i] = highlight:top ()
+    for _,v in ipairs (lexer.syntax.ops[i] or {}) do
       if v.push then
         highlight:push (v.push)
         -- but, override the initial color if a new one is pushed.
-        syntax.attrs[i] = highlight:top ()
+        lexer.syntax.attrs[i] = highlight:top ()
 
       elseif v.pop then
         assert (v.pop == highlight:top ())
@@ -123,6 +153,8 @@ local function highlight (syntax, s, grammar)
       end
     end
   end
+
+  return lexer
 end
 
 
@@ -133,17 +165,9 @@ end
 local function syntax_attrs (bp, o)
   if not bp.grammar then return nil end
 
-  local bol    = buffer_start_of_line (bp, o)
-  local eol    = bol + buffer_line_len (bp, o)
-  local region = get_buffer_region (bp, {start = bol, finish = eol})
-  local n      = offset_to_line (bp, o)
+  local lexer = highlight (state.new (bp, o))
 
-  bp.syntax[n] = { attrs = {}, ops = {} }
-  local syntax = bp.syntax[n]
-
-  highlight (syntax, tostring (region), bp.grammar)
-
-  return syntax.attrs
+  return lexer.syntax.attrs
 end
 
 
