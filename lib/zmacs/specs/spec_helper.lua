@@ -136,7 +136,7 @@ do
   --- Show stderr after a failed expectation.
   -- @tparam Editor result of an edit
   -- @treturn string `editor` results formatted for display
-  local function format_actual (editor)
+  local function format_actual (self, editor)
     local m = ":" .. reformat (editor.buffer)
     if editor.minibuf and editor.minibuf ~= "" then
       return m .. "\nand *Messages*:" .. reformat (editor.minibuf)
@@ -145,28 +145,28 @@ do
   end
 
   matchers.match_minibuf = Matcher {
-    function (actual, pattern)
+    function (self, actual, pattern)
       return (string.match (actual.minibuf, pattern) ~= nil)
     end,
 
     actual_type   = "Editor",
 
-    format_actual = function (editor)
+    format_actual = function (self, editor)
       return ":" .. reformat (editor.minibuf)
     end,
 
-    format_expect = function (expect)
+    format_expect = function (self, expect)
       return " minibuf matching:" .. reformat (expect)
     end,
 
-    format_alternatives = function (adaptor, alternatives)
+    format_alternatives = function (self, adaptor, alternatives)
       return " minibuf matching:" .. reformat (alternatives, adaptor)
     end,
   }
 
 
   matchers.match_buffer = Matcher {
-    function (actual, pattern)
+    function (self, actual, pattern)
       return (string.match (actual.buffer, pattern) ~= nil)
     end,
 
@@ -174,39 +174,39 @@ do
 
     format_actual = format_actual,
 
-    format_expect = function (expect)
+    format_expect = function (self, expect)
       return " buffer matching:" .. reformat (expect)
     end,
 
-    format_alternatives = function (adaptor, alternatives)
+    format_alternatives = function (self, adaptor, alternatives)
       return " buffer matching:" .. reformat (alternatives, adaptor)
     end,
   }
 
 
   matchers.write_to_minibuf = Matcher {
-    function (actual, expect)
+    function (self, actual, expect)
       return string.match (actual.minibuf, escape_pattern (expect)) ~= nil
     end,
 
     actual_type   = "Editor",
 
-    format_actual = function (editor)
+    format_actual = function (self, editor)
       return ":" .. reformat (editor.minibuf)
     end,
 
-    format_expect = function (expect)
+    format_expect = function (self, expect)
       return " minibuffer containing:" .. reformat (expect)
     end,
 
-    format_alternatives = function (adaptor, alternatives)
+    format_alternatives = function (self, adaptor, alternatives)
       return " minibuffer containing:" .. reformat (alternatives, adaptor)
     end,
   }
 
 
   matchers.write_to_buffer = Matcher {
-    function (actual, expect)
+    function (self, actual, expect)
       return string.match (actual.buffer, escape_pattern (expect)) ~= nil
     end,
 
@@ -214,11 +214,11 @@ do
 
     format_actual = format_actual,
 
-    format_expect = function (expect)
+    format_expect = function (self, expect)
       return " buffer containing:" .. reformat (expect)
     end,
 
-    format_alternatives = function (adaptor, alternatives)
+    format_alternatives = function (self, adaptor, alternatives)
       return " buffer containing:" .. reformat (alternatives, adaptor)
     end,
   }
