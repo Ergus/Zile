@@ -19,11 +19,11 @@ editor without reinventing the wheel for many of the common algorithms
 and structures needed to do so.
 
 It comes with an example implementation of a lightweight [Emacs][]
-clone, called Zmacs. Every Emacs user should feel at home with Zmacs.
-Zmacs is aimed at small footprint systems and quick editing sessions
+clone, called Zemacs. Every Emacs user should feel at home with Zemacs.
+Zemacs is aimed at small footprint systems and quick editing sessions
 (it starts up and shuts down instantly).
 
-Zile and Zmacs are written in Lua 5.2 using POSIX APIs, and hence
+Zile and Zemacs are written in Lua 5.2 using POSIX APIs, and hence
 requires a Lua 5.2 runtime and a few additional Lua modules:
 
  * [Lua-stdlib][]
@@ -32,7 +32,7 @@ requires a Lua 5.2 runtime and a few additional Lua modules:
  * [alien][]
 
 For exact version dependencies, see `require_version` statments in
-`bin/zmacs`. These are most easily installed using [LuaRocks][].
+`bin/zemacs`. These are most easily installed using [LuaRocks][].
 
  [alien]:      http://mascarenhas.github.io/alien/
  [emacs]:      http://www.gnu.org/s/emacs
@@ -54,7 +54,7 @@ For exact version dependencies, see `require_version` statments in
  * See file [THANKS][] for a list of important contributors.
 
 The rest of the files in the top-level directory are part of the
-[Autotools][] build system used to compile and install Zile and Zmacs.
+[Autotools][] build system used to compile and install Zile and Zemacs.
 
  * Directory [build-aux][] contains helper scripts used to build Zile.
  * Directory [doc][] contains files used to create Zile's documentation.

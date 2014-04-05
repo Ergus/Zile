@@ -18,7 +18,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-(localvar bind "require 'zmacs.bind'")
+(localvar bind "require 'zemacs.bind'")
 
 
 (defsubr self-insert-command (n)

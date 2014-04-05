@@ -21,10 +21,10 @@ GNU Zile NEWS                                    -*- outline -*-
 ** Incompatible changes
 
   - Now that GNU Zile is the text editor support infrastructure, the
-    editor formerly known as Zile has been renamed to Zmacs, a light-
+    editor formerly known as Zile has been renamed to Zemacs, a light-
     weight micro-Emacs that has feature parity with the legacy C Zile
     implementation.  There is no 'zile' executable any more, it has
-    been superseded by 'zmacs'.
+    been superseded by 'zemacs'.
 
   - Zlisp now uses a more Emacs-24-like 'shell-command-on-region'
     implementation, where the replace parameter is now the fifth
@@ -38,13 +38,13 @@ GNU Zile NEWS                                    -*- outline -*-
 
   - Now fully relocatable, with all resources found using the
     package.path directories. This means the distributions work out of
-    box (./lib/zmacs/zmacs) without running configure or make.  It also
-    means the lua source rock installs directly by copying files into
-    the rocks tree.
+    box (./lib/zemacs/zemacs) without running configure or make.  It
+    also means the lua source rock installs directly by copying files
+    into the rocks tree.
 
   - LuaRocks install doesn't copy config.ld to $docdir.
 
-*** Zmacs
+*** Zemacs
 
   - Support for FAQ, COPYING and NEWS browsing in editor with \C-h\C-f,
     \C-h\C-c and \C-h\C-n (or F1 prefix equivalents).
@@ -86,12 +86,12 @@ GNU Zile NEWS                                    -*- outline -*-
 
 *** Zz
 
-  - A new editor, currently heavily based on Zmacs, but with the zlisp
+  - A new editor, currently heavily based on Zemacs, but with the zlisp
     evaluator removed in favour of direct Lua evaluation.
 
 ** Bug fixes
 
- - zmacs 'universal-argument' guards against non-ASCII keys, so you
+ - zemacs 'universal-argument' guards against non-ASCII keys, so you
    can execute a key sequences like "\M-35\RIGHT" without inducing a
    "char out of range" crash.
 

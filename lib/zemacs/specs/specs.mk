@@ -30,7 +30,7 @@ SPECL_ENV = EMACSPROG=$(EMACSPROG) $(LUA_ENV)
 ## Specs. ##
 ## ------ ##
 
-specdir = $(srcdir)/lib/zmacs/specs
+specdir = $(srcdir)/lib/zemacs/specs
 
 specl_SPECS =					\
 	$(specdir)/zlisp_bind_spec.yaml		\

@@ -1,7 +1,7 @@
 [description]
-Zz is a lightweight text editor descended from GNU Zile's zmacs.
+Zz is a lightweight text editor descended from GNU Zile's zemacs.
 It has functionality suitable for basic editing. Compared to
-zmacs, the Lisp Evaluator has been removed in favour of direct
+zemacs, the Lisp Evaluator has been removed in favour of direct
 evaluation in the source language, Lua - with which it is easily
 extended and customized.
 
@@ -17,5 +17,5 @@ of memory.
 Zz was written by Gary V. Vaughan, based Lua Zile by Reuben Thomas.
 
 [see also]
-.BR zmacs (1),
+.BR zemacs (1),
 .BR lua (1)

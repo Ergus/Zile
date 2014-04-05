@@ -21,7 +21,7 @@ INDEX
    2.2 What happend to the 'zile' lightweight emacs clone binary?
    2.3 Does Zile support Unicode/UTF-8?
 
-3 Zmacs
+3 Zemacs
    3.1 Why another clone of Emacs?  Why not just use Emacs?
    2.2 I like the xyz function of Emacs but it's not in Zile!
 
@@ -66,7 +66,7 @@ INDEX
 
 1.4 Why are my settings in ~/.zile being ignored?
 
-    That file is called ~/.zmacs nowadays.
+    That file is called ~/.zemacs nowadays.
 
     Since Zile 2.2.16, booleans are, as in Emacs, `t' and `nil' rather
     than `true' and `false'. If you haven't yet updated your settings,
@@ -88,7 +88,7 @@ INDEX
     and you ran it using the 'zile' executable.  The Lua rewrite is
     fabulously more flexible, allowing you to write whatever kind of
     editor you like with it.  Don't believe me?  Then check out the
-    new 'zmacs' executable, which does everything C Zile used to, and
+    new 'zemacs' executable, which does everything C Zile used to, and
     more.
 
 2.3 Does Zile support Unicode/UTF-8?
@@ -97,19 +97,19 @@ INDEX
 
 ------------------------------------------------------------------------------
 
-3 Zmacs
+3 Zemacs
 
 3.1 Why another clone of Emacs?  Why not just use Emacs?
 
-    Zmacs is a small, portable Emacs for systems and situations in
+    Zemacs is a small, portable Emacs for systems and situations in
     which Emacs would be unsuitable, including small systems and quick
     editing sessions.
 
-3.2 I like the xyz function of Emacs but it's not in Zmacs!
+3.2 I like the xyz function of Emacs but it's not in Zemacs!
 
-    Zmacs was written as an example of the kinds of editors you can
-    write with Zile.  If Zmacs is almost what you want, then just add
-    the feature(s) you need.  If you hate Zmacs, you can use Zile to
+    Zemacs was written as an example of the kinds of editors you can
+    write with Zile.  If Zemacs is almost what you want, then just add
+    the feature(s) you need.  If you hate Zemacs, you can use Zile to
     code up whatever sort of text editor you want!
 
 ------------------------------------------------------------------------------
@@ -133,6 +133,6 @@ INDEX
 
 5.1 How about some more editors, as examples, then?
 
-    Sure!  Where Zmacs is a reimplementation of C Zile (and then some)
+    Sure!  Where Zemacs is a reimplementation of C Zile (and then some)
     for the old timers... Zz is the editor I actually use for my
-    day-to-day editing.  I even use Zz to maintain Zmacs.
+    day-to-day editing.  I even use Zz to maintain Zemacs.

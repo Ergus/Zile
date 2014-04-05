@@ -16,7 +16,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 --[[--
- Zmacs Lisp Evaluator.
+ Zemacs Lisp Evaluator.
 
  Extends the base ZLisp Interpreter with a func-table symbol type,
  that can be called like a regular function, but also contains its own
@@ -29,7 +29,7 @@
  macros and, again like Emacs, differentiate between interactive and
  non-interactive calls.
 
- @module zmacs.eval
+ @module zemacs.eval
 ]]
 
 
@@ -69,10 +69,10 @@ local consp, symbolp = lisp.consp, lisp.symbolp
 
 -- Name mangling wrappers for Symbol methods.
 -- FIXME: the process of mangling is only here so that the name of
---        a Symbol object as displayed from zmacs is '-' delimited,
+--        a Symbol object as displayed from zemacs is '-' delimited,
 --        but the obarray key shared by code in lib/zile/*.lua uses
 --        Lua valid '_' delimited strings.  Zile code shouldn't be
---        relying on symbols defined in zmacs/zz, so after factoring
+--        relying on symbols defined in zemacs/zz, so after factoring
 --        that away, we can get rid of the mangling step entirely.
 
 

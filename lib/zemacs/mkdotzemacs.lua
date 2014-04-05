@@ -1,4 +1,4 @@
--- Produce dotzmacs.sample
+-- Produce dotzemacs.sample
 --
 -- Copyright (c) 2012-2014 Free Software Foundation, Inc.
 --
@@ -20,11 +20,11 @@
 require "std"
 require "zile.lib"
 
--- required to load zmacs.commands
+-- required to load zemacs.commands
 require "zile.history"
 
 -- Load variables
-require "zmacs.commands"
+require "zemacs.commands"
 
 io.stdout:write (
   [[
@@ -48,4 +48,4 @@ function document_variables (symbol)
     )
   end
 end
-(require "zmacs.eval").mapatoms (document_variables)
+(require "zemacs.eval").mapatoms (document_variables)

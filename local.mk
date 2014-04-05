@@ -54,8 +54,8 @@ clean_local		=
 install_exec_hook	=
 
 include lib/zile/zile.mk
-include lib/zmacs/zmacs.mk
-include lib/zmacs/specs/specs.mk
+include lib/zemacs/zemacs.mk
+include lib/zemacs/specs/specs.mk
 include lib/zz/zz.mk
 include tests/tests.mk
 
@@ -114,7 +114,7 @@ dist_classes_DATA +=					\
 
 dist_modules_DATA +=					\
 	$(srcdir)/doc/modules/zile.zlisp.html		\
-	$(srcdir)/doc/modules/zmacs.eval.html		\
+	$(srcdir)/doc/modules/zemacs.eval.html		\
 	$(srcdir)/doc/modules/zz.eval.html		\
 	$(NOTHING_ELSE)
 

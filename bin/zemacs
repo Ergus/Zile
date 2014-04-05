@@ -99,7 +99,7 @@ curses     = require "curses" -- part of luaposix
 rex_gnu    = require_version ("rex_gnu", "2.7.1", nil, "[%S]+%s*([%S]+)")
 
 -- Load modules with Zile callbacks first:
-eval = require "zmacs.eval"
+eval = require "zemacs.eval"
 
 -- Load Zile modules:
 require "zile.lib"
@@ -127,11 +127,11 @@ require "zile.term_curses"
 require "zile.term_minibuf"
 require "zile.term_redisplay"
 
--- Zmacs modules:
-require "zmacs.callbacks"
-require "zmacs.commands"
-require "zmacs.keymaps"
-require "zmacs.main"
+-- Zemacs modules:
+require "zemacs.callbacks"
+require "zemacs.commands"
+require "zemacs.keymaps"
+require "zemacs.main"
 
 
 local function err (err)

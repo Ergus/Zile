@@ -18,10 +18,10 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-local lisp = require "zmacs.eval"
+local lisp = require "zemacs.eval"
 
 prog = require "zile.version"
-prog.name = "zmacs" -- make sure we don't go crazy with links and aliases!
+prog.name = "zemacs" -- make sure we don't go crazy with links and aliases!
 
 splash_str = "Welcome to " .. prog.program .. [[.
 

@@ -17,7 +17,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-local eval  = require "zmacs.eval"
+local eval  = require "zemacs.eval"
 
 local call_command, mapatoms = eval.call_command, eval.mapatoms
 

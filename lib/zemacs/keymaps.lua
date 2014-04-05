@@ -1,4 +1,4 @@
--- Zmacs key mappings
+-- Zemacs key mappings
 --
 -- Copyright (c) 2010-2014 Free Software Foundation, Inc.
 --
@@ -19,7 +19,7 @@
 
 local posix = require "posix"
 
-local lisp = require "zmacs.eval"
+local lisp = require "zemacs.eval"
 local intern_soft = lisp.intern_soft
 
 root_bindings = tree.new ()
@@ -43,7 +43,7 @@ function init_default_bindings ()
   package.path:gsub ("[^;]+",
                     function (path)
                       if ok == nil then
-                        path = path:gsub ("%?", "zmacs/default-bindings-el", 1)
+                        path = path:gsub ("%?", "zemacs/default-bindings-el", 1)
                         ok, errmsg = lisp.eval_file (path)
                       end
                     end)

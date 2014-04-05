@@ -24,8 +24,8 @@ local std    = require "specl.std"
 local Object, escape_pattern, slurp =
       std.Object, std.string.escape_pattern, std.string.slurp
 
-local EMACS = os.getenv ("EMACSPROG")
-local ZMACS = "lib/zmacs/zmacs"
+local EMACS  = os.getenv ("EMACSPROG")
+local ZEMACS = "lib/zemacs/zemacs"
 
 local Editor = Object {
   _type = "Editor",
@@ -105,8 +105,8 @@ local function edit (self, code, bufcontent)
 end
 
 
-Zmacs = Object {
-  _type = "Zmacs",
+Zemacs = Object {
+  _type = "Zemacs",
   _init = {"args"},
 
   __index = {
@@ -116,7 +116,7 @@ Zmacs = Object {
   },
 
   --- @export
-  command = ZMACS,
+  command = ZEMACS,
 }
 
 
