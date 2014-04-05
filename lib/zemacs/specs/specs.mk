@@ -34,6 +34,7 @@ specdir = $(srcdir)/lib/zemacs/specs
 
 specl_SPECS =					\
 	$(specdir)/zlisp_bind_spec.yaml		\
+	$(specdir)/zlisp_buffer_spec.yaml	\
 	$(specdir)/zlisp_move_spec.yaml		\
 	$(NOTHING_ELSE)
 

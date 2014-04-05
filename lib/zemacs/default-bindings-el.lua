@@ -55,6 +55,7 @@
 (global-set-key "\C-\M-f" 'forward-sexp)
 (global-set-key "\M-f" 'forward-word)
 (global-set-key "\M-\RIGHT" 'forward-word)
+(global-set-key "\M-gc" 'goto-char)
 (global-set-key "\M-gg" 'goto-line)
 (global-set-key "\M-g\M-g" 'goto-line)
 (global-set-key "\TAB" 'indent-for-tab-command)
