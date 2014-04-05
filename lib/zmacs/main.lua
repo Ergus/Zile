@@ -247,7 +247,7 @@ function main ()
     goto_offset (1)
   end
 
-  -- Load files and load files and run functions given on the command line.
+  -- Run functions & loadfiles, and open files given on the command line.
   local ok = true
   for i = 1, #zarg do
     local type, arg, line = zarg[i][1], zarg[i][2], zarg[i][3]
