@@ -53,6 +53,7 @@ script:
   # regenerate this file!).
   - $LUAROCKS install
     https://raw.githubusercontent.com/gvvaughan/specl/release-v11/specl-git-1.rockspec
+  - export SPECL=`which specl`
 
   # Make git rockspec for zile
   - make rockspecs LUAROCKS="$LUAROCKS" V=1
