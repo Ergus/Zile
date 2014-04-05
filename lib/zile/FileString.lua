@@ -112,7 +112,7 @@ local function move (self, to, from, n)
   self.s:move (to, from, n)
 end
 
-  
+
 --- Position of start of immediately following line.
 -- @int o start position
 -- @treturn int position of start of next line
@@ -141,7 +141,7 @@ local function remove (self, from, n)
   self.s:remove (from, n)
 end
 
-  
+
 --- Overwrite bytes starting at `from` with bytes from `rep`.
 -- @int from index of first byte to replace
 -- @string src replacement string
@@ -183,7 +183,7 @@ local function set (self, from, c, n)
   self.s:set (from, c, n)
 end
 
-  
+
 --- Return a copy of a substring of this MutableString.
 -- @int from the index of the first element to copy.
 -- @int[opt=end-of-string] to the index of the last element to copy.
@@ -211,7 +211,7 @@ local methods = {
   sub           = sub,
 }
 
-  
+
 FileString = Object {
   _type = "FileString",
 
