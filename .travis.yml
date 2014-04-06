@@ -62,7 +62,7 @@ script:
   # The git rockspec will rerun bootstrap, and check any rock versions
   # in bootstrap.conf:buildreq this time.
   - $LUAROCKS make $ROCKSPEC LUA="$LUA"
-  - luarocks/bin/zmacs --version
+  - luarocks/bin/zemacs --version
   - luarocks/bin/zz --version
 
   # Check specifications.
@@ -72,5 +72,5 @@ script:
   - $LUAROCKS remove $PACKAGE
   - ./configure LUA="$LUA" --prefix=`pwd`/_inst
   - make clean all install || lib/zz/zz --version
-  - _inst/bin/zmacs --help
+  - _inst/bin/zemacs --help
   - _inst/bin/zz --help
