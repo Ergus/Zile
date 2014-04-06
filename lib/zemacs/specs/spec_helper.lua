@@ -79,11 +79,11 @@ local function edit (self, code, bufcontent)
   local fbuf     = mktmpfile (bufcontent or "")
   local fminibuf = mktmpfile ""
 
+  self.batch_mode = self.args:match ("%-%-batch") ~= nil
+
   -- unless `code` begins with a `(`, assume it is a keystr
   local expandfn = not code:match "^%(" and self.mkmacro or self.mklisp
   local fcode    = mktmpfile (expandfn (self, code, fminibuf))
-
-  self.batch_mode = self.args:match ("%-%-batch") ~= nil
 
   -- batch mode scribbles on stdout and stderr.
   local redirects = ""
