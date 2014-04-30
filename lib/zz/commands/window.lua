@@ -19,7 +19,7 @@
 
 local eval  = require "zz.eval"
 local Defun = eval.Defun
-
+local table = std.table
 
 Defun ("delete_window",
 [[

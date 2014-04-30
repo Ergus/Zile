@@ -21,6 +21,7 @@ local FileString = require "zile.FileString"
 
 local eval  = require "zz.eval"
 local Defun = eval.Defun
+local set   = std.set
 
 
 Defun ("search_forward",

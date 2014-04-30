@@ -17,6 +17,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+local list = require "std.list"
+local set  = require "std.set"
+
 local FileString = require "zile.FileString"
 
 files_history = history_new ()
@@ -147,7 +150,7 @@ function minibuf_vread_completion (fmt, value, cp, hp, empty_err, invalid_err)
         popup_completion (cp)
       end
 
-      if set.member (set.new (cp.completions), ms) then
+      if set.member (set (cp.completions), ms) then
         if hp then
           add_history_element (hp, ms)
         end
@@ -226,7 +229,7 @@ function minibuf_read_key (fmt, keys, extra)
     else
       errmsg = keys[#keys]
       if #keys > 1 then
-        errmsg = table.concat (list.slice (keys, 1, -2), ", ") .. " or " .. errmsg
+        errmsg = table.concat (list.sub (keys, 1, -2), ", ") .. " or " .. errmsg
       end
       errmsg = "Please answer " .. errmsg .. ".  "
     end

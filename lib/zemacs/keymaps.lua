@@ -20,9 +20,11 @@
 local posix = require "posix"
 
 local lisp = require "zemacs.eval"
-local intern_soft = lisp.intern_soft
 
-root_bindings = tree.new ()
+local intern_soft = lisp.intern_soft
+local list        = std.list
+
+root_bindings = std.tree {}
 
 function init_default_bindings ()
   -- Bind all printing keys to self-insert-command

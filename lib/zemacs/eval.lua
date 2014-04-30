@@ -39,7 +39,11 @@
 --[[ ======== ]]--
 
 
-local lisp   = require "zile.zlisp"
+local lisp    = require "zile.zlisp"
+
+local chomp   = std.string.chomp
+local slurp   = std.io.slurp
+local memoize = std.functional.memoize
 
 --- Return a new Cons cell with supplied car and cdr.
 -- @function __call
@@ -136,7 +140,7 @@ function defsubr (name, min, max, doc, interactive, func)
   symbol.name  = name	-- unmangled name
   rawset (symbol, "func", func)
   symbol["marshall-argspec"]       = Cons (min, max)
-  symbol["function-documentation"] = doc:chomp ()
+  symbol["function-documentation"] = chomp (doc)
   symbol["interactive-form"]       = interactive
   getmetatable (symbol).__call = marshaller
   return symbol
@@ -199,7 +203,7 @@ local function defvar (name, value, doc)
   local symbol = intern (name)
   symbol.name  = name	-- unmangled name
   symbol.value = value
-  symbol["variable-documentation"] = (doc or ""):chomp ()
+  symbol["variable-documentation"] = chomp (doc or "")
   getmetatable (symbol).__tostring = display_variable_value
   return symbol
 end
@@ -371,7 +375,7 @@ end
 -- @param file path to a file of zlisp code
 -- @return `true` for success, or else `nil` plus an error string
 local function eval_file (file)
-  local s, errmsg = io.slurp (file)
+  local s, errmsg = slurp (file)
 
   if s then
     s, errmsg = eval_string (s)

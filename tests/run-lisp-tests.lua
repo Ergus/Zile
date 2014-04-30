@@ -17,8 +17,11 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-posix = require "posix"
-require "std"
+local posix = require "posix"
+local std   = require "std"
+
+local catfile, escape_pattern, list_concat, tostring =
+  std.io.catfile, std.string.escape_pattern, std.list.concat, std.string.tostring
 
 -- N.B. Tests that use execute-kbd-macro must note that keyboard input
 -- is only evaluated once the script has finished running.
@@ -34,11 +37,11 @@ local zile_fail = 0
 local emacs_pass = 0
 local emacs_fail = 0
 
-local zile_cmd = io.catfile (builddir, "lib", "zemacs", "zemacs")
-local srcdir_pat = string.escapePattern (srcdir)
+local zile_cmd = catfile (builddir, "lib", "zemacs", "zemacs")
+local srcdir_pat = escape_pattern (srcdir)
 
 function run_test (test, name, editor_name, edit_file, cmd, args)
-  posix.spawn ({"cp", io.catfile (srcdir, "tests", "test.input"), edit_file})
+  posix.spawn ({"cp", catfile (srcdir, "tests", "test.input"), edit_file})
   posix.spawn ({"chmod", "+w", edit_file})
   local status = posix.spawn ({cmd, unpack (args)})
   if status == 0 then
@@ -56,14 +59,14 @@ end
 for _, name in ipairs (arg) do
   local test = name:gsub ("%.el$", "")
   if io.open (test .. ".output") ~= nil then
-    name = test:gsub (io.catfile (srcdir, "tests/"), "")
+    name = test:gsub (catfile (srcdir, "tests/"), "")
     local edit_file = test:gsub ("^" .. srcdir_pat, builddir) .. ".input"
     local args = {"--no-init-file", edit_file, "--load", test:gsub ("^" .. srcdir_pat, abs_srcdir) .. ".el"}
 
     posix.spawn ({"mkdir", "-p", posix.dirname (edit_file)})
 
     if EMACSPROG ~= "" then
-      if run_test (test, name, "Emacs", edit_file, EMACSPROG, list.concat (args, {"--quick", "--batch"})) then
+      if run_test (test, name, "Emacs", edit_file, EMACSPROG, list_concat (args, {"--quick", "--batch"})) then
         emacs_pass = emacs_pass + 1
       else
         emacs_fail = emacs_fail + 1

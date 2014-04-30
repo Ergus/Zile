@@ -21,6 +21,11 @@ local FileString = require "zile.FileString"
 
 prog = require "zile.version"
 
+local io      = std.io
+local list    = std.list
+local ripairs = std.table.ripairs
+local set     = std.set
+
 -- FIXME: Warn when file changes on disk
 
 function exist_file (filename)

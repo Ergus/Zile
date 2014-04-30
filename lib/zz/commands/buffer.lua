@@ -17,8 +17,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <htt://www.gnu.org/licenses/>.
 
-local eval  = require "zz.eval"
-local Defun = eval.Defun
+local eval    = require "zz.eval"
+local Defun   = eval.Defun
+local ripairs = std.table.ripairs
 
 
 Defun ("kill_buffer",

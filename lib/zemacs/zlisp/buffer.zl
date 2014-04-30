@@ -17,6 +17,8 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+(localvar table "std.table")
+
 
 (defsubr point ()
   "Return value of point, as an integer.
@@ -155,7 +157,7 @@ automatically breaks the line at a previous space."
   end
 
   -- Print buffers.
-  for _, bp in ripairs (bufs) do
+  for _, bp in table.ripairs (bufs) do
     -- Print all buffers whose names don't start with space except
     -- this one (the *Buffer List*).
     if cur_bp ~= bp and bp.name[1] ~= ' ' then

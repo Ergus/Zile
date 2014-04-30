@@ -36,6 +36,9 @@
 
 local Symbol = require "zile.Symbol"
 
+local chomp = std.string.chomp
+local slurp = std.io.slurp
+
 
 --- Defun and Defvar defined symbols.
 -- @table symtab
@@ -138,7 +141,7 @@ end
 local function Defun (name, doc, interactive, func)
   local symbol = intern (name, symtab)
   symbol.value = func
-  symbol["documentation"]      = texi (doc:chomp ())
+  symbol["documentation"]      = texi (chomp (doc))
   symbol["interactive-form"]   = interactive
   getmetatable (symbol).__call = func
   return symbol
@@ -158,7 +161,7 @@ end
 local function Defvar (name, value, doc)
   local symbol = intern (name, symtab)
   symbol.value = value
-  symbol["documentation"] = texi (doc:chomp ())
+  symbol["documentation"] = texi (chomp (doc))
   return symbol
 end
 
@@ -272,7 +275,7 @@ end
 -- @string file path to a file of Lua code
 -- @return `true` for success, or else `nil` pluss an error string
 local function eval_file (file)
-  local s, errmsg = io.slurp (file)
+  local s, errmsg = slurp (file)
 
   if s then
     s, errmsg = eval_string (s)

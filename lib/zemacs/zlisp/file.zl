@@ -19,6 +19,7 @@
 
 
 (localvar FileString "require 'zile.FileString'")
+(localvar slurp "std.io.slurp")
 
 
 (defsubr find-file (filename)
@@ -100,7 +101,7 @@ Set mark after the inserted text."
     end
 
     if ok then
-      local s = io.slurp (filename)
+      local s = slurp (filename)
       if s then
         insert_estr (FileString (s))
         lisp.execute_function ('set-mark-command')

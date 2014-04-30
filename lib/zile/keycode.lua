@@ -17,6 +17,13 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+local list    = require "std.list"
+local set     = require "std.set"
+local table   = require "std.table"
+
+local memoize = std.functional.memoize
+
+
 -- Key modifiers.
 local KBD_CTRL = 512
 local KBD_META = 1024
@@ -154,6 +161,8 @@ end
 -- A key code has one `keypress' and some optional modifiers.
 -- For comparisons to work, keycodes are immutable atoms.
 local keycode_mt = {
+  _type = "Keycode",
+
   -- Output the write syntax for this keycode (e.g. C-M-<f1>).
   __tostring = function (self)
     return mapkey (codetoname, self, {C = "C-", M = "M-"})
@@ -265,7 +274,7 @@ end
 -- A fast way to check for a group of keys:
 --   if set.member (keyset {"x", "y", "z"}, key) then ... end
 function keyset (l)
-  return set.new (list.map (keycode, l))
+  return set (list.map (keycode, l))
 end
 
 -- Iterator over a key sequence string, returning the next key chord on

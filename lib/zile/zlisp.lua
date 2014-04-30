@@ -37,8 +37,11 @@
  @module zile.zlisp
 ]]
 
-local Set    = require "zile.Set"
+
 local io     = require "std.io"
+local string = require "std.string".monkey_patch ()
+
+local Set    = require "zile.Set"
 
 
 --[[ ======== ]]--

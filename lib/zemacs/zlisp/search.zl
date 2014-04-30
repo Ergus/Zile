@@ -19,6 +19,8 @@
 
 
 (localvar FileString "require 'zile.FileString'")
+(localvar set "std.set")
+
 
 (defsubr search-forward (string)
   "Search forward from point for STRING."

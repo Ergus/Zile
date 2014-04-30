@@ -17,6 +17,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+local list = std.list
+local tree = std.tree
+
 local codetokey, keytocode, key_buf
 
 -- ASCII character codes:
@@ -80,7 +83,7 @@ function term_init ()
   key_buf = {}
 
   -- from curses key presses to zile keycodes
-  codetokey = tree.new ()
+  codetokey = tree {}
 
   -- from zile keycodes back to curses keypresses
   keytocode = {}
@@ -249,8 +252,10 @@ function term_getkey (delay)
   else
     -- Detecting non-ESC involves fetching chars and matching...
     while true do
-      table.insert (codes, c)
-      key = codetokey[codes]
+      if c then
+        table.insert (codes, c)
+        key = codetokey[codes]
+      end
       if key and key.key then
         -- ...code lookup matched a key, return it.
         break
