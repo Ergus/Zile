@@ -18,8 +18,9 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+(localvar set "require 'std.set'")
+
 (localvar FileString "require 'zile.FileString'")
-(localvar set "std.set")
 
 
 (defsubr search-forward (string)

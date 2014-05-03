@@ -34,10 +34,10 @@
 --[[ ======== ]]--
 
 
-local Symbol = require "zile.Symbol"
+local slurp = require "std.io".slurp
+local chomp = require "std.string".chomp
 
-local chomp = std.string.chomp
-local slurp = std.io.slurp
+local Symbol = require "zile.Symbol"
 
 
 --- Defun and Defvar defined symbols.

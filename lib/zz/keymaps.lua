@@ -18,10 +18,12 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local posix = require "posix"
+local list  = require "std.list"
+local Tree  = require "std.tree"
 
 local eval  = require "zz.eval"
 
-root_bindings = std.tree {}
+root_bindings = Tree {}
 
 function init_default_bindings ()
   -- Bind all printing keys to self-insert-command
@@ -32,10 +34,10 @@ function init_default_bindings ()
   end
 
   -- Bind special key names to self-insert-command
-  std.list.map (function (e)
-                  root_bindings[{keycode (e)}] = eval.sandbox.self_insert_command
-                end,
-                {"\\SPC", "\\TAB", "\\RET", "\\\\"})
+  list.map (function (e)
+              root_bindings[{keycode (e)}] = eval.sandbox.self_insert_command
+            end,
+            {"\\SPC", "\\TAB", "\\RET", "\\\\"})
 
   -- Search package.path for default-bindings.el, and load it.
   local ok, errmsg

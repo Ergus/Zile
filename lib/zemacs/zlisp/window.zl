@@ -17,7 +17,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(localvar table "std.table")
+(localvar table "require 'std.table'")
 
 (defvar highlight-nonselected-windows nil
   "If non-nil, highlight region even in nonselected windows.")

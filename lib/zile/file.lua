@@ -17,14 +17,14 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+local io      = require "std.io"
+local list    = require "std.list"
+local set     = require "std.set"
+local ripairs = require "std.table".ripairs
+
 local FileString = require "zile.FileString"
 
 prog = require "zile.version"
-
-local io      = std.io
-local list    = std.list
-local ripairs = std.table.ripairs
-local set     = std.set
 
 -- FIXME: Warn when file changes on disk
 

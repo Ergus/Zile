@@ -17,11 +17,12 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+local set = require "std.set"
+
 local FileString = require "zile.FileString"
 
 local eval  = require "zz.eval"
 local Defun = eval.Defun
-local set   = std.set
 
 
 Defun ("search_forward",

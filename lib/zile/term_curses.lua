@@ -17,8 +17,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-local list = std.list
-local tree = std.tree
+local list = require "std.list"
+local Tree = require "std.tree"
 
 local codetokey, keytocode, key_buf
 
@@ -83,7 +83,7 @@ function term_init ()
   key_buf = {}
 
   -- from curses key presses to zile keycodes
-  codetokey = tree {}
+  codetokey = Tree {}
 
   -- from zile keycodes back to curses keypresses
   keytocode = {}

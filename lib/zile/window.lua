@@ -18,7 +18,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-local table = std.table
+local table = require "std.table"
 
 -- The window list
 windows = {}

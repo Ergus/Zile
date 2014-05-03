@@ -23,8 +23,9 @@
  @classmod zile.FileString
 ]]
 
-local MutableString = require "zile.MutableString"
 local Object        = require "std.object"
+
+local MutableString = require "zile.MutableString"
 
 -- Formats of end-of-line
 coding_eol_lf = "\n"

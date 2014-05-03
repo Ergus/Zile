@@ -18,13 +18,14 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local posix = require "posix"
+local list  = require "std.list"
+local Tree  = require "std.tree"
 
-local lisp = require "zemacs.eval"
+local lisp  = require "zemacs.eval"
 
 local intern_soft = lisp.intern_soft
-local list        = std.list
 
-root_bindings = std.tree {}
+root_bindings = Tree {}
 
 function init_default_bindings ()
   -- Bind all printing keys to self-insert-command

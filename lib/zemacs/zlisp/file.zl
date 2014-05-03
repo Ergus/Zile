@@ -18,8 +18,9 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+(localvar slurp "require 'std.io'.slurp")
+
 (localvar FileString "require 'zile.FileString'")
-(localvar slurp "std.io.slurp")
 
 
 (defsubr find-file (filename)

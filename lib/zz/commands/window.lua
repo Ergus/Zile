@@ -17,9 +17,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+local table = require "std.table"
+
 local eval  = require "zz.eval"
 local Defun = eval.Defun
-local table = std.table
 
 Defun ("delete_window",
 [[

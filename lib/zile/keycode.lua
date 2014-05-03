@@ -18,10 +18,9 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local list    = require "std.list"
+local memoize = require "std.functional".memoize
 local set     = require "std.set"
 local table   = require "std.table"
-
-local memoize = std.functional.memoize
 
 
 -- Key modifiers.

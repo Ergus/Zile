@@ -39,6 +39,8 @@
 --[[ ======== ]]--
 
 
+local std     = require "std"
+
 local lisp    = require "zile.zlisp"
 
 local chomp   = std.string.chomp
