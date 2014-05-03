@@ -85,9 +85,8 @@ specify zlisp/move:
 
     - context with lisp:
       - it diagnoses invalid argument: |
-          pending "argument type checking"
           expect (zemacs:edit [[(goto-char "six")]]).
-            to_match_minibuf 'goto-char: wrong-type-argument integerp "six"'
+            to_match_minibuf 'goto%-char: wrong%-type%-argument integerp "six"'
       - it accepts a character offset argument:
           lisp = [[(goto-char 10) (delete-char)]]
           expect (zemacs:edit (lisp, "Fix a typ_o\n")).
@@ -106,9 +105,8 @@ specify zlisp/move:
         zemacs = Zemacs {"--no-init-file"}
     - context with lisp:
       - it diagnoses invalid argument: |
-          pending "argument type checking"
-          --expect (zemacs:edit [[(goto--char "six")]]).
-          --  to_match_minibuf 'goto-char: wrong-type-argument integerp "six"'
+          expect (zemacs:edit [[(goto-char "six")]]).
+            to_match_minibuf 'goto%-char: wrong%-type%-argument integerp "six"'
       - it accepts a character count argument:
           lisp = [[(goto-char 10) (delete-char)]]
           expect (zemacs:edit (lisp, "Fix a typ_o\n")).

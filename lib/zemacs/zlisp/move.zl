@@ -60,12 +60,8 @@ If N is omitted or nil, move point 1 character forward."
 (defsubr goto-char (position)
   "Set point to POSITION, a number.
 Beginning of buffer is position 1."
-  (interactive)
-    "if not position then
-      position = minibuf_read_number ('Goto char: ')
-    end
-
-    return type (position) == 'number' and
+  (interactive "NGoto char: ")
+    "return type (position) == 'number' and
       goto_offset (math.min (get_buffer_size (cur_bp) + 1, math.max (position, 1)))")
 
 
