@@ -1,81 +1,143 @@
-before:
-  require "spec_helper"
+specify zlisp/move:
+- describe backward-char:
+  - context in batch mode:
+    - before:
+        zemacs = Zemacs {"--batch"}
 
-specify backward-char:
-- context in batch mode:
-  - before:
-      zemacs = Zemacs {"--batch"}
+    # Lisp context only - you can't send keystrokes in batch mode!
+    - context with lisp:
+      - it diagnoses invalid argument: |
+          pending "argument type checking"
+          expect (zemacs:edit [[(backward-char "six")]]).
+            to_match_minibuf 'backward-char: wrong-type-argument integerp "six"'
+      - it moves point backwards one character:
+          lisp = [[(end-of-line) (backward-char) (backward-delete-char)]]
+          expect (zemacs:edit (lisp, "Fix a typ_o\n")).
+            to_write_to_buffer "Fix a typo\n"
+      - it accepts a character count argument:
+          lisp = [[(end-of-line) (backward-char 6) (backward-delete-char)]]
+          expect (zemacs:edit (lisp, "Fix _a typo\n")).
+            to_write_to_buffer "Fix a typo\n"
+      - it diagnoses backward move from start of buffer: |
+          expect (zemacs:edit [[(backward-char)]]).
+            to_match_minibuf "Beginning of buffer"
+      - it move point forward with a negative character count:
+          lisp = [[(backward-char -6) (delete-char)]]
+          expect (zemacs:edit (lisp, "Fix a _typo\n")).
+            to_write_to_buffer "Fix a typo\n"
+      - it diagnoses forward move from end of buffer: |
+          expect (zemacs:edit ([[(backward-char -3)]], "x")).
+            to_match_minibuf "End of buffer"
 
-  # Lisp context only - you can't send keystrokes in batch mode!
-  - context with lisp:
-    - it diagnoses invalid argument: |
-        pending "argument type checking"
-        expect (zemacs:edit [[(backward-char "six")]]).
-          should_match_minibuf 'backward-char: wrong-type-argument integerp "six"'
-    - it moves point backwards one character:
-        lisp = [[(end-of-line) (backward-char) (backward-delete-char)]]
-        expect (zemacs:edit (lisp, "Fix a typ_o\n")).
-          should_write_to_buffer "Fix a typo\n"
-    - it accepts a character count argument:
-        lisp = [[(end-of-line) (backward-char 6) (backward-delete-char)]]
-        expect (zemacs:edit (lisp, "Fix _a typo\n")).
-          should_write_to_buffer "Fix a typo\n"
-    - it diagnoses backward move from start of buffer: |
-        expect (zemacs:edit [[(backward-char)]]).
-          should_match_minibuf "Beginning of buffer"
-    - it move point forward with a negative character count:
-        lisp = [[(backward-char -6) (delete-char)]]
-        expect (zemacs:edit (lisp, "Fix a _typo\n")).
-          should_write_to_buffer "Fix a typo\n"
-    - it diagnoses forward move from end of buffer: |
-        expect (zemacs:edit ([[(backward-char -3)]], "x")).
-          should_match_minibuf "End of buffer"
+  - context in interactive mode:
+    - before:
+        zemacs = Zemacs {"--no-init-file"}
+    - context with lisp:
+      - it diagnoses invalid argument: |
+          pending "argument type checking"
+          --expect (zemacs:edit [[(backward-char "six")]]).
+          --  to_match_minibuf 'backward-char: wrong-type-argument integerp "six"'
+      - it moves point backwards one character:
+          lisp = [[(end-of-line) (backward-char) (backward-delete-char)]]
+          expect (zemacs:edit (lisp, "Fix a typ_o\n")).
+            to_write_to_buffer "Fix a typo\n"
+      - it accepts a character count argument:
+          lisp = [[(end-of-line) (backward-char 6) (backward-delete-char)]]
+          expect (zemacs:edit (lisp, "Fix _a typo\n")).
+            to_write_to_buffer "Fix a typo\n"
+      - it diagnoses backward move from start of buffer: |
+          expect (zemacs:edit [[(backward-char)]]).
+            to_match_minibuf "Beginning of buffer"
+      - it move point forward with a negative character count:
+          lisp = [[(backward-char -6) (delete-char)]]
+          expect (zemacs:edit (lisp, "Fix a _typo\n")).
+            to_write_to_buffer "Fix a typo\n"
+      - it diagnoses forward move from end of buffer: |
+          expect (zemacs:edit ([[(backward-char -3)]], "x")).
+            to_match_minibuf "End of buffer"
+    - context with keystrokes:
+      - it moves point backwards one character: |
+          expect (zemacs:edit [[1\LEFT2\LEFT3]]).
+            to_write_to_buffer "321"
+      - it accepts a character count argument:
+          keystrokes = [[\C-e\M-6\LEFT^]]
+          expect (zemacs:edit (keystrokes, "buffer text\n")).
+            to_write_to_buffer "buffe^r text\n"
+      - it understands the universal argument:
+          keystrokes = [[\C-e\C-u\LEFT^]]
+          expect (zemacs:edit (keystrokes, "buffer text\n")).
+            to_write_to_buffer "buffer ^text\n"
+      - it diagnoses backward move from start of buffer: |
+          expect (zemacs:edit [[\LEFT]]).
+            to_match_minibuf "call%-interactively: Beginning of buffer"
+      - it move point forward with a negative character count:
+          lisp = [[\ESC-6\LEFT^]]
+          expect (zemacs:edit (lisp, "buffer text\n")).
+            to_write_to_buffer "buffer^ text\n"
+      - it diagnoses forward move from end of buffer: |
+          expect (zemacs:edit ([[\M--\C-u\LEFT]], "x")).
+            to_match_minibuf "call%-interactively: End of buffer"
 
-- context in interactive mode:
-  - before:
-      zemacs = Zemacs {"--no-init-file"}
-  - context with lisp:
-    - it diagnoses invalid argument: |
-        pending "argument type checking"
-        --expect (zemacs:edit [[(backward-char "six")]]).
-        --  should_match_minibuf 'backward-char: wrong-type-argument integerp "six"'
-    - it moves point backwards one character:
-        lisp = [[(end-of-line) (backward-char) (backward-delete-char)]]
-        expect (zemacs:edit (lisp, "Fix a typ_o\n")).
-          should_write_to_buffer "Fix a typo\n"
-    - it accepts a character count argument:
-        lisp = [[(end-of-line) (backward-char 6) (backward-delete-char)]]
-        expect (zemacs:edit (lisp, "Fix _a typo\n")).
-          should_write_to_buffer "Fix a typo\n"
-    - it diagnoses backward move from start of buffer: |
-        expect (zemacs:edit [[(backward-char)]]).
-          should_match_minibuf "Beginning of buffer"
-    - it move point forward with a negative character count:
-        lisp = [[(backward-char -6) (delete-char)]]
-        expect (zemacs:edit (lisp, "Fix a _typo\n")).
-          should_write_to_buffer "Fix a typo\n"
-    - it diagnoses forward move from end of buffer: |
-        expect (zemacs:edit ([[(backward-char -3)]], "x")).
-          should_match_minibuf "End of buffer"
-  - context with keystrokes:
-    - it moves point backwards one character: |
-        expect (zemacs:edit [[1\LEFT2\LEFT3]]).
-          should_write_to_buffer "321"
-    - it accepts a character count argument:
-        keystrokes = [[\C-e\M-6\LEFT^]]
-        expect (zemacs:edit (keystrokes, "buffer text\n")).
-          should_write_to_buffer "buffe^r text\n"
-    - it understands the universal argument:
-        keystrokes = [[\C-e\C-u\LEFT^]]
-        expect (zemacs:edit (keystrokes, "buffer text\n")).
-          should_write_to_buffer "buffer ^text\n"
-    - it diagnoses backward move from start of buffer: |
-        expect (zemacs:edit [[\LEFT]]).
-          should_match_minibuf "call%-interactively: Beginning of buffer"
-    - it move point forward with a negative character count:
-        lisp = [[\ESC-6\LEFT^]]
-        expect (zemacs:edit (lisp, "buffer text\n")).
-          should_write_to_buffer "buffer^ text\n"
-    - it diagnoses forward move from end of buffer: |
-        expect (zemacs:edit ([[\M--\C-u\LEFT]], "x")).
-          should_match_minibuf "call%-interactively: End of buffer"
+- describe goto-char:
+  - context in batch mode:
+    - before:
+        zemacs = Zemacs {"--batch"}
+
+    - context with lisp:
+      - it diagnoses invalid argument: |
+          pending "argument type checking"
+          expect (zemacs:edit [[(goto-char "six")]]).
+            to_match_minibuf 'goto-char: wrong-type-argument integerp "six"'
+      - it accepts a character offset argument:
+          lisp = [[(goto-char 10) (delete-char)]]
+          expect (zemacs:edit (lisp, "Fix a typ_o\n")).
+            to_write_to_buffer "Fix a typo\n"
+      - it rounds too small offset to start of buffer: |
+          lisp = [[(goto-char -1) (delete-char)]]
+          expect (zemacs:edit (lisp, "_rest of buffer\n")).
+            to_write_to_buffer "rest of buffer\n"
+      - it rounds too large offset to end of buffer: |
+          lisp = [[(goto-char 999999) (backward-delete-char)]]
+          expect (zemacs:edit (lisp, "rest of buffer\n_")).
+            to_write_to_buffer "rest of buffer\n"
+
+  - context in interactive mode:
+    - before:
+        zemacs = Zemacs {"--no-init-file"}
+    - context with lisp:
+      - it diagnoses invalid argument: |
+          pending "argument type checking"
+          --expect (zemacs:edit [[(goto--char "six")]]).
+          --  to_match_minibuf 'goto-char: wrong-type-argument integerp "six"'
+      - it accepts a character count argument:
+          lisp = [[(goto-char 10) (delete-char)]]
+          expect (zemacs:edit (lisp, "Fix a typ_o\n")).
+            to_write_to_buffer "Fix a typo\n"
+      - it rounds too small offset to start of buffer: |
+          lisp = [[(goto-char -1) (delete-char)]]
+          expect (zemacs:edit (lisp, "_rest of buffer\n")).
+            to_write_to_buffer "rest of buffer\n"
+      - it rounds too large offset to end of buffer: |
+          lisp = [[(goto-char 999999) (backward-delete-char)]]
+          expect (zemacs:edit (lisp, "rest of buffer\n_")).
+            to_write_to_buffer "rest of buffer\n"
+    - context with keystrokes:
+      - it moves point to provided offset: |
+          expect (zemacs:edit [[1\M-gc1\r2\M-gc2\r3]]).
+            to_write_to_buffer "231"
+      - it accepts a character count argument:
+          keystrokes = [[\M-6\M-gc^]]
+          expect (zemacs:edit (keystrokes, "buffer text\n")).
+            to_write_to_buffer "buffe^r text\n"
+      - it understands the universal argument:
+          keystrokes = [[\C-u\M-gc^]]
+          expect (zemacs:edit (keystrokes, "buffer text\n")).
+            to_write_to_buffer "buf^fer text\n"
+      - it rounds too small offset to start of buffer: |
+          keystrokes = [[\M--1\M-gc^]]
+          expect (zemacs:edit (keystrokes, "buffer text\n")).
+            to_write_to_buffer "^buffer text\n"
+      - it rounds too large offset to end of buffer: |
+          keystrokes = [[\C-u10000\M-gc^]]
+          expect (zemacs:edit (keystrokes, "buffer text")).
+            to_write_to_buffer "buffer text\n^"
