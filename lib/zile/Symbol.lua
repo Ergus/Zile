@@ -45,7 +45,7 @@
 
 
 
-local Set = require "zile.Set"
+local Set = require "std.set"
 
 
 --- Default symbol table.

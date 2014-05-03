@@ -108,7 +108,6 @@ dist_classes_DATA +=					\
 	$(srcdir)/doc/classes/zile.Cons.html		\
 	$(srcdir)/doc/classes/zile.FileString.html	\
 	$(srcdir)/doc/classes/zile.MutableString.html	\
-	$(srcdir)/doc/classes/zile.Set.html		\
 	$(srcdir)/doc/classes/zile.Symbol.html		\
 	$(NOTHING_ELSE)
 

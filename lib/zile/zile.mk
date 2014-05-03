@@ -21,7 +21,6 @@ dist_pkgdata_DATA =				\
 	lib/zile/Cons.lua			\
 	lib/zile/FileString.lua			\
 	lib/zile/MutableString.lua		\
-	lib/zile/Set.lua			\
 	lib/zile/Symbol.lua			\
 	lib/zile/bind.lua			\
 	lib/zile/buffer.lua			\
