@@ -47,13 +47,7 @@ script:
   - export PATH=`pwd`/luarocks/bin:$PATH
 
   # Install extra rocks into $LUAROCKS_CONFIG rocks tree.
-  - $LUAROCKS install lyaml; $LUAROCKS install ldoc
-
-  # Temporarily install specl git master (when specl 12 is released,
-  # regenerate this file!).
-  - $LUAROCKS install
-    https://raw.githubusercontent.com/gvvaughan/specl/release-v11/specl-git-1.rockspec
-  - export SPECL=`which specl`
+  - $LUAROCKS install lyaml; $LUAROCKS install specl; $LUAROCKS install ldoc
 
   # Make git rockspec for zile
   - make rockspecs LUAROCKS="$LUAROCKS" V=1
