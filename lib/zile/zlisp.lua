@@ -184,10 +184,19 @@ local function lex (s, i, mangle)
       c, i = nextch (s, i)
       if c == nil then
         error (iton (s, i - 1) .. ': incomplete string "' .. token, 0)
-      elseif c ~= '"' then
-        token = token .. c
+      elseif c == '\\' then
+	c, i = nextch (s, i)
+	if c == nil then
+	  error (iton (s, i - 1) .. ': incomplete escape sequence "' .. token, 0)
+        end
+	if c ~= '"' then
+	  token = token .. '\\'
+	end
+      elseif c == '"' then
+	break
       end
-    until c == '"'
+      token = token .. c
+    until false
 
     return token, "literal", i
   end
