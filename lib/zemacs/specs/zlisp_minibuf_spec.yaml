@@ -1,0 +1,30 @@
+specify zlisp/minibuf:
+- describe message:
+  - context in batch mode:
+    - before:
+        zemacs = Zemacs {"--batch"}
+    - context with lisp:
+      - it outputs to the minibuffer: |
+          expect (zemacs:edit [[(message "a string")]]).
+            to_write_to_minibuf "a string"
+      - it formats integer arguments: |
+          expect (zemacs:edit [[(message "%d" 42)]]).
+            to_write_to_minibuf "42"
+
+  - context in interactive mode:
+    - before:
+        zemacs = Zemacs {"--no-init-file"}
+    - context with lisp:
+      - it outputs to the minibuffer: |
+          expect (zemacs:edit [[(message "a string")]]).
+            to_write_to_minibuf "a string"
+      - it formats integer arguments: |
+          expect (zemacs:edit [[(message "%d" 42)]]).
+            to_write_to_minibuf "42"
+    - context with keystrokes:
+      - it outputs to the minibuffer: |
+          expect (zemacs:edit [[\M-:(message "a string")\r]]).
+            to_write_to_minibuf "a string"
+      - it formats integer arguments: |
+          expect (zemacs:edit [[\M-:(message "%d" 42)\r]]).
+            to_write_to_minibuf "42"

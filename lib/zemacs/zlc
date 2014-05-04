@@ -116,6 +116,22 @@ local function argspec (paramlist, min, max, kw)
 end
 
 
+-- Convert lisp style argument list into a list of equivalent paramaters
+-- suitable for a Lua function declaration.
+local function render_params (paramlist)
+  if paramlist == nil then return nil end
+
+  local car = paramlist.car.value or paramlist.car
+  if isname (car) then
+    return Cons (car, render_params (paramlist.cdr))
+  elseif car.name == "&rest" then
+    return Cons ({ name = "..." })
+  else
+    return render_params (paramlist.cdr)
+  end
+end
+
+
 -- (defsubr NAME ([PARAM]...) DOCSTRING [(interactive)] "BODY")
 -- A special form for describing Zemacs commands.  Each time it is called
 -- by Zlisp, output a lua command declaration for binding into Zemacs.
@@ -205,7 +221,7 @@ define ("defsubr",
     local mkparams = function ()
       local params
       if consp (paramlist) then
-        params = paramlist:filter (isname)
+        params = render_params (paramlist)
       end
       if params and params.car then
         params = params:mapconcat (function (symbol)

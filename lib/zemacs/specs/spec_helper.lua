@@ -71,7 +71,7 @@ local function mkmacro (self, keystr, fminibuf)
       [[\C-x\C-f]] .. fminibuf .. [[\r\C-y]]
   end
 
-  return [[(execute-kbd-macro "]] .. keystr .. [[\C-u\C-x\C-c")]]
+  return [[(execute-kbd-macro "]] .. keystr:gsub ('"', '\\"') .. [[\C-u\C-x\C-c")]]
 end
 
 

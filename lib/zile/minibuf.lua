@@ -120,6 +120,8 @@ function minibuf_echo (s)
     local bp = get_buffer_create ("*Messages*", create_auto_buffer)
     with_current_buffer (bp, trim_messages)
   end
+
+  return s
 end
 
 function keyboard_quit ()

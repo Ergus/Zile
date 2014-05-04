@@ -24,9 +24,23 @@ If nil, disable message logging.  If t, log messages but don't truncate
 the buffer when it becomes large.")
 
 
-(defsubr message (msg)
+(defsubr message (format-string &rest args)
   "Display a message at the bottom of the screen.
 
+The message also goes into the `*Messages*' buffer, if `message-log-max'
+is non-nil.
+
+Return the message.
+
 In batch mode, the message is printed to the standard error stream,
-followed by a newline."
-   "minibuf_echo (tostring (msg))")
+followed by a newline.
+
+The first argument is a format control string, and the rest are data
+to be formatted under control of the string.
+
+Note: Use (message '%s' VALUE) to print the value of expressions and
+variables to avoid accidentally interpreting `%' as format specifiers.
+
+If the first argument is nil or the empty string, the function clears
+any existing message."
+    "return minibuf_echo (string.format (format_string, ...))")
