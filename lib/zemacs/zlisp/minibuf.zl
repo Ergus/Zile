@@ -43,4 +43,4 @@ variables to avoid accidentally interpreting `%' as format specifiers.
 
 If the first argument is nil or the empty string, the function clears
 any existing message."
-    "return minibuf_echo (string.format (format_string, ...))")
+    "return minibuf_out (io.stderr, string.format (format_string, ...))")

@@ -21,15 +21,17 @@
 local posix  = require "posix"
 local std    = require "specl.std"
 
+local Process = require "specl.shell".Process
 local Object, escape_pattern, slurp =
       std.Object, std.string.escape_pattern, std.string.slurp
 
 local EMACS  = os.getenv ("EMACSPROG")
 local ZEMACS = "lib/zemacs/zemacs"
 
-local Editor = Object {
-  _type = "Editor",
-  _init = {"status", "buffer", "minibuf"},
+-- Don't overwrite _type, so we can also use Process matchers on
+-- Editor objects.
+local Editor = Process {
+  _init = {"status", "output", "errout", "buffer", "minibuf"},
 }
 
 
@@ -76,6 +78,8 @@ end
 
 
 local function edit (self, code, bufcontent)
+  local fout     = os.tmpname ()
+  local ferr     = os.tmpname ()
   local fbuf     = mktmpfile (bufcontent or "")
   local fminibuf = mktmpfile ""
 
@@ -85,21 +89,19 @@ local function edit (self, code, bufcontent)
   local expandfn = not code:match "^%s*%(" and self.mkmacro or self.mklisp
   local fcode    = mktmpfile (expandfn (self, code, fminibuf))
 
-  -- batch mode scribbles on stdout and stderr.
-  local redirects = ""
-  if self.batch_mode then
-    redirects = ">" .. fminibuf .. " 2>&1"
-  end
+  local redirects = ">" .. fout .. " 2>" .. ferr
 
   local status = posix.spawn (table.concat ({
     self.command, self.args, fbuf, "--load", fcode, redirects
   }, " "))
 
-  local buffer = Editor {status, slurp (fbuf), slurp (fminibuf)}
+  local buffer = Editor {status, slurp (fout), slurp (ferr), slurp (fbuf), slurp (fminibuf)}
 
   os.remove (fcode)
   os.remove (fminibuf)
   os.remove (fbuf)
+  os.remove (ferr)
+  os.remove (fout)
 
   return buffer
 end
@@ -149,7 +151,7 @@ do
       return (string.match (actual.minibuf, pattern) ~= nil)
     end,
 
-    actual_type   = "Editor",
+    actual_type   = "Process",
 
     format_actual = function (self, editor)
       return ":" .. reformat (editor.minibuf)
@@ -170,7 +172,7 @@ do
       return (string.match (actual.buffer, pattern) ~= nil)
     end,
 
-    actual_type   = "Editor",
+    actual_type   = "Process",
 
     format_actual = format_actual,
 
@@ -189,7 +191,7 @@ do
       return string.match (actual.minibuf, escape_pattern (expect)) ~= nil
     end,
 
-    actual_type   = "Editor",
+    actual_type   = "Process",
 
     format_actual = function (self, editor)
       return ":" .. reformat (editor.minibuf)
@@ -210,7 +212,7 @@ do
       return string.match (actual.buffer, escape_pattern (expect)) ~= nil
     end,
 
-    actual_type   = "Editor",
+    actual_type   = "Process",
 
     format_actual = format_actual,
 

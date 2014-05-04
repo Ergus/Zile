@@ -88,29 +88,11 @@ local function trim_messages (bp, msg)
 end
 
 
--- Write the specified error string in the minibuffer, or to stderr in
--- batch mode, and signal an error.
-function minibuf_error (s)
-  if bflag then
-    io.stderr:write (s .. "\n")
-  else
-    minibuf_write (s)
-  end
-
-  local max = eval.get_variable ("message_log_max") or "nil"
-  if max ~= "nil" then
-    local bp = get_buffer_create ("*Messages*", create_auto_buffer)
-    with_current_buffer (bp, trim_messages, bp,
-                         "call-interactively: " .. minibuf_contents)
-  end
-  return ding ()
-end
-
--- Write the specified string to the minibuffer, or to stdout in batch
+-- Write the specified string to the minibuffer, or to bstream in batch
 -- mode.
-function minibuf_echo (s)
+function minibuf_out (bstream, s)
   if bflag then
-    io.stdout:write (s .. "\n")
+    bstream:write (s .. "\n")
   else
     minibuf_write (s)
   end
@@ -120,14 +102,43 @@ function minibuf_echo (s)
     local bp = get_buffer_create ("*Messages*", create_auto_buffer)
     with_current_buffer (bp, trim_messages)
   end
-
   return s
 end
+
+
+-- Write the specified error string in the minibuffer, or to stderr in
+-- batch mode, and signal an error.
+function minibuf_error (s)
+  if bflag then
+    io.stderr:write (s .. "\n")
+  else
+    minibuf_write (s)
+    ding ()
+  end
+
+  local max = eval.get_variable ("message_log_max") or "nil"
+  if max ~= "nil" then
+    local bp = get_buffer_create ("*Messages*", create_auto_buffer)
+    with_current_buffer (bp, trim_messages, bp,
+                         "call-interactively: " .. minibuf_contents)
+  end
+
+  return false, s
+end
+
+
+-- Write the specified string to the minibuffer, or to stdout in batch
+-- mode.
+function minibuf_echo (s)
+  return minibuf_out (io.stdout, s)
+end
+
 
 function keyboard_quit ()
   deactivate_mark ()
   return minibuf_error ("Quit")
 end
+
 
 -- Read a string from the minibuffer using a completion.
 function minibuf_vread_completion (fmt, value, cp, hp, empty_err, invalid_err)

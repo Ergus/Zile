@@ -6,10 +6,10 @@ specify zlisp/minibuf:
     - context with lisp:
       - it outputs to the minibuffer: |
           expect (zemacs:edit [[(message "a string")]]).
-            to_write_to_minibuf "a string"
+            to_contain_error "a string\n"
       - it formats integer arguments: |
           expect (zemacs:edit [[(message "%d" 42)]]).
-            to_write_to_minibuf "42"
+            to_contain_error "42\n"
 
   - context in interactive mode:
     - before:
@@ -17,14 +17,14 @@ specify zlisp/minibuf:
     - context with lisp:
       - it outputs to the minibuffer: |
           expect (zemacs:edit [[(message "a string")]]).
-            to_write_to_minibuf "a string"
+            to_write_to_minibuf "a string\n"
       - it formats integer arguments: |
           expect (zemacs:edit [[(message "%d" 42)]]).
-            to_write_to_minibuf "42"
+            to_write_to_minibuf "42\n"
     - context with keystrokes:
       - it outputs to the minibuffer: |
           expect (zemacs:edit [[\M-:(message "a string")\r]]).
-            to_write_to_minibuf "a string"
+            to_write_to_minibuf "a string\n"
       - it formats integer arguments: |
           expect (zemacs:edit [[\M-:(message "%d" 42)\r]]).
-            to_write_to_minibuf "42"
+            to_write_to_minibuf "42\n"

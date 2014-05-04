@@ -8,7 +8,7 @@ specify zlisp/move:
     - context with lisp:
       - it diagnoses invalid argument: |
           expect (zemacs:edit [[(backward-char "six")]]).
-            to_write_to_minibuf 'backward-char: wrong-type-argument integerp "six"'
+            to_contain_error 'backward-char: wrong-type-argument integerp "six"'
       - it moves point backwards one character:
           lisp = [[(end-of-line) (backward-char) (backward-delete-char)]]
           expect (zemacs:edit (lisp, "Fix a typ_o\n")).
@@ -19,14 +19,14 @@ specify zlisp/move:
             to_write_to_buffer "Fix a typo\n"
       - it diagnoses backward move from start of buffer: |
           expect (zemacs:edit [[(backward-char)]]).
-            to_write_to_minibuf "Beginning of buffer"
+            to_contain_error "Beginning of buffer\n"
       - it move point forward with a negative character count:
           lisp = [[(backward-char -6) (delete-char)]]
           expect (zemacs:edit (lisp, "Fix a _typo\n")).
             to_write_to_buffer "Fix a typo\n"
       - it diagnoses forward move from end of buffer: |
           expect (zemacs:edit ([[(backward-char -3)]], "x")).
-            to_write_to_minibuf "End of buffer"
+            to_contain_error "End of buffer\n"
 
   - context in interactive mode:
     - before:
@@ -84,7 +84,7 @@ specify zlisp/move:
     - context with lisp:
       - it diagnoses invalid argument: |
           expect (zemacs:edit [[(goto-char "six")]]).
-            to_write_to_minibuf 'goto-char: wrong-type-argument integerp "six"'
+            to_contain_error 'goto-char: wrong-type-argument integerp "six"\n'
       - it accepts a character offset argument:
           lisp = [[(goto-char 10) (delete-char)]]
           expect (zemacs:edit (lisp, "Fix a typ_o\n")).
