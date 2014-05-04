@@ -35,7 +35,7 @@
 On attempt to pass beginning or end of buffer, stop and signal error.
 Interactively, N is the numeric prefix argument.
 If N is omitted or nil, move point 1 character backward."
-  (interactive)
+  (interactive "p")
     "n = n or 1
     local ok = move_char (-n)
     if not ok then
