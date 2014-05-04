@@ -20,6 +20,9 @@
 ;; MA 02111-1301, USA.
 
 
+(localvar case "require 'std.functional'.case")
+
+
 (defsubr load (file)
   "Execute a file of Lisp code named FILE."
   (interactive)
@@ -84,8 +87,21 @@ evaluate it."
       exp = minibuf_read ('Eval: ', '', nil, exprs_history)
     end
 
-    lisp.eval_string (exp)
+    local ok, err = lisp.eval_string (exp)
+    if err then
+      minibuf_error (err)
+    elseif ok ~= true then
+      minibuf_echo (case (type (ok), {
+        number = function ()
+                   return string.format ('%d (#o%o, #x%x)', ok, ok, ok)
+                 end,
+
+                 function () return tostring (ok) end,
+      }))
+    end
 
     if exp then
       add_history_element (exprs_history, exp)
-    end")
+    end
+
+    return ok, err")

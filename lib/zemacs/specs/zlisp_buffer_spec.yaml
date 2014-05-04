@@ -31,12 +31,14 @@ specify buffer:
           expect (zemacs:edit (lisp, content)).to_write_to_minibuf "10"
     - context with keystrokes:
       - it returns the buffer offset for point: |
-          pending "minibuf sexpr value display"
           expect (zemacs:edit [[\M-:(point)\r]]).
             to_write_to_minibuf "1 (#o1, #x1)"
           expect (zemacs:edit [[(insert "abc") (message (point))]]).
-            to_write_to_minibuf "4 (#o4, #x4)"
-          lisp = [[(goto-char 10) (message (point))]]
+            to_write_to_minibuf "4"
+          lisp = [[
+            (goto-char 10)
+            (message "%d (#o%o, #x%x)" (point) (point) (point))
+          ]]
           expect (zemacs:edit (lisp, content)).
             to_write_to_minibuf "10 (#o12, #xa)"
 
@@ -78,7 +80,6 @@ specify buffer:
           expect (zemacs:edit (lisp, content)).to_write_to_minibuf "46"
     - context with keystrokes:
       - it returns the maximum buffer offset for point: |
-          pending "minibuf sexpr value display"
           expect (zemacs:edit [[\M-:(point-max)\r]]).
             to_write_to_minibuf "1 (#o1, #x1)"
           expect (zemacs:edit [[abc\M-:(point-max)\r]]).
@@ -127,7 +128,6 @@ specify buffer:
           expect (zemacs:edit (lisp, content)).to_write_to_minibuf "1"
     - context with keystrokes:
       - it returns the minimum buffer offset for point: |
-          pending "minibuf sexpr value display"
           expect (zemacs:edit [[\M-:(point-min)\r]]).
             to_write_to_minibuf "1 (#o1, #x1)"
           expect (zemacs:edit [[abc\M-:(point-min)\r]]).

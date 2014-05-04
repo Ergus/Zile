@@ -82,7 +82,7 @@ local function edit (self, code, bufcontent)
   self.batch_mode = self.args:match ("%-%-batch") ~= nil
 
   -- unless `code` begins with a `(`, assume it is a keystr
-  local expandfn = not code:match "^%(" and self.mkmacro or self.mklisp
+  local expandfn = not code:match "^%s*%(" and self.mkmacro or self.mklisp
   local fcode    = mktmpfile (expandfn (self, code, fminibuf))
 
   -- batch mode scribbles on stdout and stderr.

@@ -309,10 +309,10 @@ local function eval_string (s)
   if not ok then return nil, list end
 
   while list do
-    eval_command (list.car)
+    ok = eval_command (list.car)
     list = list.cdr
   end
-  return true
+  return ok or true
 end
 
 
