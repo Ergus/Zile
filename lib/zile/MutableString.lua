@@ -182,9 +182,12 @@ else
 
   -- Check array members manually if necessary.
   function rchr (self, s, to)
-    local b, c = self.buf, string.byte (s)
-    for i = to - 1, 1, -1 do
-      if b[i] == c then return i end
+    -- FIXME: don't call with to = #self + 1 !!
+    if to > 0 and to <= #self + 1 then -- skip if out-of-bounds
+      local b, c = self.buf, string.byte (s)
+      for i = to - 1, 1, -1 do
+        if b[i] == c then return i end
+      end
     end
   end
 
@@ -196,11 +199,17 @@ end
 -- @string s string to search for
 -- @int to largest index to search
 local function rfind (self, s, to)
-  local b, len = self.buf.buffer, #s
-  to = to - #s + 1
-  while to and to > 0 do
-    to = rchr (self, s, to)
-    if to and b:tostring (len, to) == s then return to end
+  -- FIXME: don't call with to = #self + 1 !!
+  if to > 0 and to <= #self + 1 then -- skip if out-of-bounds
+    local b, len = self.buf.buffer, #s
+    to = to - #s + 1
+    while to and to > 0 do
+      to = rchr (self, s, to)
+      if to then
+	if b:tostring (len, to) == s then return to end
+	to = to - 1
+      end
+    end
   end
 end
 

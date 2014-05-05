@@ -51,3 +51,55 @@ specify MutableString:
   - it can find a word ending at the last character: |
       expect (haystack:find ("s", #haystack - 10)).to_be (#haystack)
       expect (haystack:find ("characters", 1)).to_be (39)
+
+- describe rchr:
+  - it returns nil when search is out-of-bounds: |
+      expect (haystack:rchr ("s", -1)).to_be (nil)
+      expect (haystack:rchr ("s", 0)).to_be (nil)
+      pending "issue #3, caller off-by-one"
+      expect (haystack:rchr ("s", #haystack + 1)).to_be (nil)
+  - it returns nil when needle is not present: |
+      expect (haystack:rchr ("x", #haystack)).to_be (nil)
+  - it returns offset of needle: |
+      expect (haystack:rchr ("w", #haystack)).to_be (10)
+  - it finds last occurrence of needle: |
+      pending "issue #3, caller off-by-one"
+      expect (haystack:rchr ("s", #haystack)).to_be (#haystack)
+  - it starts search from the given offset: |
+      expect (haystack:rchr ("s", #haystack - 1)).to_be (33)
+  - it can find the first character:
+      expect (haystack:rchr ("a", 10)).to_be (1)
+  - it can find the last character: |
+      pending "issue #3, caller off-by-one"
+      expect (haystack:rchr ("s", #haystack)).to_be (#haystack)
+
+- describe rfind:
+  - it returns nil when search is out-of-bounds: |
+      expect (haystack:rfind ("string", -1)).to_be (nil)
+      expect (haystack:rfind ("string", 0)).to_be (nil)
+      pending "issue #3, caller off-by-one"
+      expect (haystack:rfind ("string", #haystack + 1)).to_be (nil)
+  - it returns nil when needle is not present: |
+      expect (haystack:rfind ("not here", #haystack)).to_be (nil)
+  - it returns nil when needle cannot fit in remaining characters: |
+      needle = "string"
+      n = #needle
+      expect (haystack:rfind (needle, n)).to_be (nil)
+      expect (haystack:rfind (needle, n - 1)).to_be (nil)
+  - it returns offset of needle: |
+      expect (haystack:rfind ("w", #haystack)).to_be (10)
+      expect (haystack:rfind ("with", #haystack)).to_be (10)
+  - it finds last occurrence of needle: |
+      expect (haystack:rfind ("string", #haystack)).to_be (27)
+      pending "issue #3, caller off-by-one"
+      expect (haystack:rfind ("s", #haystack)).to_be (#haystack)
+  - it starts search from the given offset: |
+      expect (haystack:rfind ("s", #haystack - 1)).to_be (33)
+      expect (haystack:rfind ("string", 10)).to_be (3)
+  - it can find a word starting at the first character: |
+      expect (haystack:rfind ("a", 10)).to_be (1)
+      expect (haystack:rfind ("a string", #haystack)).to_be (1)
+  - it can find a word ending at the last character: |
+      pending "issue #3, caller off-by-one"
+      expect (haystack:rfind ("s", #haystack)).to_be (#haystack)
+      expect (haystack:rfind ("characters", #haystack)).to_be (39)
