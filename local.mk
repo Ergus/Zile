@@ -55,16 +55,29 @@ install_exec_hook	=
 
 include lib/zile/zile.mk
 include lib/zemacs/zemacs.mk
-include lib/zemacs/specs/specs.mk
 include lib/zz/zz.mk
 include tests/tests.mk
 
-check-local: $(check_local)
-clean-local: $(clean_local)
 install-exec-hook: $(install_exec_hook)
 
 ## Use a builtin rockspec build with root at $(srcdir)/lib
 mkrockspecs_args = --module-dir $(srcdir)/lib
+
+
+## ------ ##
+## Specs. ##
+## ------ ##
+
+SPECL_ENV   = EMACSPROG=$(EMACSPROG) $(LUA_ENV)
+
+specl_SPECS =
+
+include lib/zile/specs/specs.mk
+include lib/zemacs/specs/specs.mk
+include build-aux/specl.mk
+
+check-local: $(check_local)
+clean-local: $(clean_local)
 
 
 ## ------------- ##

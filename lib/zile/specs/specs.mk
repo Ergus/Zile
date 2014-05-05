@@ -23,14 +23,12 @@
 ## Specs. ##
 ## ------ ##
 
-zemacs_specdir = $(srcdir)/lib/zemacs/specs
+zile_specdir = $(srcdir)/lib/zile/specs
 
 specl_SPECS +=						\
-	$(zemacs_specdir)/zlisp_bind_spec.yaml		\
-	$(zemacs_specdir)/zlisp_buffer_spec.yaml	\
-	$(zemacs_specdir)/zlisp_move_spec.yaml		\
+	$(zile_specdir)/MutableString_spec.yaml		\
 	$(NOTHING_ELSE)
 
 EXTRA_DIST +=						\
-	$(zemacs_specdir)/spec_helper.lua		\
+	$(zile_specdir)/spec_helper.lua			\
 	$(NOTHING_ELSE)

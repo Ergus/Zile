@@ -99,7 +99,10 @@ else
     local b, len = self.buf.buffer, #s
     while from and from + len <= #self do
       from = chr (self, s, from)
-      if from and b:tostring (len, from) == s then return from end
+      if from then
+	if b:tostring (len, from) == s then return from end
+	from = from + 1
+      end
     end
   end
 

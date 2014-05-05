@@ -1,0 +1,53 @@
+before:
+  MutableString = require "zile.MutableString"
+
+specify MutableString:
+- before:
+    #                         v1  .    v10  .    v20  .    v30  .    v40  .
+    haystack = MutableString "a string with repeated substrings and characters"
+- describe chr:
+  - it returns nil when search is out-of-bounds: |
+      expect (haystack:chr ("s", -1)).to_be (nil)
+      expect (haystack:chr ("s", 0)).to_be (nil)
+      expect (haystack:chr ("s", #haystack + 1)).to_be (nil)
+  - it returns nil when needle is not present:
+      expect (haystack:chr ("x", 1)).to_be (nil)
+  - it returns offset of needle:
+      expect (haystack:chr ("w", 1)).to_be (10)
+  - it finds first occurrence of needle:
+      expect (haystack:chr ("s", 1)).to_be (3)
+  - it starts search from the given offset:
+      expect (haystack:chr ("s", 4)).to_be (24)
+  - it can find the first character:
+      expect (haystack:chr ("a", 1)).to_be (1)
+  - it can find the last character: |
+      expect (haystack:chr ("s", #haystack - 10)).to_be (#haystack)
+
+- describe find:
+  - it returns nil when search is out-of-bounds: |
+      expect (haystack:find ("string", -1)).to_be (nil)
+      expect (haystack:find ("string", 0)).to_be (nil)
+      expect (haystack:find ("string", #haystack + 1)).to_be (nil)
+  - it returns nil when needle is not present:
+      expect (haystack:find ("not here", 1)).to_be (nil)
+  - it returns nil when needle cannot fit in remaining characters: |
+      needle = "string"
+      n = #needle
+      expect (haystack:find (needle, #haystack)).to_be (nil)
+      expect (haystack:find (needle, #haystack - n)).to_be (nil)
+      expect (haystack:find (needle, #haystack - n + 1)).to_be (nil)
+  - it returns offset of needle:
+      expect (haystack:find ("w", 1)).to_be (10)
+      expect (haystack:find ("with", 1)).to_be (10)
+  - it finds first occurrence of needle:
+      expect (haystack:find ("s", 1)).to_be (3)
+      expect (haystack:find ("string", 1)).to_be (3)
+  - it starts search from the given offset:
+      expect (haystack:find ("s", 4)).to_be (24)
+      expect (haystack:find ("string", 4)).to_be (27)
+  - it can find a word starting at the first character:
+      expect (haystack:find ("a", 1)).to_be (1)
+      expect (haystack:find ("a string", 1)).to_be (1)
+  - it can find a word ending at the last character: |
+      expect (haystack:find ("s", #haystack - 10)).to_be (#haystack)
+      expect (haystack:find ("characters", 1)).to_be (39)
