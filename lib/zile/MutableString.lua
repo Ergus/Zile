@@ -76,6 +76,7 @@ end
 local find
 
 local have_memmem = pcall (loadstring [[
+  local libc = require "alien".default
   libc.memmem:types ("pointer", "pointer", "size_t", "pointer", "size_t")
 ]])
 
@@ -163,6 +164,7 @@ end
 local rchr
 
 local have_memrchr = pcall (loadstring [[
+  local libc = require "alien".default
   libc.memrchr:types ("pointer", "pointer", "int", "size_t")
 ]])
 
