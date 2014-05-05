@@ -22,6 +22,8 @@ specify MutableString:
       expect (haystack:chr ("a", 1)).to_be (1)
   - it can find the last character: |
       expect (haystack:chr ("s", #haystack - 10)).to_be (#haystack)
+  - it can find final character when starting at last character: |
+      expect (haystack:chr ("s", #haystack)).to_be (#haystack)
 
 - describe find:
   - it returns nil when search is out-of-bounds: |
@@ -51,6 +53,8 @@ specify MutableString:
   - it can find a word ending at the last character: |
       expect (haystack:find ("s", #haystack - 10)).to_be (#haystack)
       expect (haystack:find ("characters", 1)).to_be (39)
+  - it can find final character when starting at last character: |
+      expect (haystack:find ("s", #haystack)).to_be (#haystack)
 
 - describe rchr:
   - it returns nil when search is out-of-bounds: |
@@ -69,6 +73,9 @@ specify MutableString:
       expect (haystack:rchr ("s", #haystack - 1)).to_be (33)
   - it can find the first character:
       expect (haystack:rchr ("a", 10)).to_be (1)
+  - it can find first character when starting at first character: |
+      pending "issue #3, caller off-by-one"
+      expect (haystack:rchr ("s", 1)).to_be (1)
   - it can find the last character: |
       pending "issue #3, caller off-by-one"
       expect (haystack:rchr ("s", #haystack)).to_be (#haystack)
@@ -99,6 +106,9 @@ specify MutableString:
   - it can find a word starting at the first character: |
       expect (haystack:rfind ("a", 10)).to_be (1)
       expect (haystack:rfind ("a string", #haystack)).to_be (1)
+  - it can find first character when starting at first character: |
+      pending "issue #3, caller off-by-one"
+      expect (haystack:rchr ("a", 1)).to_be (1)
   - it can find a word ending at the last character: |
       pending "issue #3, caller off-by-one"
       expect (haystack:rfind ("s", #haystack)).to_be (#haystack)

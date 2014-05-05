@@ -96,8 +96,8 @@ else
 
   -- Use chr, and then check array members manually if necessary.
   function find (self, s, from)
-    local b, len = self.buf.buffer, #s
-    while from and from + len <= #self do
+    local b, len, n = self.buf.buffer, #s, #self - (#s - 1)
+    while from and from <= n do
       from = chr (self, s, from)
       if from then
 	if b:tostring (len, from) == s then return from end
