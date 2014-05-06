@@ -1,0 +1,14 @@
+specify zemacs/help:
+- describe describe-function:
+
+- describe describe-key:
+
+- describe describe-variable:
+
+- describe describe-copying:
+
+- describe describe-no-warranty:
+
+- describe view-emacs-FAQ:
+
+- describe view-emacs-news:

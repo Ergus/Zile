@@ -1,0 +1,14 @@
+specify zlisp/killring:
+- describe kill-word:
+
+- describe backward-kill-word:
+
+- describe kill-sexp:
+
+- describe yank:
+
+- describe kill-region:
+
+- describe copy-region-as-kill:
+
+- describe kill-line:

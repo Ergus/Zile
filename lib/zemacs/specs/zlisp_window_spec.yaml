@@ -1,0 +1,24 @@
+specify zlisp/window:
+- describe delete-window:
+
+- describe enlarge-window:
+
+- describe shrink-window:
+
+- describe delete-other-windows:
+
+- describe other-window:
+
+- describe split-window:
+
+- describe recenter:
+
+- describe screen-height:
+
+- describe screen-width:
+
+- describe set-screen-height:
+
+- describe set-screen-size:
+
+- describe set-screen-width:

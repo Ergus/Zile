@@ -1,0 +1,4 @@
+specify zlisp/undo:
+- describe undo:
+
+- describe revert-buffer:

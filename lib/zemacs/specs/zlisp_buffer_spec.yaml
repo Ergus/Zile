@@ -156,3 +156,17 @@ specify zlisp/buffer:
           lisp = [[\M-gc22\r\M-:(point-min)\r]]
           expect (zemacs:edit (lisp, content)).
             to_write_to_minibuf "1 (#o1, #x1)"
+
+- describe kill-buffer:
+
+- describe set-buffer:
+
+- describe switch-to-buffer:
+
+- describe toggle-read-only:
+
+- describe auto-fill-mode:
+
+- describe list-buffers:
+
+- describe buffer-size:

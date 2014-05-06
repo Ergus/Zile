@@ -1,0 +1,16 @@
+specify zlisp/marker:
+- describe mark:
+
+- describe exchange-point-and-mark:
+
+- describe set-mark:
+
+- describe set-mark-command:
+
+- describe mark-mord:
+
+- describe mark-sexp:
+
+- describe mark-paragraph:
+
+- describe mark-whole-buffer:

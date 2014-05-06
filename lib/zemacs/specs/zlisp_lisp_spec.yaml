@@ -1,0 +1,10 @@
+specify zlisp/lisp:
+- describe load:
+
+- describe setq:
+
+- describe execute-extended-command:
+
+- describe eval-buffer:
+
+- describe eval-expression:

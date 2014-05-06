@@ -28,7 +28,21 @@ zemacs_specdir = $(srcdir)/lib/zemacs/specs
 specl_SPECS +=						\
 	$(zemacs_specdir)/zlisp_bind_spec.yaml		\
 	$(zemacs_specdir)/zlisp_buffer_spec.yaml	\
+	$(zemacs_specdir)/zlisp_edit_spec.yaml		\
+	$(zemacs_specdir)/zlisp_file_spec.yaml		\
+	$(zemacs_specdir)/zlisp_help_spec.yaml		\
+	$(zemacs_specdir)/zlisp_killring_spec.yaml	\
+	$(zemacs_specdir)/zlisp_line_spec.yaml		\
+	$(zemacs_specdir)/zlisp_lisp_spec.yaml		\
+	$(zemacs_specdir)/zlisp_macro_spec.yaml		\
+	$(zemacs_specdir)/zlisp_marker_spec.yaml	\
+	$(zemacs_specdir)/zlisp_minibuf_spec.yaml	\
 	$(zemacs_specdir)/zlisp_move_spec.yaml		\
+	$(zemacs_specdir)/zlisp_registers_spec.yaml	\
+	$(zemacs_specdir)/zlisp_search_spec.yaml	\
+	$(zemacs_specdir)/zlisp_undo_spec.yaml		\
+	$(zemacs_specdir)/zlisp_variables_spec.yaml	\
+	$(zemacs_specdir)/zlisp_window_spec.yaml	\
 	$(NOTHING_ELSE)
 
 EXTRA_DIST +=						\

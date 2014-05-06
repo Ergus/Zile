@@ -1,0 +1,22 @@
+specify zlisp/line:
+- describe indent-for-tab-command:
+
+- describe indent-relative:
+
+- describe newline-and-indent:
+
+- describe delete-char:
+
+- describe backward-delete-char:
+
+- describe delete-horizontal-space:
+
+- describe just-one-space:
+
+- describe tab-to-tab-stop:
+
+- describe newline:
+
+- describe open-line:
+
+- describe insert:

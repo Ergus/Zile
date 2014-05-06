@@ -1,4 +1,6 @@
 specify zlisp/bind:
+- describe self-insert-command:
+
 - describe where-is:
   - context in batch mode:
     - before:
@@ -47,3 +49,15 @@ specify zlisp/bind:
       - it writes unbound command to current buffer:
           expect (zemacs:edit [[\C-u\C-hwauto-fill-mode\r]]).
             should_write_to_buffer "M-x auto-fill-mode RET"
+
+- describe describe-bindings:
+
+- describe global-set-key:
+
+- describe global-unset-key:
+
+- describe universal-argument:
+
+- describe keyboard-quit:
+
+- describe suspend-emacs:

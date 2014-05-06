@@ -1,0 +1,18 @@
+specify zlisp/search:
+- describe search-forward:
+
+- describe search-backward:
+
+- describe search-forward-regexp:
+
+- describe search-backward-regexp:
+
+- describe isearch-forward:
+
+- describe isearch-backward:
+
+- describe isearch-forward-regexp:
+
+- describe isearch-backward-regexp:
+
+- describe query-replace:

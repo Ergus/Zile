@@ -1,0 +1,20 @@
+specify zlisp/file:
+- describe find-file:
+
+- describe find-file-read-only:
+
+- describe find-alternate-file:
+
+- describe insert-file:
+
+- describe save-buffer:
+
+- describe write-file:
+
+- describe save-some-buffers:
+
+- describe save-buffers-kill-emacs:
+
+- describe cd:
+
+- describe insert-buffer:

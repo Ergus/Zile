@@ -1,0 +1,32 @@
+specify zlisp/edit:
+- describe set-fill-column:
+
+- describe quoted-insert:
+
+- describe fill-paragraph:
+
+- describe shell-command:
+
+- describe shell-command-on-region:
+
+- describe delete-region:
+
+- describe delete-blank-lines:
+
+- describe downcase-word:
+
+- describe upcase-word:
+
+- describe capitalize-word:
+
+- describe upcase-region:
+
+- describe downcase-region:
+
+- describe transpose-chars:
+
+- describe transpose-words:
+
+- describe transpose-sexps:
+
+- describe transpose-lines:

@@ -1,0 +1,6 @@
+specify zlisp/registers:
+- describe copy-to-register:
+
+- describe insert-register:
+
+- describe list-registers:

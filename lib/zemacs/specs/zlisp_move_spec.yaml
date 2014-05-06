@@ -1,4 +1,8 @@
 specify zlisp/move:
+- describe beginning-of-line:
+
+- describe end-of-line:
+
 - describe backward-char:
   - context in batch mode:
     - before:
@@ -213,3 +217,33 @@ specify zlisp/move:
           keystrokes = [[\C-u10000\M-gc^]]
           expect (zemacs:edit (keystrokes, "buffer text")).
             to_write_to_buffer "buffer text\n^"
+
+- describe goto-line:
+
+- describe previous-line:
+
+- describe next-line:
+
+- describe beginning-of-buffer:
+
+- describe end-of-buffer:
+
+- describe scroll-down:
+
+- describe scroll-up:
+
+- describe forward-line:
+
+- describe backward-paragraph:
+
+- describe forward-paragraph:
+
+- describe backward-sexp:
+
+- describe forward-sexp:
+
+- describe back-to-indentation:
+
+- describe backward-word:
+
+- describe forward-word:
