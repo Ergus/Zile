@@ -39,7 +39,7 @@ local function mktmpfile (content)
   local f = os.tmpname ()
   if content and content ~= "" then
     local h = io.open (f, "w")
-    h:write (content .. "\n")
+    h:write (content)
     h:close ()
   end
   return f

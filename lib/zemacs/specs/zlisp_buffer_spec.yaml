@@ -1,7 +1,7 @@
 specify zlisp/buffer:
 - before:
-    content = "assorted random words\nacross\nseveral\t  lines" -- auto-\n ending
-    contentmax = tostring (#content + 2) .. "\n"
+    content = "assorted random words\nacross\nseveral\t  lines\n"
+    contentmax = tostring (#content + 1) .. "\n"
 
 - describe point:
   - context in batch mode:
@@ -60,7 +60,7 @@ specify zlisp/buffer:
             to_contain_error ("point<=" .. contentmax)
           lisp = [[(insert "abc") (message "point<=%d" (point-max))]]
           expect (zemacs:edit (lisp, content)).
-            to_contain_error (string.format ("point<=%d\n", #content + 2 + 3))
+            to_contain_error (string.format ("point<=%d\n", #content + 3 + 1))
           lisp = [[(goto-char (point-max)) (message "point<=%d" (point-max))]]
           expect (zemacs:edit (lisp, content)).
             to_contain_error ("point<=" .. contentmax)
@@ -77,7 +77,7 @@ specify zlisp/buffer:
             to_write_to_minibuf ("point<=" .. contentmax)
           lisp = [[(insert "abc") (message "point<=%d" (point-max))]]
           expect (zemacs:edit (lisp, content)).
-            to_write_to_minibuf (string.format ("point<=%d\n", #content + 2 + 3))
+            to_write_to_minibuf (string.format ("point<=%d\n", #content + 3 + 1))
           lisp = [[(goto-char (point-max)) (message "point<=%d" (point))]]
           expect (zemacs:edit (lisp, content)).
             to_write_to_minibuf "point<=46\n"

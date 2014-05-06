@@ -102,7 +102,7 @@ specify zlisp/move:
             to_contain_error "End of buffer\n"
       - it moves point backward with a negative character count:
           lisp = [[(end-of-buffer) (forward-char -6) (delete-char)]]
-          expect (zemacs:edit (lisp, "Fix a t_ypo\n")).
+          expect (zemacs:edit (lisp, "Fix a _typo\n")).
             to_write_to_buffer "Fix a typo\n"
       - it diagnoses backward move from beginning of buffer: |
           expect (zemacs:edit ([[(forward-char -3)]], "x")).
@@ -128,7 +128,7 @@ specify zlisp/move:
             to_write_to_minibuf "End of buffer"
       - it moves point backward with a negative character count:
           lisp = [[(end-of-buffer) (forward-char -6) (delete-char)]]
-          expect (zemacs:edit (lisp, "Fix a t_ypo\n")).
+          expect (zemacs:edit (lisp, "Fix a _typo\n")).
             to_write_to_buffer "Fix a typo\n"
       - it diagnoses backward move from beginning of buffer: |
           expect (zemacs:edit ([[(forward-char -3)]], "x")).
@@ -216,7 +216,7 @@ specify zlisp/move:
       - it rounds too large offset to end of buffer: |
           keystrokes = [[\C-u10000\M-gc^]]
           expect (zemacs:edit (keystrokes, "buffer text")).
-            to_write_to_buffer "buffer text\n^"
+            to_write_to_buffer "buffer text^"
 
 - describe goto-line:
 
