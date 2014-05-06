@@ -34,6 +34,11 @@ GNU Zile NEWS                                    -*- outline -*-
 
 ** New features
 
+  - Beginnings of LDoc generated api documentation of Zile modules.
+
+  - Legacy Zemacs tests are migrating to Specl and have significantly
+    better coverage now.
+
 *** Build-related
 
   - Now fully relocatable, with all resources found using the
@@ -43,6 +48,19 @@ GNU Zile NEWS                                    -*- outline -*-
     into the rocks tree.
 
   - LuaRocks install doesn't copy config.ld to $docdir.
+
+*** Zile
+
+  - Cursor movement on moderate to large size files is a good order of
+    magnitude faster, by virtue of using Alien buffers and calling C
+    `memmem` and `memrchr` to find buffer line-ends etc.
+
+  - Vast improvements to speed of search functions.
+
+*** Zz
+
+  - A new editor, currently heavily based on Zemacs, but with the zlisp
+    evaluator removed in favour of direct Lua evaluation.
 
 *** Zemacs
 
@@ -71,8 +89,17 @@ GNU Zile NEWS                                    -*- outline -*-
     example, calling functions with arguments that are themselves
     function calls or variables works as expected.
 
+  - Zlisp strings support embedded double-quotes with backslash escapes,
+    for example: "a \"quoted\" substring".
+
   - `copy-region-as-kill` understands it's parameters now, and copies
     the described region correctly.
+
+  - `eval-expression` displays the result of the expression it evaluates
+    in the mini-buffer upon completion.
+
+  - `message` now treats it's first argument as a format-string, and
+    plugs % specifiers with values of the remaining args.
 
   - `save-buffers-kill-emacs` accepts an optional prefix argument; when
     non-nil save all modified buffers without asking.
@@ -84,16 +111,25 @@ GNU Zile NEWS                                    -*- outline -*-
     `point-min`.
     \C-h f ... RET for details.
 
-*** Zz
+*** Zlc
 
-  - A new editor, currently heavily based on Zemacs, but with the zlisp
-    evaluator removed in favour of direct Lua evaluation.
+  - `defsubr` parameter lists now support &optional and &rest parameters.
+
+  - `interactive` supports a "Nprompt: " and "p", making argument checking
+    and reading more consistent across zlisp function implementations.
 
 ** Bug fixes
 
  - zemacs 'universal-argument' guards against non-ASCII keys, so you
    can execute a key sequences like "\M-35\RIGHT" without inducing a
    "char out of range" crash.
+
+ - Removed latent infinite loops in fallback `MutableString:find` and
+   `MutableString:rfind` (when the C library doesn't provide `memmem` or
+   `memrchr` resp.).
+
+ - No longer mangles the last character of a multi-line buffer when
+   using fallback `MutableString:find`.
 
 
 * Noteworthy changes in release 3 (2013-09-25) [alpha]
