@@ -232,7 +232,82 @@ specify zlisp/move:
 
 - describe scroll-up:
 
+# No keystrokes, because forward-char is not bound to a key.
 - describe forward-line:
+  - before:
+      content = "a buffer\nstring with\nseveral lines of\ntext"
+  - context in batch mode:
+    - before:
+        zemacs = Zemacs {"--batch"}
+
+    - context with lisp:
+      - it diagnoses invalid argument: |
+          expect (zemacs:edit [[(forward-line "six")]]).
+            to_contain_error 'forward-line: wrong-type-argument integerp "six"'
+      - it moves point forwards one line:
+          expect (zemacs:edit ([[(forward-line) (insert "^")]], content)).
+            to_write_to_buffer "^string with\n"
+      - it moves to the end of a non-empty line at the end:
+          expect (zemacs:edit ([[(forward-line) (insert "^")]], "non-empty line")).
+            to_write_to_buffer "non-empty line^"
+      - it returns 0 for a successful line movement: |
+          expect (zemacs:edit ([[(message "remain=%d" (forward-line))]], content)).
+            to_contain_error "remain=0\n"
+      - it accepts a line count argument:
+          expect (zemacs:edit ([[(forward-line 2) (insert "^")]], content)).
+            to_write_to_buffer "^several lines of\n"
+      - it moves to the beginning-of-line with zero argument:
+          lisp = [[(end-of-buffer) (forward-line 0) (insert "^")]]
+          expect (zemacs:edit (lisp, content)).to_match_buffer "\n%^text$"
+      - it returns remainder for a partial line movement: |
+          expect (zemacs:edit ([[(message "remain=%d" (forward-line 6))]], content)).
+            to_contain_error "remain=2\n"
+      - it moves point backward with a negative line count:
+          lisp = [[(end-of-buffer) (forward-line -1) (insert "^")]]
+          expect (zemacs:edit (lisp, content)).
+            to_write_to_buffer "^several lines of\n"
+          lisp = [[(end-of-buffer) (forward-line -2) (insert "^")]]
+          expect (zemacs:edit (lisp, content)).
+            to_write_to_buffer "^string with\n"
+      - it returns remainder for a partial backwards line movement: |
+          expect (zemacs:edit ([[(message "remain=%d" (forward-line -6))]], content)).
+            to_contain_error "remain=6\n"
+
+  - context in interactive mode:
+    - before:
+        zemacs = Zemacs {"--no-init-file"}
+    - context with lisp:
+      - it diagnoses invalid argument: |
+          expect (zemacs:edit [[(forward-line "six")]]).
+            to_write_to_minibuf 'forward-line: wrong-type-argument integerp "six"'
+      - it moves point forwards one line:
+          expect (zemacs:edit ([[(forward-line) (insert "^")]], content)).
+            to_write_to_buffer "^string with\n"
+      - it moves to the end of a non-empty line at the end:
+          expect (zemacs:edit ([[(forward-line) (insert "^")]], "non-empty line")).
+            to_write_to_buffer "non-empty line^"
+      - it returns 0 for a successful line movement: |
+          expect (zemacs:edit ([[(message "remain=%d" (forward-line))]], content)).
+            to_write_to_minibuf "remain=0\n"
+      - it accepts a line count argument:
+          expect (zemacs:edit ([[(forward-line 2) (insert "^")]], content)).
+            to_write_to_buffer "^several lines of\n"
+      - it moves to the beginning-of-line with zero argument:
+          lisp = [[(end-of-buffer) (forward-line 0) (insert "^")]]
+          expect (zemacs:edit (lisp, content)).to_match_buffer "\n%^text$"
+      - it returns remainder for a partial line movement: |
+          expect (zemacs:edit ([[(message "remain=%d" (forward-line 6))]], content)).
+            to_write_to_minibuf "remain=2\n"
+      - it moves point backward with a negative line count:
+          lisp = [[(end-of-buffer) (forward-line -1) (insert "^")]]
+          expect (zemacs:edit (lisp, content)).
+            to_write_to_buffer "^several lines of\n"
+          lisp = [[(end-of-buffer) (forward-line -2) (insert "^")]]
+          expect (zemacs:edit (lisp, content)).
+            to_write_to_buffer "^string with\n"
+      - it returns remainder for a partial backwards line movement: |
+          expect (zemacs:edit ([[(message "remain=%d" (forward-line -6))]], content)).
+            to_write_to_minibuf "remain=6\n"
 
 - describe backward-paragraph:
 

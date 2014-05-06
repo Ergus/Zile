@@ -98,6 +98,10 @@ GNU Zile NEWS                                    -*- outline -*-
   - `eval-expression` displays the result of the expression it evaluates
     in the mini-buffer upon completion.
 
+  - `forward-line` now returns the number of requested line moves that
+    were not actioned, and treats a non-empty line at the end of a file
+    correctly.
+
   - `message` now treats it's first argument as a format-string, and
     plugs % specifiers with values of the remaining args.
 

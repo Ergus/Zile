@@ -133,18 +133,16 @@ column, or at the end of the line if it is not long enough."
     "return execute_with_uniarg (false, arg or 1, scroll_up, scroll_down)")
 
 
-(defsubr forward-line (n)
+(defsubr forward-line (&optional n)
   "Move N lines forward (backward if N is negative).
-Precisely, if point is on line I, move to the start of line I + N
-('start of line' in the logical order).
-If there isn't room, go as far as possible (no error)."
-  (interactive)
-    "n = n or current_prefix_arg or 1
-    if n ~= 0 then
-      beginning_of_line ()
-      return move_line (n)
-    end
-    return false")
+Precisely, if point is on line I, move to the start of line I + N.
+If there isn't room, go as far as possible (no error).
+Returns the count of lines left to move.  If moving forward,
+that is N - number of lines moved; if backward, N + number moved.
+With positive N, a non-empty line at the end counts as one line
+successfully moved (for the return value)."
+  (interactive "p")
+    "return forward_line (n or 1)")
 
 
 (localfun move_paragraph (uniarg forward backward line_extremum)

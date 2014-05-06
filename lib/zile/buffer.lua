@@ -588,6 +588,7 @@ function goto_goalc ()
   set_buffer_pt (cur_bp, i)
 end
 
+
 function move_line (n)
   local func = buffer_next_line
   if n < 0 then
@@ -614,6 +615,41 @@ function move_line (n)
 
   return n == 0
 end
+
+
+--- Move point N lines forward (backward if N is negative).
+-- @int n number of lines to move.
+-- @treturn integer number of lines remaining if a buffer boundary was
+--   met
+function forward_line (n)
+  local movefn = n < 0 and buffer_prev_line or buffer_next_line
+  local remain = math.abs (n or 1)
+  local o      = buffer_start_of_line (cur_bp, cur_bp.pt)
+
+  while remain > 0 do
+    local pos = movefn (cur_bp, o)
+    if pos == nil then break end
+    o, remain = pos, remain - 1
+  end
+
+  -- Moving forward over remaining characters of a non-empty last line
+  -- counts as one line successfully moved.
+  if remain > 0 and n > 0 then
+    local pos = buffer_end_of_line (cur_bp, o)
+    if pos > o then
+      o, remain = pos, remain - 1
+    end
+  end
+
+  -- Set point once after completing position calculations, to minimize
+  -- e.g. buffer-gap memory copies.
+  set_buffer_pt (cur_bp, o)
+
+  thisflag.need_resync = true
+
+  return remain
+end
+
 
 function offset_to_line (bp, offset)
   local n = 0
