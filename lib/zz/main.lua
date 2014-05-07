@@ -47,8 +47,9 @@ Report bugs to ]] .. prog.PACKAGE_BUGREPORT .. "."
 
 -- Runtime constants
 
--- Zi display attributes
+-- Zz display attributes
 display = {}
+colors = {}
 
 -- Keyboard handling
 
@@ -62,7 +63,6 @@ GETKEY_DELAYED = 2000
 -- set_uniarg:     the last command modified the universal arg variable `uniarg'.
 -- uniarg_empty:   current universal arg is just C-u's with no number.
 -- defining_macro: we are defining a macro.
-
 
 -- The current window
 cur_wp = nil
@@ -208,6 +208,8 @@ local function signal_init ()
   posix.signal(posix.SIGTERM, other_sig_handler)
 end
 
+local set_colors = require "zile.bundle".set_colors
+
 function main ()
   local scratch_bp, errmsg
 
@@ -221,6 +223,11 @@ function main ()
   if errmsg ~= nil then minibuf_error (errmsg) end
 
   init_default_bindings ()
+
+  -- If there are still no colors set, load the default set.
+  if not colors.normal then
+    colors = set_colors "zz.default-color"
+  end
 
   -- Create the `*scratch*' buffer, so that initialisation commands
   -- that act on a buffer have something to act on.

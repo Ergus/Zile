@@ -58,6 +58,7 @@ dist_zzcmds_DATA =					\
 
 dist_zzdata_DATA =					\
 	lib/zz/default-bindings.lua			\
+	lib/zz/default-color-bundle.lua			\
 	lib/zz/bind.lua					\
 	lib/zz/callbacks.lua				\
 	lib/zz/commands.lua				\

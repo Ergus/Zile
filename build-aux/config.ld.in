@@ -13,6 +13,7 @@ file = {
   "../lib/zile/Symbol.lua",
 
   -- Modules
+  "../lib/zile/bundle.lua",
   "../lib/zile/zlisp.lua",
   "../lib/zemacs/eval.lua",
   "../lib/zz/eval.lua",

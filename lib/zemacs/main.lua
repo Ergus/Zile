@@ -47,8 +47,9 @@ Report bugs to ]] .. prog.PACKAGE_BUGREPORT .. "."
 
 -- Runtime constants
 
--- Zi display attributes
+-- Zemacs display attributes
 display = {}
+colors = {}
 
 -- Keyboard handling
 
@@ -208,6 +209,8 @@ local function signal_init ()
   posix.signal(posix.SIGTERM, other_sig_handler)
 end
 
+local set_colors = require "zile.bundle".set_colors
+
 function main ()
   local scratch_bp, errmsg
 
@@ -221,6 +224,9 @@ function main ()
   if errmsg ~= nil then minibuf_error (errmsg) end
 
   init_default_bindings ()
+
+  -- Load default colors.
+  colors = set_colors "zile.default-color"
 
   -- Create the `*scratch*' buffer, so that initialisation commands
   -- that act on a buffer have something to act on.

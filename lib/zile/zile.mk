@@ -24,7 +24,9 @@ dist_pkgdata_DATA =				\
 	lib/zile/Symbol.lua			\
 	lib/zile/bind.lua			\
 	lib/zile/buffer.lua			\
+	lib/zile/bundle.lua			\
 	lib/zile/completion.lua			\
+	lib/zile/default-color-bundle.lua	\
 	lib/zile/editfns.lua			\
 	lib/zile/file.lua			\
 	lib/zile/funcs.lua			\
