@@ -34,6 +34,15 @@ GNU Zile NEWS                                    -*- outline -*-
 
 ** New features
 
+  - New "bundle" loading scheme for JSON-like Lua format tables with
+    `require`.
+
+  - Beginnings of a UI coloring bundle file format.  Zemacs does not
+    use it, as it is completely different to (but much more light-weight
+    than) the Emacs font-lock system; but Zz now has a rudimentary color
+    UI on color terminals with a color-capable curses binding (i.e. just
+    about any modern system).
+
   - Beginnings of LDoc generated api documentation of Zile modules.
 
   - Legacy Zemacs tests are migrating to Specl and have significantly
