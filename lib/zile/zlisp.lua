@@ -40,7 +40,7 @@
 
 local io     = require "std.io"
 local Set    = require "std.set"
-local string = require "std.string".monkey_patch ()
+local string = require "std.string"
 
 
 
