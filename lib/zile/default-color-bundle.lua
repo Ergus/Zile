@@ -130,7 +130,7 @@
 
  Not all of these values can be displayed on all terminals, though at
  least 'normal', 'underline', 'reverse' and 'bold' are almost universal.
- 
+
  @module zile.default-color
 ]]
 
