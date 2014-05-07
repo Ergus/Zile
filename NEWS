@@ -92,6 +92,10 @@ GNU Zile NEWS                                    -*- outline -*-
   - Zlisp strings support embedded double-quotes with backslash escapes,
     for example: "a \"quoted\" substring".
 
+  - `beginning-of-line` and `end-of-line` now support optional argument
+    for stepping over lines before moving point to beginning or end of
+    that line resp.
+
   - `copy-region-as-kill` understands it's parameters now, and copies
     the described region correctly.
 

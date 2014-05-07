@@ -18,16 +18,21 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-(defsubr beginning-of-line ()
-  "Move point to beginning of current line."
-  (interactive)
-  "return beginning_of_line ()")
+(defsubr beginning-of-line (&optional n)
+  "Move point to beginning of current line.
+With argument N not nil or 1, move forward N - 1 lines first.
+If point reaches the beginning or end of buffer, it stops there."
+  (interactive "p")
+    "forward_line ((n or 1) - 1)")
 
 
-(defsubr end-of-line ()
-  "Move point to end of current line."
-  (interactive)
-  "return end_of_line ()")
+(defsubr end-of-line (&optional n)
+  "Move point to end of current line.
+With argument N not nil or 1, move forward N - 1 lines first.
+If point reaches the beginning or end of buffer, it stops there."
+  (interactive "p")
+    "forward_line ((n or 1) - 1)
+    return end_of_line ()")
 
 
 (defsubr backward-char (&optional n)

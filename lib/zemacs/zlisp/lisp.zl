@@ -90,13 +90,24 @@ evaluate it."
     local ok, err = lisp.eval_string (exp)
     if err then
       minibuf_error (err)
-    elseif ok ~= true then
+    else
       minibuf_echo (case (type (ok), {
-        number = function ()
-                   return string.format ('%d (#o%o, #x%x)', ok, ok, ok)
-                 end,
+        number  = function ()
+                    return string.format ('%d (#o%o, #x%x)', ok, ok, ok)
+                  end,
 
-                 function () return tostring (ok) end,
+        string  = function () return string.format ('%q', ok) end,
+
+        -- FIXME: remove this when we don't rely on returning true for
+        --        success and false for error; for now assume errors
+        --        were handled already, and `true` indicates a function
+        --        not yet updated to return a proper value... so we
+        --        display `nil` to indicate nothing returned.
+        boolean = function ()
+                    return 'nil'
+                  end,
+
+                  function () return tostring (ok) end,
       }))
     end
 

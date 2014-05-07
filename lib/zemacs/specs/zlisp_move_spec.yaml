@@ -1,7 +1,188 @@
+before:
+  content = "a buffer\nstring with\nseveral lines of\ntext"
+
+
 specify zlisp/move:
 - describe beginning-of-line:
+  - context in batch mode:
+    - before:
+        zemacs = Zemacs {"--batch"}
+
+    - context with lisp:
+      - it diagnoses invalid argument: |
+          expect (zemacs:edit [[(beginning-of-line "six")]]).
+            to_contain_error 'beginning-of-line: wrong-type-argument integerp "six"'
+      - it moves point to the beginning of the current line:
+          lisp = [[(insert "start ") (beginning-of-line) (insert "^")]]
+          expect (zemacs:edit (lisp, content)).
+            to_write_to_buffer "^start a buffer\n"
+      - it returns nil: |
+          expect (zemacs:edit [[(eval-expression "(beginning-of-line)")]]).
+            to_contain_output "nil\n"
+      - it accepts a line count argument:
+          expect (zemacs:edit ([[(beginning-of-line 3) (insert "^")]], content)).
+            to_write_to_buffer "^several lines of\n"
+      - it moves to the beginning of current line with 1-valued argument:
+          lisp = [[(end-of-buffer) (beginning-of-line 1) (insert "^")]]
+          expect (zemacs:edit (lisp, content)).to_match_buffer "\n%^text$"
+      - it moves to the end of a non-empty line at the end:
+          expect (zemacs:edit ([[(beginning-of-line 2) (insert "^")]], "non-empty line")).
+            to_write_to_buffer "non-empty line^"
+      - it moves point backward with a non-positive line count: |
+          lisp = [[(end-of-buffer) (beginning-of-line %d) (insert "^")]]
+          lines = {}
+          content:gsub ("([^\n]+)", function (line) lines[#lines + 1] = line end)
+          for n = 1, #lines - 1 do
+            expect (zemacs:edit (string.format (lisp, 1 - n), content)).
+              to_write_to_buffer ("^" .. lines[#lines - n] .. "\n")
+          end
+
+  - context in interactive mode:
+    - before:
+        zemacs = Zemacs {"--no-init-file"}
+    - context with lisp:
+      - it diagnoses invalid argument: |
+          expect (zemacs:edit [[(beginning-of-line "six")]]).
+            to_write_to_minibuf 'beginning-of-line: wrong-type-argument integerp "six"'
+      - it moves point to the beginning of the current line:
+          lisp = [[(insert "start ") (beginning-of-line) (insert "^")]]
+          expect (zemacs:edit (lisp, content)).
+            to_write_to_buffer "^start a buffer\n"
+      - it returns nil: |
+          expect (zemacs:edit [[(eval-expression "(beginning-of-line)")]]).
+            to_write_to_minibuf "nil\n"
+      - it accepts a line count argument:
+          expect (zemacs:edit ([[(beginning-of-line 3) (insert "^")]], content)).
+            to_write_to_buffer "^several lines of\n"
+      - it moves to the beginning of current line with 1-valued argument:
+          lisp = [[(end-of-buffer) (beginning-of-line 1) (insert "^")]]
+          expect (zemacs:edit (lisp, content)).to_match_buffer "\n%^text$"
+      - it moves to the end of a non-empty line at the end:
+          expect (zemacs:edit ([[(beginning-of-line 2) (insert "^")]], "non-empty line")).
+            to_write_to_buffer "non-empty line^"
+      - it moves point backward with a non-positive line count: |
+          lisp = [[(end-of-buffer) (beginning-of-line %d) (insert "^")]]
+          lines = {}
+          content:gsub ("([^\n]+)", function (line) lines[#lines + 1] = line end)
+          for n = 1, #lines - 1 do
+            expect (zemacs:edit (string.format (lisp, 1 - n), content)).
+              to_write_to_buffer ("^" .. lines[#lines - n] .. "\n")
+          end
+    - context with keystrokes:
+      - it moves point to the beginning of the current line:
+          expect (zemacs:edit ([[start \C-a^]], content)).
+            to_write_to_buffer "^start a buffer\n"
+      - it returns nil: |
+          expect (zemacs:edit [[\M-:(beginning-of-line)\r]]).
+            to_write_to_minibuf "nil\n"
+      - it accepts a line count argument:
+          expect (zemacs:edit ([[\M-3\C-a^]], content)).
+            to_write_to_buffer "^several lines of\n"
+      - it moves to the beginning of current line with 1-valued argument:
+          expect (zemacs:edit ([[\M->\M-1\C-a^]], content)).to_match_buffer "\n%^text$"
+      - it moves to the end of a non-empty line at the end:
+          expect (zemacs:edit ([[\M-2\C-a^]], "non-empty line")).
+            to_write_to_buffer "non-empty line^"
+      - it moves point backward with a non-positive line count: |
+          keys = [[\M->\M-%d\C-a^]]
+          lines = {}
+          content:gsub ("([^\n]+)", function (line) lines[#lines + 1] = line end)
+          for n = 1, #lines - 1 do
+            expect (zemacs:edit (string.format (keys, 1 - n), content)).
+              to_write_to_buffer ("^" .. lines[#lines - n] .. "\n")
+          end
 
 - describe end-of-line:
+  - context in batch mode:
+    - before:
+        zemacs = Zemacs {"--batch"}
+
+    - context with lisp:
+      - it diagnoses invalid argument: |
+          expect (zemacs:edit [[(end-of-line "six")]]).
+            to_contain_error 'end-of-line: wrong-type-argument integerp "six"'
+      - it moves point to the end of the current line:
+          lisp = [[(end-of-line) (insert "^")]]
+          expect (zemacs:edit (lisp, content)).
+            to_write_to_buffer "a buffer^\n"
+      - it returns nil: |
+          expect (zemacs:edit [[(eval-expression "(end-of-line)")]]).
+            to_contain_output "nil\n"
+      - it accepts a line count argument:
+          expect (zemacs:edit ([[(end-of-line 3) (insert "^")]], content)).
+            to_write_to_buffer "several lines of^\n"
+      - it moves to the end of current line with 1-valued argument:
+          lisp = [[(end-of-line 1) (insert "^")]]
+          expect (zemacs:edit (lisp, content)).
+            to_write_to_buffer "a buffer^\n"
+      - it moves to the end of a non-empty line at the end:
+          expect (zemacs:edit ([[(end-of-line 2) (insert "^")]], "non-empty line")).
+            to_write_to_buffer "non-empty line^"
+      - it moves point backward with a non-positive line count: |
+          lisp = [[(end-of-buffer) (end-of-line %d) (insert "^")]]
+          lines = {}
+          content:gsub ("([^\n]+)", function (line) lines[#lines + 1] = line end)
+          for n = 1, #lines - 1 do
+            expect (zemacs:edit (string.format (lisp, 1 - n), content)).
+              to_write_to_buffer (lines[#lines - n] .. "^\n")
+          end
+
+  - context in interactive mode:
+    - before:
+        zemacs = Zemacs {"--no-init-file"}
+    - context with lisp:
+      - it diagnoses invalid argument: |
+          expect (zemacs:edit [[(end-of-line "six")]]).
+            to_write_to_minibuf 'end-of-line: wrong-type-argument integerp "six"'
+      - it moves point to the end of the current line:
+          lisp = [[(end-of-line) (insert "^")]]
+          expect (zemacs:edit (lisp, content)).
+            to_write_to_buffer "a buffer^\n"
+      - it returns nil: |
+          expect (zemacs:edit [[(eval-expression "(end-of-line)")]]).
+            to_write_to_minibuf "nil\n"
+      - it accepts a line count argument:
+          expect (zemacs:edit ([[(end-of-line 3) (insert "^")]], content)).
+            to_write_to_buffer "several lines of^\n"
+      - it moves to the end of current line with 1-valued argument:
+          lisp = [[(end-of-line 1) (insert "^")]]
+          expect (zemacs:edit (lisp, content)).
+            to_write_to_buffer "a buffer^\n"
+      - it moves to the end of a non-empty line at the end:
+          expect (zemacs:edit ([[(end-of-line 2) (insert "^")]], "non-empty line")).
+            to_write_to_buffer "non-empty line^"
+      - it moves point backward with a non-positive line count: |
+          lisp = [[(end-of-buffer) (end-of-line %d) (insert "^")]]
+          lines = {}
+          content:gsub ("([^\n]+)", function (line) lines[#lines + 1] = line end)
+          for n = 1, #lines - 1 do
+            expect (zemacs:edit (string.format (lisp, 1 - n), content)).
+              to_write_to_buffer (lines[#lines - n] .. "^\n")
+          end
+    - context with keystrokes:
+      - it moves point to the end of the current line:
+          expect (zemacs:edit ([[\C-e^]], content)).
+            to_write_to_buffer "a buffer^\n"
+      - it returns nil: |
+          expect (zemacs:edit [[\M-:(end-of-line)\r]]).
+            to_write_to_minibuf "nil\n"
+      - it accepts a line count argument:
+          expect (zemacs:edit ([[\M-3\C-e^]], content)).
+            to_write_to_buffer "several lines of^\n"
+      - it moves to the end of current line with 1-valued argument:
+          expect (zemacs:edit ([[\M-1\C-e^]], content)).
+            to_write_to_buffer "a buffer^\n"
+      - it moves to the end of a non-empty line at the end:
+          expect (zemacs:edit ([[\M-2\C-e^]], "non-empty line")).
+            to_write_to_buffer "non-empty line^"
+      - it moves point backward with a non-positive line count: |
+          keys = [[\M->\M-%d\C-e^]]
+          lines = {}
+          content:gsub ("([^\n]+)", function (line) lines[#lines + 1] = line end)
+          for n = 1, #lines - 1 do
+            expect (zemacs:edit (string.format (keys, 1 - n), content)).
+              to_write_to_buffer (lines[#lines - n] .. "^\n")
+          end
 
 - describe backward-char:
   - context in batch mode:
@@ -234,8 +415,6 @@ specify zlisp/move:
 
 # No keystrokes, because forward-char is not bound to a key.
 - describe forward-line:
-  - before:
-      content = "a buffer\nstring with\nseveral lines of\ntext"
   - context in batch mode:
     - before:
         zemacs = Zemacs {"--batch"}
