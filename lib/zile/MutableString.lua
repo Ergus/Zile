@@ -34,6 +34,7 @@
 
 
 local alien  = require "alien"
+local case   = require "std.functional".case
 local Object = require "std.object"
 local table  = require "std.table"
 
@@ -41,11 +42,6 @@ local calloc, cstring, libc, memmove, memset =
   alien.array, alien.buffer, alien.default, alien.memmove, alien.memset
 
 local clone, merge = table.clone, table.merge
-
-
-local utils = require "zile.lib"
-
--- local case = utils.case -- FIXME uncomment when zile.lib returns a table
 
 
 local MutableString  -- forward declaration

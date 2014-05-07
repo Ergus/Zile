@@ -23,6 +23,7 @@
  @classmod zile.FileString
 ]]
 
+local case          = require "std.functional".case
 local Object        = require "std.object"
 
 local MutableString = require "zile.MutableString"
