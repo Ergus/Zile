@@ -33,6 +33,9 @@
 ]]
 
 
+local empty = require "std.table".empty
+
+
 -- Metamethods for syntax parsers state.
 local metatable = {
   -- Queue a stack operation.
@@ -40,10 +43,11 @@ local metatable = {
   -- @int o offest into line
   -- @int attr attribute to push or pop
   push_op = function (self, op, o, attr)
-    if not attr then return nil end
-    local st = self.syntax.ops
-    st[o] = st[o] or stack.new ()
-    st[o]:push { [op] = attr }
+    if o and attr then
+      local st = self.syntax.ops
+      st[o] = st[o] or stack.new ()
+      st[o]:push { [op] = attr }
+    end
   end,
 }
 
@@ -86,10 +90,17 @@ local state = {
 -- @string s string to match against rex
 -- @param i search start index into s
 -- @treturn int offset of beginning of match
--- @treturn int oppset of end of match
+-- @treturn int offset of end of match
+-- @treturn table expression capture offsets
 local function rex_exec (rex, s, i)
-  local b, e = rex:exec (s, i + 1)
-  return b and (b - 1), e and (e - 1)
+  local b, e, caps = rex:exec (s, i + 1)
+
+  for k, v in pairs (caps or {}) do
+    -- onig stores unmatched captures as `false`.
+    if v then caps[k] = v - 1 end
+  end
+
+  return b and (b - 1), e and (e - 1), caps
 end
 
 
@@ -99,21 +110,22 @@ end
 -- @tparam table pats a list of patterns
 -- @treturn int offset of beginning of match
 -- @treturn int offset of end of match
+-- @treturn table expression capture offsets
 -- @treturn pattern matching pattern
 local function leftmost_match (lexer, i, pats)
   local s = lexer.s
-  local b, e, p
+  local b, e, caps, matched
 
-  for _,v in ipairs (pats) do
+  for _, v in ipairs (pats) do
     if v.match then
-      local _b, _e = rex_exec (v.match, s, i)
+      local _b, _e, _caps = rex_exec (v.match, s, i)
       if _b and (not b or _b < b) then
-        b, e, p = _b, _e, v
+        b, e, caps, matched = _b, _e, _caps, v
       end
     end
   end
 
-  return b, e, p
+  return b, e, caps, matched
 end
 
 
@@ -122,14 +134,25 @@ end
 -- @tparam table lexer syntax highlight matcher stat
 local function parse (lexer)
   local pats = lexer.grammar.patterns
-  local b, e, p
+  local b, e, caps, matched
 
   local i = 0
   repeat
-    b, e, p = leftmost_match (lexer, i, pats)
+    b, e, caps, matched = leftmost_match (lexer, i, pats)
     if b then
-      lexer:push_op ("push", b, p.attrs)
-      lexer:push_op ("pop",  e, p.attrs)
+      lexer:push_op ("push", b, matched.attrs)
+      if caps and matched.captures then
+        for k, t in pairs (matched.captures) do
+          -- onig marks zero length captures with first > last
+          local first, last = caps[(k * 2) - 1], caps[k * 2]
+
+          if first and first < last then
+            lexer:push_op ("push", first, t.attrs)
+            lexer:push_op ("pop",  last,  t.attrs)
+          end
+        end
+      end
+      lexer:push_op ("pop",  e, matched.attrs)
 
       i = e + 1
     end
