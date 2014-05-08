@@ -128,6 +128,27 @@ local function set_colors (name)
 end
 
 
+--- Return attributes for most complete match against scope name.
+-- @string name full scope name
+-- @treturn int attributes for closest matching scope.
+local function scopetoattr (name)
+  if not name then return nil end
+
+  local key = {}
+  for w in name:gmatch "[^%.]+" do
+    table.insert (key, w)
+  end
+
+  repeat
+    local scope = table.concat (key, ".")
+    if colors[scope] then
+      return colors[scope]
+    end
+    table.remove (key)
+  until #key == 0
+end
+
+
 --- Load the grammar description for modename.
 -- @string modename name of a mode with this grammar
 -- @treturn table grammar
@@ -140,19 +161,12 @@ function load_grammar (modename)
     if g and g.patterns then
       for _, v in ipairs (g.patterns) do
         if v.name then
-          local key = {}
-	  for w in v.name:gmatch "[^%.]+" do
-            key[#key + 1] = w
-	  end
-
-	  repeat
-            local scope = table.concat (key, ".")
-	    if colors[scope] then
-              v.attrs = colors[scope]
-	      break
-	    end
-	    table.remove (key)
-	  until #key == 0
+          v.attrs = scopetoattr (v.name)
+        end
+        if v.captures then
+          for _, t in ipairs (v.captures) do
+            t.attrs = scopetoattr (t.name)
+          end
         end
 
         local ok
