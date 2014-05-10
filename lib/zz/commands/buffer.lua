@@ -17,7 +17,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <htt://www.gnu.org/licenses/>.
 
-local ripairs = require "std.table".ripairs
+local table = require "std.table"
+local clone, ripairs = table.clone, table.ripairs
 
 local eval    = require "zz.eval"
 
@@ -133,7 +134,7 @@ local function write_buffers_list (old_wp)
   insert_string ('--- ------                ----  ----             ----\n')
 
   -- Rotate buffer list to get current buffer at head.
-  local bufs = table.clone (buffers)
+  local bufs = clone (buffers)
   for i = #buffers, 1, -1 do
     if buffers[i] == old_wp.bp then
       break
