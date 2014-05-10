@@ -231,7 +231,7 @@ function load_grammar (modename)
   local fullname = "zile.grammar." .. modename
 
   if package.loaded[fullname] == nil then
-    local g = require (fullname)
+    local _, g = pcall (require, fullname)
 
     if g and g.patterns then
       g.repository = compile_patterns (g.repository)
