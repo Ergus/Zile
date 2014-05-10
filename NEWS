@@ -127,6 +127,9 @@ GNU Zile NEWS                                    -*- outline -*-
   - `message` now treats it's first argument as a format-string, and
     plugs % specifiers with values of the remaining args.
 
+  - `query-replace-regexp` works like `query-replace` but treats the
+    search string argument as a regular expression.
+
   - `save-buffers-kill-emacs` accepts an optional prefix argument; when
     non-nil save all modified buffers without asking.
 

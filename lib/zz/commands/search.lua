@@ -141,87 +141,125 @@ local function check_case (s)
 end
 
 
+-- Replace some occurrences of a match with another string.
+local function do_query_replace (regexp)
+  local prompt = string.format ([[Query replace %s: ]], regexp and 'regexp' or 'string')
+  local find = minibuf_read (prompt, '')
+  if not find then
+    return keyboard_quit ()
+  end
+  if find == '' then
+    return false
+  end
+  local find_no_upper = no_upper (find, false)
+
+  prompt = string.format ([[Query replace %s`%s' with: ]],
+                          regexp and 'regexp' or '', find)
+  local repl = minibuf_read (prompt, '')
+  if not repl then
+    keyboard_quit ()
+  end
+
+  local noask = false
+  local count = 0
+  local ok = true
+  prompt = string.format ([[Query replacing `%s' with `%s' (y, n, !, ., q)? ]], find, repl)
+  while search (find, true, regexp) do
+    local c = keycode ' '
+
+    if not noask then
+      if thisflag.need_resync then
+        window_resync (cur_wp)
+      end
+      minibuf_write (prompt)
+      c = getkey (GETKEY_DEFAULT)
+      minibuf_clear ()
+      if c == keycode 'q' then -- Quit immediately.
+        break
+      elseif c == keycode '\\C-g' then
+        ok = keyboard_quit ()
+        break
+      elseif c == keycode '!' then -- Replace all without asking.
+        noask = true
+      end
+    end
+
+    if set.member (keyset {' ', 'y', 'Y', '.', '!'}, c) then
+      -- Perform replacement.
+      count = count + 1
+      local case_repl = repl
+      local r = region_new (get_buffer_pt (cur_bp) - #find, get_buffer_pt (cur_bp))
+      if find_no_upper and eval.get_variable ('case_replace') then
+        local case_type = check_case (tostring (get_buffer_region (cur_bp, r))) -- FIXME
+        if case_type then
+          case_repl = recase (repl, case_type)
+        end
+      end
+      local m = point_marker ()
+      goto_offset (r.start)
+      replace_estr (#find, FileString (case_repl))
+      goto_offset (m.o)
+      unchain_marker (m)
+
+      if c == keycode '.' then -- Replace and quit.
+        break
+      end
+    elseif not set.member (keyset {'n', 'N', '\\RET', '\\DELETE'}, c) then
+      ungetkey (c)
+      ok = false
+      break
+    end
+  end
+
+  if thisflag.need_resync then
+    window_resync (cur_wp)
+  end
+
+  if ok then
+    minibuf_write (string.format ('Replaced %d occurrence%s', count, count ~= 1 and 's' or ''))
+  end
+
+  return ok
+end
+
+
 Defun ("query_replace",
 [[
-Replace occurrences of a string with other text.
+Replace some occurrences of FROM-STRING with TO-STRING.
 As each match is found, the user must type a character saying
 what to do with it.
+
+Matching is independent of case if `case-fold-search' is non-nil and
+FROM-STRING has no uppercase letters.  Replacement transfers the case
+pattern of the old text to the new text, if `case-replace' and
+`case-fold-search' are non-nil and FROM-STRING has no uppercase
+letters.  (Transferring the case pattern means that if the old text
+matched is all caps, or capitalized, then its replacement is upcased
+or capitalized.)
 ]],
   true,
   function ()
-    local find = minibuf_read ('Query replace string: ', '')
-    if not find then
-      return keyboard_quit ()
-    end
-    if find == '' then
-      return false
-    end
-    local find_no_upper = no_upper (find, false)
+    return do_query_replace (false)
+  end
+)
 
-    local repl = minibuf_read (string.format ([[Query replace `%s' with: ]], find), '')
-    if not repl then
-      keyboard_quit ()
-    end
 
-    local noask = false
-    local count = 0
-    local ok = true
-    while search (find, true, false) do
-      local c = keycode ' '
+Defun ("query_replace_regexp",
+[[
+Replace some occurrences of REGEXP with TO-STRING.
+As each match is found, the user must type a character saying
+what to do with it.
 
-      if not noask then
-        if thisflag.need_resync then
-          window_resync (cur_wp)
-        end
-        minibuf_write (string.format ([[Query replacing `%s' with `%s' (y, n, !, ., q)? ]], find, repl))
-        c = getkey (GETKEY_DEFAULT)
-        minibuf_clear ()
-
-        if c == keycode 'q' then -- Quit immediately.
-          break
-        elseif c == keycode '\\C-g' then
-          ok = keyboard_quit ()
-          break
-        elseif c == keycode '!' then -- Replace all without asking.
-          noask = true
-        end
-      end
-
-      if set.member (keyset {' ', 'y', 'Y', '.', '!'}, c) then
-        -- Perform replacement.
-        count = count + 1
-        local case_repl = repl
-        local r = region_new (get_buffer_pt (cur_bp) - #find, get_buffer_pt (cur_bp))
-        if find_no_upper and eval.get_variable ('case_replace') then
-          local case_type = check_case (tostring (get_buffer_region (cur_bp, r))) -- FIXME
-          if case_type then
-            case_repl = recase (repl, case_type)
-          end
-        end
-        local m = point_marker ()
-        goto_offset (r.start)
-        replace_estr (#find, FileString (case_repl))
-        goto_offset (m.o)
-        unchain_marker (m)
-
-        if c == keycode '.' then -- Replace and quit.
-          break
-        end
-      elseif not set.member (keyset {'n', 'N', '\\RET', '\\DELETE'}, c) then
-        ungetkey (c)
-        ok = false
-        break
-      end
-    end
-
-    if thisflag.need_resync then
-      window_resync (cur_wp)
-    end
-
-    if ok then
-      minibuf_write (string.format ('Replaced %d occurrence%s', count, count ~= 1 and 's' or ''))
-    end
-
-    return ok
+Matching is independent of case if `case-fold-search' is non-nil and
+FROM-STRING has no uppercase letters.  Replacement transfers the case
+pattern of the old text to the new text, if `case-replace' and
+`case-fold-search' are non-nil and FROM-STRING has no uppercase
+letters.  (Transferring the case pattern means that if the old text
+matched is all caps, or capitalized, then its replacement is upcased
+or capitalized.)
+]],
+  true,
+  function ()
+    return do_query_replace (true)
   end
 )
