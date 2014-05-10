@@ -132,6 +132,19 @@ end
 -- @tfield[opt={}] table plist property list
 
 
+--- Manage labels around sandbox function calls.
+-- @tparam function fn function to be called
+-- @treturn function a function that manages labels around call to fn
+local function labelfn (fn)
+  return function (...)
+    command.attach_label (nil)
+    local ok = fn (...)
+    command.next_label ()
+    return ok
+  end
+end
+
+
 --- Define a command in the execution environment for the evaluator.
 -- @string name command name
 -- @string doc docstring
@@ -140,10 +153,10 @@ end
 -- @treturn symbol newly interned symbol
 local function Defun (name, doc, interactive, func)
   local symbol = intern (name, symtab)
-  symbol.value = func
+  symbol.value = labelfn (func)
   symbol["documentation"]      = texi (chomp (doc))
   symbol["interactive-form"]   = interactive
-  getmetatable (symbol).__call = func
+  getmetatable (symbol).__call = symbol.value
   return symbol
 end
 
