@@ -232,6 +232,13 @@ local function parse (lexer)
   repeat
     b, e, caps, matched = leftmost_match (lexer, i, pats:top ())
     if b then
+      -- If there are subexpressions, push those on the pattern stack.
+      if matched.patterns then
+        lexer:push_op ("push", b, colors:push (matched.colors))
+        begincaps:push {caps = caps, begin = lexer.s}
+        pats:push (matched.patterns)
+      end
+
       lexer:push_op ("push", b, matched.colors)
       if caps and matched.captures then
         for k, v in pairs (matched.captures) do
@@ -247,13 +254,6 @@ local function parse (lexer)
       lexer:push_op ("pop",  e, matched.colors)
 
       i = e + 1
-
-      -- If there are subexpressions, push those on the pattern stack.
-      if matched.patterns then
-        lexer:push_op ("push", b, colors:push (matched.colors))
-        begincaps:push {caps = caps, begin = lexer.s}
-        pats:push (matched.patterns)
-      end
 
       -- Pop completed subexpressions off the pattern stack
       if matched.finish then
