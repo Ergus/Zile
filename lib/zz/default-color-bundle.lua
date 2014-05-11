@@ -98,6 +98,32 @@
     settings = 'magenta',
   },
 
+  -- yaml files
+  {
+    scope = 'punctuation.definition.entry.yaml',
+    settings = { fontStyle = 'bold', foreground = 'yellow' },
+  },
+  {
+    scope = 'punctuation.separator.key-value.yaml',
+    settings = 'red',
+  },
+  {
+    scope = 'punctuation.block.style.yaml',
+    settings = { fontStyle = 'bold', foreground = 'magenta' },
+  },
+  {
+    scope = 'string.unquoted.description.yaml',
+    settings = 'blue',
+  },
+  {
+    scope = 'string.quoted.double.yaml',
+    settings = 'cyan',
+  },
+  {
+    scope = 'entity.name.tag.yaml',
+    settings = { fontStyle = 'bold', foreground = 'cyan' },
+  },
+
   -- patch files
   {
     scope = 'meta.diff.header',
