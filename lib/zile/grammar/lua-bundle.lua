@@ -20,32 +20,37 @@
 {
   name = 'Lua',
   fileTypes = { 'lua' },
-  foldingStartMarker = [[^\s*\b(function|local\s+function|if|for)\b|{[ \t]*$|\[\[]],
+  firstLineMatch =[[\A#!.*?\blua\b]],
+  decreaseIndentPattern = [[^\s*(elseif|else|end|\})\s*$]],
+  increaseIndentPattern = [[\b(else|elseif|(local\s+)?function|then|do|repeat)\b((?!end).)*$|\{\s*$]],
+  foldingStartMarker = [[\b(function|local\s+function|then|do|repeat)\b|{[ \t]*$|\[\[]],
   foldingStopMarker = [=[\bend\b|^\s*}|\]\]]=],
   patterns = {
     {
       name = 'meta.function.lua',
-      match = [[\b([a-zA-Z_.:]+[.:])?([a-zA-Z_]\w*)\s*(=)\s*(function)\s*(\()([^)]*)(\))]],
+      match = [[\b([a-zA-Z_.:]+[.:])?([a-zA-Z_]\w*)\s*(=)\s*(function)\s*(\()(self\b)?([^)]*)(\))]],
       captures = {
         [1] = { name = 'entity.name.function.scope.lua' },
         [2] = { name = 'entity.name.function.lua' },
         [3] = { name = 'keyword.operator.lua' },
         [4] = { name = 'keyword.control.lua' },
         [5] = { name = 'punctuation.definition.parameters.begin.lua' },
-        [6] = { name = 'variable.parameter.function.lua' },
-        [7] = { name = 'punctuation.definition.parameters.end.lua' },
+        [6] = { name = 'variable.language.self.lua' },
+        [7] = { name = 'variable.parameter.function.lua' },
+        [8] = { name = 'punctuation.definition.parameters.end.lua' },
       },
     },
     {
       name = 'meta.function.lua',
-      match = [[\b(function)\s+([a-zA-Z_.:]+[.:])?([a-zA-Z_]\w*)\s*(\()([^)]*)(\))]],
+      match = [[\b(function)(?:\s+([a-zA-Z_.:]+[.:])?([a-zA-Z_]\w*)\s*)?(\()(self\b)?([^)]*)(\))]],
       captures = {
         [1] = { name = 'keyword.control.lua' },
         [2] = { name = 'entity.name.function.scope.lua' },
         [3] = { name = 'entity.name.function.lua' },
         [4] = { name = 'punctuation.definition.parameters.begin.lua' },
-        [5] = { name = 'variable.parameter.function.lua' },
-        [6] = { name = 'punctuation.definition.parameters.end.lua' },
+        [5] = { name = 'variable.language.self.lua' },
+        [6] = { name = 'variable.parameter.function.lua' },
+        [7] = { name = 'punctuation.definition.parameters.end.lua' },
       },
     },
     {
@@ -102,7 +107,7 @@
       },
     },
     {
-      begin = [[(^[ \t]+)?(?=--)]],
+      begin = [[(^[ \t]+)?(?=--(?!\[\[))]],
       beginCaptures = {
         [1] = { name = 'punctuation.whitespace.comment.leading.lua' },
       },
@@ -136,15 +141,23 @@
     },
     {
       name = 'support.function.lua',
-      match = [[(?<![^.]\.|:)\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall)\b(?=[( {])]],
+      match = [[(?<![^.]\.|:)\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall)\b(?=\s*(?:[({"']|\[\[))]],
     },
     {
       name = 'support.function.library.lua',
-      match = [[(?<![^.]\.|:)\b(coroutine\.(create|resume|running|status|wrap|yield)|string\.(byte|char|dump|find|format|gmatch|gsub|len|lower|match|rep|reverse|sub|upper)|table\.(concat|insert|maxn|remove|sort)|math\.(abs|acos|asin|atan2?|ceil|cosh?|deg|exp|floor|fmod|frexp|ldexp|log|log10|max|min|modf|pow|rad|random|randomseed|sinh?|sqrt|tanh?)|io\.(close|flush|input|lines|open|output|popen|read|tmpfile|type|write)|os\.(clock|date|difftime|execute|exit|getenv|remove|rename|setlocale|time|tmpname)|package\.(cpath|loaded|loadlib|path|preload|seeall)|debug\.(debug|[gs]etfenv|[gs]ethook|getinfo|[gs]etlocal|[gs]etmetatable|getregistry|[gs]etupvalue|traceback))\b(?=[( {])]],
+      match = [[(?<![^.]\.|:)\b(coroutine\.(create|resume|running|status|wrap|yield)|string\.(byte|char|dump|find|format|gmatch|gsub|len|lower|match|rep|reverse|sub|upper)|table\.(concat|insert|maxn|remove|sort)|math\.(abs|acos|asin|atan2?|ceil|cosh?|deg|exp|floor|fmod|frexp|ldexp|log|log10|max|min|modf|pow|rad|random|randomseed|sinh?|sqrt|tanh?)|io\.(close|flush|input|lines|open|output|popen|read|tmpfile|type|write)|os\.(clock|date|difftime|execute|exit|getenv|remove|rename|setlocale|time|tmpname)|package\.(cpath|loaded|loadlib|path|preload|seeall)|debug\.(debug|[gs]etfenv|[gs]ethook|getinfo|[gs]etlocal|[gs]etmetatable|getregistry|[gs]etupvalue|traceback))\b(?=\s*(?:[({"']|\[\[))]],
     },
     {
       name = 'keyword.operator.lua',
       match = [[\b(not|and|or)\b]],
+    },
+    {
+      name = 'support.function.any-method.lua',
+      match = [[\b([A-Za-z_]\w*)\b(?=\s*(?:[({"'']|\[\[))]],
+    },
+    {
+      name = 'variable.other.lua',
+      match = [[(?<=[^.]\.|:)\b([A-Za-z_]\w*)]],
     },
     {
       name = 'keyword.operator.lua',

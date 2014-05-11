@@ -63,7 +63,15 @@
   },
   {
     scope = 'support.function',
-    settings = 'cyan',
+    settings = { fontStype = 'bold', foreground = 'blue' },
+  },
+  {
+    scope = 'support.function.library',
+    settings = { fontStyle = 'bold', foreground = 'blue' },
+  },
+  {
+    scope = 'support.function.any-method',
+    settings = 'blue',
   },
   {
     scope = 'invalid',
@@ -78,12 +86,16 @@
     settings = 'yellow',
   },
   {
-    scope = 'variable',
-    settings = 'blue',
+    scope = 'variable.parameter',
+    settings = 'cyan',
   },
   {
     scope = 'variable.other',
-    settings = { fontStyle = 'bold', foreground = 'blue' },
+    settings = 'cyan',
+  },
+  {
+    scope = 'variable.language',
+    settings = 'magenta',
   },
 
   -- patch files
