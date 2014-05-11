@@ -172,7 +172,7 @@ local function expand (lexer, match)
     b, e = match:find ("\\.", e + 1)
     if e then
       local n = match:sub (e, e):match ("%d")
-      if n then
+      if n and begincaps[n * 2] then
         -- begincaps was adjusted to 0-based indexing by rex_exec.
         local replace = string_sub (begin, begincaps[(n * 2) - 1], begincaps[n * 2])
         match = match:sub (1, b - 1) .. replace .. match:sub (e + 1)
