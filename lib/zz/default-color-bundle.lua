@@ -108,20 +108,20 @@
     settings = 'red',
   },
   {
+    scope = 'punctuation.style.flow.yaml',
+    settings = 'magenta',
+  },
+  {
     scope = 'punctuation.block.style.yaml',
     settings = { fontStyle = 'bold', foreground = 'magenta' },
   },
   {
-    scope = 'string.unquoted.description.yaml',
-    settings = 'blue',
-  },
-  {
     scope = 'string.quoted.double.yaml',
-    settings = 'cyan',
+    settings = 'white',
   },
   {
     scope = 'entity.name.tag.yaml',
-    settings = { fontStyle = 'bold', foreground = 'cyan' },
+    settings = { fontStyle = 'bold', foreground = 'white' },
   },
 
   -- patch files

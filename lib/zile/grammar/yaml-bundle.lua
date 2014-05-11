@@ -65,7 +65,7 @@
     },
     invalid_trailing_whitespace = {
       name = 'invalid.deprecated.trailing-whitespace.yaml',
-      match = [[(\s+)$]],
+      match = [[([ \t]+)$]],
     },
     merge_key = {
       name = 'keyword.operator.merge-key.yaml',
@@ -112,15 +112,17 @@
     },
     unquoted_block = {
       name = 'string.unquoted.block.yaml',
-      begin = [[^(\s*)(?:(-)|(?:(-\s*)?(\w+\s*(:))))(?:\s*(\||>))]],
+      begin = [[^(\s*)(?:(-)|(?:(-\s*)?(\S[^:]*\s*(:))))(?:\s*(\||>))?$]],
       beginCaptures = {
         [2] = { name = 'punctuation.definition.entry.yaml' },
         [3] = { name = 'punctuation.definition.entry.yaml' },
         [4] = { name = 'entity.name.tag.yaml' },
         [5] = { name = 'punctuation.separator.key-value.yaml' },
+        [6] = { name = 'punctuation.style.flow.yaml' },
       },
       ['end'] = [[^(?!^\1)|^(?=\1(-|\w+\s*:)|#)]],
       patterns = {
+        { include = '#comment' },
         { include = '#unquoted_block' },
         { include = '#numeric_constant' },
         { include = '#unquoted_string' },
@@ -132,7 +134,6 @@
         { include = '#interpolated' },
         { include = '#merge_key' },
         { include = '#invalid_trailing_whitespace' },
-        { include = '#comment' },
         { include = '#hyphen' },
         { include = '#invalid_leading_tabs' },
         { include = 'source.lua' },
@@ -140,7 +141,7 @@
     },
     unquoted_string = {
       name = 'string.unquoted.yaml',
-      match = [[(?:(?:(-\s*)?(\w+\s*(:)))|(-))\s*([A-Za-z0-9].*)\s*$]],
+      match = [[(?:(?:(-\s*)?(\S[^:]+\s*(:)))|(-))\s*([A-Za-z0-9].*)\s*$]],
       captures = {
         [1] = { name = 'punctuation.definition.entry.yaml' },
         [2] = { name = 'entity.name.tag.yaml' },
@@ -158,6 +159,7 @@
     },
   },
   patterns = {
+    { include = '#comment' },
     { include = '#unquoted_block' },
     { include = '#numeric_constant' },
     { include = '#unquoted_string' },
@@ -169,7 +171,6 @@
     { include = '#interpolated' },
     { include = '#merge_key' },
     { include = '#invalid_trailing_whitespace' },
-    { include = '#comment' },
     { include = '#hyphen' },
     { include = '#invalid_leading_tabs' },
   },
