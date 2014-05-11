@@ -238,7 +238,7 @@ local function parse (lexer)
           -- onig marks zero length captures with first > last
           local first, last = caps[(k * 2) - 1], caps[k * 2]
 
-          if first and first < last then
+          if first and first <= last then
             lexer:push_op ("push", first, v)
             lexer:push_op ("pop",  last,  v)
           end
