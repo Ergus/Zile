@@ -191,7 +191,7 @@ function compile_pattern (v)
   local p = {
     captures = capturestoattr (v.captures or v.beginCaptures),
     colors   = scopetoattr (v.name),
-    include  = v.include and v.include:match "^#([%w_]+)$",
+    include  = v.include,
     patterns = compile_patterns (v.patterns),
     rex      = compile_rex (v.match or v.begin),
   }

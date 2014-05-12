@@ -67,6 +67,14 @@
       name = 'invalid.deprecated.trailing-whitespace.yaml',
       match = [[([ \t]+)$]],
     },
+    lua = {
+      name = 'source.embedded.lua',
+      begin = [[^(\s+)(?![-#\s])]],
+      ['end'] = [[^(?!^\1)|^(?=\1(-|\w+\s*:))]],
+      patterns = {
+        {  include = 'source.lua' },
+      },
+    },
     merge_key = {
       name = 'keyword.operator.merge-key.yaml',
       match = [[(\\<\\<) = ((\\*).*)$]],
@@ -112,7 +120,7 @@
     },
     unquoted_block = {
       name = 'string.unquoted.block.yaml',
-      begin = [[^(\s*)(?:(-)|(?:(-\s*)?(\S[^:]*\s*(:))))(?:\s*(\||>))?$]],
+      begin = [[^(\s*)(?:(-)|(?:(-\s*)?(\S[^:]*\s*(:))))(?:\s*(\||>|$))]],
       beginCaptures = {
         [2] = { name = 'punctuation.definition.entry.yaml' },
         [3] = { name = 'punctuation.definition.entry.yaml' },
@@ -136,18 +144,24 @@
         { include = '#invalid_trailing_whitespace' },
         { include = '#hyphen' },
         { include = '#invalid_leading_tabs' },
-        { include = 'source.lua' },
+        { include = '#lua' },
       },
     },
     unquoted_string = {
       name = 'string.unquoted.yaml',
-      match = [[(?:(?:(-\s*)?(\S[^:]+\s*(:)))|(-))\s*([A-Za-z0-9].*)\s*$]],
+      match = [=[(?:(?:(-\s*)?(\w+\s*(:)))|(-))\s*(?:((")[^"]*("))|((')[^']*('))|([^,{}&#\[\]]+))\s*]=],
       captures = {
         [1] = { name = 'punctuation.definition.entry.yaml' },
         [2] = { name = 'entity.name.tag.yaml' },
         [3] = { name = 'punctuation.separator.key-value.yaml' },
         [4] = { name = 'punctuation.definition.entry.yaml' },
-        [5] = { name = 'string.unquoted.yaml' },
+        [5] = { name = 'string.quoted.double.yaml' },
+        [6] = { name = 'punctuation.definition.string.begin.yaml' },
+        [7] = { name = 'punctuation.definition.string.end.yaml' },
+        [8] = { name = 'string.quoted.single.yaml' },
+        [9] = { name = 'punctuation.definition.string.begin.yaml' },
+        [10] = { name = 'punctuation.definition.string.end.yaml' },
+        [11] = { name = 'string.unquoted.yaml' },
       },
     },
     variable = {
@@ -173,5 +187,6 @@
     { include = '#invalid_trailing_whitespace' },
     { include = '#hyphen' },
     { include = '#invalid_leading_tabs' },
+    { include = '#lua' },
   },
 }

@@ -189,25 +189,46 @@ end
 -- @tparam table lexer syntax highlight matcher state
 -- @int i search start index
 -- @tparam table pats a list of patterns
+-- @tparam table repo additional rules repository
 -- @treturn int offset of beginning of match
 -- @treturn int offset of end of match
 -- @treturn table expression capture offsets
 -- @treturn pattern matching pattern
-local function leftmost_match (lexer, i, pats)
-  local repo, s = lexer.bp.grammar.repository, lexer.s
-  local b, e, caps, matched
+local function leftmost_match (lexer, i, pats, repo)
+  local s = lexer.s
+  local b, e, caps, matched, rex
 
   for _, v in ipairs (pats) do
-    local _p  = v.include and repo[v.include] or v
-    local rex = expand (lexer, _p.match) or _p.rex or _p.finish
-
-    -- Match next candidate expression.
     local _b, _e, _caps
-    if rex then
-      _b, _e, _caps = rex_exec (rex, s, i)
-    elseif _p.patterns then
-      _b, _e, _caps, _p = leftmost_match (lexer, i, _p.patterns)
-    end
+    local _p  = v
+
+    repeat
+      if type (v.include) == "string" then
+
+        -- look-up `{ include = 'source.foo' }` in grammar foo
+        local key = v.include:match "^source%.([%w_]+)$"
+        local g   = key and load_grammar (key) or nil
+        if g then
+          _b, _e, _caps, _p = leftmost_match (lexer, i, g.patterns, g.repository)
+          break
+        end
+
+        -- look-up `{ include = "#foo" }` key in repo
+        key = v.include:match "^#([%w_]+)$"
+        if key then
+          _p = repo[key] or v
+        end
+      end
+
+      local rex = expand (lexer, _p.match) or _p.rex or _p.finish
+
+      -- Match next candidate expression.
+      if rex then
+        _b, _e, _caps = rex_exec (rex, s, i)
+      elseif _p.patterns then
+        _b, _e, _caps, _p = leftmost_match (lexer, i, _p.patterns, repo)
+      end
+    until true
 
     -- Save candidate if it matched earlier than previous candidate.
     if _b and (not b or _b < b) then
@@ -230,7 +251,7 @@ local function parse (lexer)
 
   local i = 0
   repeat
-    b, e, caps, matched = leftmost_match (lexer, i, pats:top ())
+    b, e, caps, matched = leftmost_match (lexer, i, pats:top (), lexer.bp.grammar.repository)
     if b then
       -- If there are subexpressions, push those on the pattern stack.
       if matched.patterns then
