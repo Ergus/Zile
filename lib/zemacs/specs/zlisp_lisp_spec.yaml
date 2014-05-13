@@ -8,3 +8,34 @@ specify zlisp/lisp:
 - describe eval-buffer:
 
 - describe eval-expression:
+
+- describe progn:
+  - context in batch mode:
+    - before:
+        zemacs = Zemacs {"--batch"}
+    - context with lisp:
+      - it returns nil with no arguments:
+          pending "propagate nil return correctly"
+          expect (zemacs:edit '(message "result=%s" (progn))').
+            to_contain_error 'result=nil'
+      - it propagates the result of a single expresson:
+          expect (zemacs:edit '(message "result=%s" (progn 42))').
+            to_contain_error 'result=42\n'
+      - it returns result of evaluating last expression:
+          expect (zemacs:edit '(message "result=%d" (progn 1 2 3))').
+            to_contain_error 'result=3\n'
+
+  - context in interactive mode:
+    - before:
+        zemacs = Zemacs {"--no-init-file"}
+    - context with lisp:
+      - it returns nil with no arguments:
+          pending "propagate nil return correctly"
+          expect (zemacs:edit '(message "result=%s" (progn))').
+            to_write_to_minibuf 'result=nil'
+      - it propagates the result of a single expresson:
+          expect (zemacs:edit '(message "result=%s" (progn 42))').
+            to_write_to_minibuf 'result=42\n'
+      - it returns result of evaluating last expression:
+          expect (zemacs:edit '(message "result=%d" (progn 1 2 3))').
+            to_write_to_minibuf 'result=3\n'

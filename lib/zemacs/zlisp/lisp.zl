@@ -116,3 +116,16 @@ evaluate it."
     end
 
     return ok, err")
+
+
+(localvar elems "require 'std.list'.elems")
+
+(defsubr progn (...)
+  "(progn BODY...)
+
+Eval BODY forms sequentially and return value of last one."
+    "local ret
+    for exp in elems {...} do
+      ret = lisp.eval_expression (exp)
+    end
+    return ret")
