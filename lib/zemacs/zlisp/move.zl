@@ -67,8 +67,8 @@ If N is omitted or nil, move point 1 character forward."
   "Set point to POSITION, a number.
 Beginning of buffer is position 1."
   (interactive "NGoto char: ")
-    "return type (position) == 'number' and
-      goto_offset (math.min (get_buffer_size (cur_bp) + 1, math.max (position, 1)))")
+    "goto_offset (math.min (get_buffer_size (cur_bp) + 1, math.max (position, 1)))
+    return position")
 
 
 (defsubr goto-line (line)

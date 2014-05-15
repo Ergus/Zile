@@ -674,6 +674,7 @@ function goto_offset (o, bp)
     cur_bp.goalc = get_goalc ()
     thisflag.need_resync = true
   end
+  return o
 end
 
 function buffer_next (this_bp)

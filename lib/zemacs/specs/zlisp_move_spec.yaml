@@ -343,6 +343,10 @@ specify zlisp/move:
         zemacs = Zemacs {"--batch"}
 
     - context with lisp:
+      - it diagnoses missing argument: |
+          pending "diagnose missing arguments"
+          expect (zemacs:edit [[(goto-char)]]).
+            to_contain_error 'Wrong number of arguments: goto-char, 0\n'
       - it diagnoses invalid argument: |
           expect (zemacs:edit [[(goto-char "six")]]).
             to_contain_error 'goto-char: wrong-type-argument integerp "six"\n'
@@ -350,6 +354,11 @@ specify zlisp/move:
           lisp = [[(goto-char 10) (delete-char)]]
           expect (zemacs:edit (lisp, "Fix a typ_o\n")).
             to_write_to_buffer "Fix a typo\n"
+      - it returns argument value: |
+          for _, o in ipairs {-999, -1, 0, 1, #content -1, #content, #content + 1, 999999} do
+            expect (zemacs:edit ([[(message "result=%d" (goto-char ]] .. o.. [[))]], content)).
+              to_contain_error (string.format ("result=%d\n", o))
+          end
       - it rounds too small offset to start of buffer: |
           lisp = [[(goto-char -1) (delete-char)]]
           expect (zemacs:edit (lisp, "_rest of buffer\n")).
@@ -363,6 +372,10 @@ specify zlisp/move:
     - before:
         zemacs = Zemacs {"--no-init-file"}
     - context with lisp:
+      - it diagnoses missing argument: |
+          pending "diagnose missing arguments"
+          --expect (zemacs:edit [[(goto-char)]]).
+          --  to_write_to_minibuf 'Wrong number of arguments: goto-char, 0\n'
       - it diagnoses invalid argument: |
           expect (zemacs:edit [[(goto-char "six")]]).
             to_write_to_minibuf 'goto-char: wrong-type-argument integerp "six"'
@@ -370,6 +383,11 @@ specify zlisp/move:
           lisp = [[(goto-char 10) (delete-char)]]
           expect (zemacs:edit (lisp, "Fix a typ_o\n")).
             to_write_to_buffer "Fix a typo\n"
+      - it returns argument value: |
+          for _, o in ipairs {-999, -1, 0, 1, #content -1, #content, #content + 1, 999999} do
+            expect (zemacs:edit ([[(message "result=%d" (goto-char ]] .. o.. [[))]], content)).
+              to_write_to_minibuf (string.format ("result=%d\n", o))
+          end
       - it rounds too small offset to start of buffer: |
           lisp = [[(goto-char -1) (delete-char)]]
           expect (zemacs:edit (lisp, "_rest of buffer\n")).
@@ -382,14 +400,23 @@ specify zlisp/move:
       - it moves point to provided offset: |
           expect (zemacs:edit [[1\M-gc1\r2\M-gc2\r3]]).
             to_write_to_buffer "231"
-      - it accepts a character count argument:
+      - it returns argument value: |
+          for _, o in ipairs {-999, -1, 0, 1, #content -1, #content, #content + 1, 999999} do
+            expect (zemacs:edit ([[(message "result=%d" (goto-char ]] .. o.. [[))]], content)).
+              to_write_to_minibuf (string.format ("result=%d\n", o))
+          end
+      - it accepts a character count prefix argument:
           keystrokes = [[\M-6\M-gc^]]
           expect (zemacs:edit (keystrokes, "buffer text\n")).
             to_write_to_buffer "buffe^r text\n"
-      - it understands the universal argument:
+      - it treats the universal prefix argument as 4:
           keystrokes = [[\C-u\M-gc^]]
           expect (zemacs:edit (keystrokes, "buffer text\n")).
             to_write_to_buffer "buf^fer text\n"
+      - it reads an offset from the minibuffer when invoked with no prefix:
+          keystrokes = [[\M-gc10\r^]]
+          expect (zemacs:edit (keystrokes, "buffer text\n")).
+            to_write_to_buffer "buffer te^xt\n"
       - it rounds too small offset to start of buffer: |
           keystrokes = [[\M--1\M-gc^]]
           expect (zemacs:edit (keystrokes, "buffer text\n")).
