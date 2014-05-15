@@ -162,13 +162,15 @@ function marshaller (symbol, arglist)
   while arglist and arglist.car ~= nil do
     local arg = arglist.car
     if argspec.cdr ~= "UNEVAL" then arg = eval_expression (arg) end
-    table.insert (args, arg)
+
+    -- Lisp 't and 'nil are represented by Lua true and false.
+    table.insert (args, arg or false)
     arglist = arglist.cdr
   end
 
   current_prefix_arg, prefix_arg = prefix_arg, false
 
-  return symbol.func (unpack (args)) or true
+  return symbol.func (unpack (args))
 end
 
 
@@ -282,7 +284,7 @@ end
 --   symbol to execute
 -- @param[opt=nil] uniarg a single non-table argument for `symbol_or_name`
 local function execute_function (symbol_or_name, uniarg)
-  local symbol, ok = symbol_or_name, false
+  local symbol, value = symbol_or_name
 
   if type (symbol_or_name) ~= "table" then
     symbol = intern_soft (symbol_or_name)
@@ -293,10 +295,10 @@ local function execute_function (symbol_or_name, uniarg)
   end
 
   command.attach_label (nil)
-  ok = symbol and symbol (uniarg)
+  value = symbol and symbol (uniarg) or nil
   command.next_label ()
 
-  return ok
+  return value
 end
 
 
@@ -309,7 +311,7 @@ local function call_command (symbol, arglist)
 
   -- Execute the command.
   command.interactive_enter ()
-  local ok = execute_function (symbol, arglist)
+  local value = execute_function (symbol, arglist)
   command.interactive_exit ()
 
   -- Only add keystrokes if we were already in macro defining mode
@@ -324,7 +326,7 @@ local function call_command (symbol, arglist)
 
   lastflag = thisflag
 
-  return ok
+  return value
 end
 
 
@@ -365,12 +367,13 @@ local function eval_string (s)
   local ok, list = pcall (lisp.parse, s, mangle)
   if not ok then return nil, list end
 
+  local value
   while list do
-    ok = eval_command (list.car)
+    value = eval_command (list.car)
     list = list.cdr
   end
 
-  return ok or true
+  return value
 end
 
 
@@ -380,11 +383,12 @@ end
 local function eval_file (file)
   local s, errmsg = slurp (file)
 
+  local value
   if s then
-    s, errmsg = eval_string (s)
+    value, errmsg = eval_string (s)
   end
 
-  return s, errmsg
+  return value, errmsg
 end
 
 
