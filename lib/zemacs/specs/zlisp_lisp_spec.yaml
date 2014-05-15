@@ -6,8 +6,63 @@ specify zlisp/lisp:
 - describe execute-extended-command:
 
 - describe eval-buffer:
+  - context in batch mode:
+    - before:
+        zemacs = Zemacs {"--batch"}
+
+  - context in interactive mode:
+    - before:
+        zemacs = Zemacs {"--no-init-file"}
+    - context with lisp:
+    - context with keystrokes:
+      - it diagnoses void variable references: |
+          pending "factor away symbol-name mangling"
+          expect (zemacs:edit ([[\M-xeval-buffer\r]], 'not-defined')).
+            to_write_to_minibuf "Symbol's value as a variable is void: not-defined"
+      - it diagnoses void function calls: |
+          pending "factor away symbol-name mangling"
+          expect (zemacs:edit ([[\M-xeval-buffer\r]], '(not-defined)')).
+            to_write_to_minibuf "Symbol's function definition is void: not-defined"
+      - it diagnoses invalid functions: |
+          expect (zemacs:edit ([[\M-xeval-buffer\r]], '(42)')).
+            to_write_to_minibuf 'Invalid function: 42'
 
 - describe eval-expression:
+  - context in batch mode:
+    - before:
+        zemacs = Zemacs {"--batch"}
+
+  - context in interactive mode:
+    - before:
+        zemacs = Zemacs {"--no-init-file"}
+    - context with lisp:
+    - context with keystrokes:
+      - it diagnoses void variable references: |
+          pending "factor away symbol-name mangling"
+          expect (zemacs:edit [[\M-:not-defined\r]]).
+            to_write_to_minibuf "Symbol's value as a variable is void: not-defined"
+      - it diagnoses void function calls: |
+          pending "factor away symbol-name mangling"
+          expect (zemacs:edit [[\M-:(not-defined)\r]]).
+            to_write_to_minibuf "Symbol's function definition is void: not-defined"
+      - it diagnoses invalid functions: |
+          expect (zemacs:edit [[\M-:(42)\r]]).
+            to_write_to_minibuf 'Invalid function: 42'
+      - it evaluates nil:
+          expect (zemacs:edit [[\M-:nil\r]]).
+            to_write_to_minibuf 'nil'
+      - it evaluates t:
+          expect (zemacs:edit [[\M-:t\r]]).
+            to_write_to_minibuf 't'
+      - it evaluates strings:
+          expect (zemacs:edit [[\M-:"a string"\r]]).
+            to_write_to_minibuf [["a string"]]
+      - it evaluates symbols as variables:
+          expect (zemacs:edit [[\M-:message-log-max\r]]).
+            to_write_to_minibuf '1000'
+      - it evaluates lists as function calls:
+          expect (zemacs:edit [[\M-:(point-min)\r]]).
+            to_write_to_minibuf '1'
 
 - describe progn:
   - context in batch mode:

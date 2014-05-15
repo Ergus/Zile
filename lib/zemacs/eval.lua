@@ -284,10 +284,15 @@ end
 --   symbol to execute
 -- @param[opt=nil] uniarg a single non-table argument for `symbol_or_name`
 local function execute_function (symbol_or_name, uniarg)
-  local symbol, value = symbol_or_name
-
-  if type (symbol_or_name) ~= "table" then
+  local symbol = symbol_or_name
+  if type (symbol_or_name) == "string" then
     symbol = intern_soft (symbol_or_name)
+  end
+
+  if not symbolp (symbol) then
+    return nil, "Invalid function: " .. tostring (symbol)
+  elseif type (symbol.func) ~= "function" then
+    return nil, "Symbol's function definition is void: " .. symbol.name
   end
 
   if uniarg ~= nil and type (uniarg) ~= "table" then
@@ -295,10 +300,13 @@ local function execute_function (symbol_or_name, uniarg)
   end
 
   command.attach_label (nil)
-  value = symbol and symbol (uniarg) or nil
+  local value, errmsg
+  if symbol then
+    value, errmsg = symbol (uniarg)
+  end
   command.next_label ()
 
-  return value
+  return value, errmsg
 end
 
 
@@ -311,7 +319,7 @@ local function call_command (symbol, arglist)
 
   -- Execute the command.
   command.interactive_enter ()
-  local value = execute_function (symbol, arglist)
+  local value, errmsg = execute_function (symbol, arglist)
   command.interactive_exit ()
 
   -- Only add keystrokes if we were already in macro defining mode
@@ -326,7 +334,7 @@ local function call_command (symbol, arglist)
 
   lastflag = thisflag
 
-  return value
+  return value, errmsg
 end
 
 
@@ -335,7 +343,9 @@ end
 --   command name.
 -- @return the result of evaluating `list`, or else `nil`
 local function eval_command (list)
-  return list and list.car and call_command (list.car, list.cdr) or nil
+  if list and list.car then
+    return call_command (list.car, list.cdr)
+  end
 end
 
 
@@ -367,13 +377,23 @@ local function eval_string (s)
   local ok, list = pcall (lisp.parse, s, mangle)
   if not ok then return nil, list end
 
-  local value
+  local value, errmsg
   while list do
-    value = eval_command (list.car)
+    local expr = list.car
+    if consp (expr) then
+      value, errmsg = eval_command (expr)
+    elseif symbolp (expr) then
+      if not expr.value then
+        return nil, "Symbol's value as a variable is void: " .. expr.name
+      end
+      value = expr.value
+    else
+      value = expr
+    end
     list = list.cdr
   end
 
-  return value
+  return value, errmsg
 end
 
 

@@ -31,7 +31,10 @@ function get_and_run_command ()
   minibuf_clear ()
 
   if func then
-    call_command (func, lastflag.set_uniarg and (prefix_arg or 1))
+    local _, errmsg = call_command (func, lastflag.set_uniarg and (prefix_arg or 1))
+    if errmsg ~= nil then
+      minibuf_error (errmsg)
+    end
   else
     minibuf_error (tostring (keys) .. " is undefined")
   end

@@ -264,9 +264,9 @@ function main ()
         minibuf_error (string.format ("Function `%s' not defined", arg))
       end
     elseif type == "loadfile" then
-      ok = lisp.eval_file (arg)
-      if not ok then
-        minibuf_error (string.format ("Cannot open load file: %s\n", arg))
+      local ok, errmsg = lisp.eval_file (arg)
+      if errmsg then
+        minibuf_error (string.format ("Cannot open load file: %s: %s\n", arg, errmsg))
       end
     elseif type == "file" then
       ok = find_file (arg)

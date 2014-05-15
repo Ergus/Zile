@@ -62,7 +62,9 @@ The values val are expressions; they are evaluated."
 
     local name = minibuf_read_function_name (msg)
     local command = name and lisp.intern_soft (name)
-    return command and lisp.execute_function (command, prefixarg) or nil")
+    if command then
+      return lisp.execute_function (command, prefixarg)
+    end")
 
 
 (defsubr eval-buffer (&optional buffer)
@@ -98,14 +100,7 @@ evaluate it."
 
         string  = function () return string.format ('%q', ok) end,
 
-        -- FIXME: remove this when we don't rely on returning true for
-        --        success and false for error; for now assume errors
-        --        were handled already, and `true` indicates a function
-        --        not yet updated to return a proper value... so we
-        --        display `nil` to indicate nothing returned.
-        boolean = function ()
-                    return 'nil'
-                  end,
+        boolean = function () return ok and 't' or 'nil' end,
 
                   function () return tostring (ok) end,
       }))

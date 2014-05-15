@@ -45,8 +45,7 @@ If N is omitted or nil, move point 1 character backward."
     local ok = move_char (-n)
     if not ok then
       minibuf_error ((n < 0 and 'End' or 'Beginning') .. ' of buffer')
-    end
-    return ok")
+    end")
 
 
 (defsubr forward-char (&optional n)
@@ -59,8 +58,7 @@ If N is omitted or nil, move point 1 character forward."
     local ok = move_char (n)
     if not ok then
       minibuf_error ((n > 0 and 'End' or 'Beginning') .. ' of buffer')
-    end
-    return ok")
+    end")
 
 
 (defsubr goto-char (position)
