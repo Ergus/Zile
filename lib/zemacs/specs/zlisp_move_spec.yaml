@@ -72,12 +72,12 @@ specify zlisp/move:
       - it moves point to the beginning of the current line:
           expect (zemacs:edit ([[start \C-a^]], content)).
             to_write_to_buffer "^start a buffer\n"
-      - it returns nil: |
-          expect (zemacs:edit [[\M-:(beginning-of-line)\r]]).
-            to_write_to_minibuf "nil\n"
-      - it accepts a line count argument:
+      - it accepts a line count prefix argument:
           expect (zemacs:edit ([[\M-3\C-a^]], content)).
             to_write_to_buffer "^several lines of\n"
+      - it treats universal prefix argument as 4:
+          expect (zemacs:edit ([[\C-u\C-a^]], content)).
+            to_write_to_buffer "^text"
       - it moves to the beginning of current line with 1-valued argument:
           expect (zemacs:edit ([[\M->\M-1\C-a^]], content)).to_match_buffer "\n%^text$"
       - it moves to the end of a non-empty line at the end:
@@ -163,12 +163,12 @@ specify zlisp/move:
       - it moves point to the end of the current line:
           expect (zemacs:edit ([[\C-e^]], content)).
             to_write_to_buffer "a buffer^\n"
-      - it returns nil: |
-          expect (zemacs:edit [[\M-:(end-of-line)\r]]).
-            to_write_to_minibuf "nil\n"
-      - it accepts a line count argument:
+      - it accepts a line count prefix argument:
           expect (zemacs:edit ([[\M-3\C-e^]], content)).
             to_write_to_buffer "several lines of^\n"
+      - it treats the universal prefix argument as 4:
+          expect (zemacs:edit ([[\C-u\C-e^]], content)).
+            to_write_to_buffer "text^"
       - it moves to the end of current line with 1-valued argument:
           expect (zemacs:edit ([[\M-1\C-e^]], content)).
             to_write_to_buffer "a buffer^\n"
@@ -189,7 +189,6 @@ specify zlisp/move:
     - before:
         zemacs = Zemacs {"--batch"}
 
-    # Lisp context only - you can't send keystrokes in batch mode!
     - context with lisp:
       - it diagnoses invalid argument: |
           expect (zemacs:edit [[(backward-char "six")]]).
@@ -198,6 +197,10 @@ specify zlisp/move:
           lisp = [[(end-of-line) (backward-char) (backward-delete-char)]]
           expect (zemacs:edit (lisp, "Fix a typ_o\n")).
             to_write_to_buffer "Fix a typo\n"
+      - it returns nil: |
+          lisp = [[(end-of-line) (eval-expression "(backward-char)")]]
+          expect (zemacs:edit (lisp, content)).
+            to_contain_output "nil\n"
       - it accepts a character count argument:
           lisp = [[(end-of-line) (backward-char 6) (backward-delete-char)]]
           expect (zemacs:edit (lisp, "Fix _a typo\n")).
@@ -224,6 +227,10 @@ specify zlisp/move:
           lisp = [[(end-of-line) (backward-char) (backward-delete-char)]]
           expect (zemacs:edit (lisp, "Fix a typ_o\n")).
             to_write_to_buffer "Fix a typo\n"
+      - it returns nil: |
+          lisp = [[(end-of-line) (eval-expression "(backward-char)")]]
+          expect (zemacs:edit (lisp, content)).
+            to_write_to_minibuf "nil\n"
       - it accepts a character count argument:
           lisp = [[(end-of-line) (backward-char 6) (backward-delete-char)]]
           expect (zemacs:edit (lisp, "Fix _a typo\n")).
@@ -242,11 +249,11 @@ specify zlisp/move:
       - it moves point backwards one character: |
           expect (zemacs:edit [[1\LEFT2\LEFT3]]).
             to_write_to_buffer "321"
-      - it accepts a character count argument:
+      - it accepts a character count prefix argument:
           keystrokes = [[\C-e\M-6\LEFT^]]
           expect (zemacs:edit (keystrokes, "buffer text\n")).
             to_write_to_buffer "buffe^r text\n"
-      - it understands the universal argument:
+      - it treats the universal prefix argument as 4:
           keystrokes = [[\C-e\C-u\LEFT^]]
           expect (zemacs:edit (keystrokes, "buffer text\n")).
             to_write_to_buffer "buffer ^text\n"
@@ -274,6 +281,10 @@ specify zlisp/move:
           lisp = [[(forward-char) (delete-char)]]
           expect (zemacs:edit (lisp, "F_ix a typo\n")).
             to_write_to_buffer "Fix a typo\n"
+      - it returns nil: |
+          lisp = [[(eval-expression "(forward-char)")]]
+          expect (zemacs:edit (lisp, content)).
+            to_contain_output "nil\n"
       - it accepts a character count argument:
           lisp = [[(forward-char 6) (delete-char)]]
           expect (zemacs:edit (lisp, "Fix a _typo\n")).
@@ -300,6 +311,10 @@ specify zlisp/move:
           lisp = [[(forward-char) (delete-char)]]
           expect (zemacs:edit (lisp, "F_ix a typo\n")).
             to_write_to_buffer "Fix a typo\n"
+      - it returns nil: |
+          lisp = [[(eval-expression "(forward-char)")]]
+          expect (zemacs:edit (lisp, content)).
+            to_write_to_minibuf "nil\n"
       - it accepts a character count argument:
           lisp = [[(forward-char 6) (delete-char)]]
           expect (zemacs:edit (lisp, "Fix a _typo\n")).
@@ -322,7 +337,7 @@ specify zlisp/move:
           keystrokes = [[\M-6\RIGHT^]]
           expect (zemacs:edit (keystrokes, "buffer text\n")).
             to_write_to_buffer "buffer^ text\n"
-      - it understands the universal argument:
+      - it treats the universal prefix argument as 4:
           keystrokes = [[\C-u\RIGHT^]]
           expect (zemacs:edit (keystrokes, "buffer text\n")).
             to_write_to_buffer "buff^er text\n"

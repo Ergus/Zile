@@ -1,0 +1,30 @@
+# Specs for ZLisp functions
+
+- describe name-of-function:
+  - context in batch mode:
+    - before:
+        zemacs = Zemacs {"--batch"}
+    - context with lisp:
+      - it diagnoses missing argument(s):
+      - it diagnoses invalid argument(s):
+
+      # check correct behaviour for valid arguments and initial conditions
+
+      # check return values for valid arguments and initial conditions
+
+  - context in interactive mode:
+    - before:
+        zemacs = Zemacs {"--no-init-file"}
+    - context with lisp:
+
+        # same as batch mode examples above
+
+    # For `(interactive)` functions that are (or can be!) bound to a key
+    - context with keystrokes:
+      - it diagnoses invalid argument(s):
+
+      # check correct behaviour along with prompted parameters, if any
+
+      # check correct behaviour with numeric prefix arguments
+
+      # check correct behaviour with universal prefix argument(s)
