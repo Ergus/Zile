@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 dist_pkgdata_DATA =				\
+	lib/zile/Array.lua			\
 	lib/zile/Cons.lua			\
 	lib/zile/FileString.lua			\
 	lib/zile/MutableString.lua		\

@@ -26,6 +26,7 @@
 zile_specdir = $(srcdir)/lib/zile/specs
 
 specl_SPECS +=						\
+	$(zile_specdir)/Array_spec.yaml			\
 	$(zile_specdir)/MutableString_spec.yaml		\
 	$(NOTHING_ELSE)
 

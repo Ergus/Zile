@@ -118,6 +118,7 @@ dist_doc_DATA +=					\
 	$(NOTHING_ELSE)
 
 dist_classes_DATA +=					\
+	$(srcdir)/doc/classes/zile.Array.html		\
 	$(srcdir)/doc/classes/zile.Cons.html		\
 	$(srcdir)/doc/classes/zile.FileString.html	\
 	$(srcdir)/doc/classes/zile.MutableString.html	\
