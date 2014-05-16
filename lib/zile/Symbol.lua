@@ -92,18 +92,6 @@ local obarray = {}
 -- @tfield[opt={}] table plist property list
 
 
---- Return a string representation of the value of a variable.
--- @tparam symbol symbol a symbol
--- @treturn string string representation, suitable for display
-local function display_variable_value (symbol)
-  local value = symbol.value
-  if type (value) == "string" then
-    return '"' .. value:gsub ('"', '\\"') .. '"'
-  end
-  return tostring (value)
-end
-
-
 local keynames = Set { "name", "value" }
 
 --- Shared metatable for Symbol objects.
@@ -132,7 +120,7 @@ local metatable = {
                  return rawset (self.plist, propname, value)
                end,
 
-  __tostring = display_variable_value,
+  __tostring = function (self) return self.name end,
 }
 
 
