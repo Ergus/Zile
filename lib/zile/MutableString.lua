@@ -138,8 +138,9 @@ end
 -- @int from index of first byte to remove
 -- @int n number of bytes to remove
 local function remove (self, from, n)
-  assert (from + n <= #self + 1)
-  self:move (from + n, from, n)
+  local b, e, eob = from, from + n, #self + 1
+  assert (e <= eob)
+  self:move (e, b, eob - e)
   self:set_len (#self - n)
 end
 
