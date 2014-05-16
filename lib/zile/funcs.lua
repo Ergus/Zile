@@ -18,6 +18,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local FileString = require "zile.FileString"
+local recase     = require "zile.lib".recase
 
 function get_region ()
   activate_mark ()

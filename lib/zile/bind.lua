@@ -19,6 +19,8 @@
 
 -- Key binding.
 
+local iscallable = require "zile.lib".iscallable
+
 -- Initialise prefix arg
 prefix_arg = false -- Not nil, so it is picked up in environment table
 current_prefix_arg = false

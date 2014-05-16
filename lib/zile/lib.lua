@@ -19,14 +19,14 @@
 
 
 -- Return true if x is a function, or is a Symbol with a __call metamethod.
-function iscallable (x)
+local function iscallable (x)
   if type (x) == "function" then return true end
   local mt = getmetatable (x)
   return mt and mt.__call and mt._type == "Symbol"
 end
 
 -- Recase str according to newcase.
-function recase (s, newcase)
+local function recase (s, newcase)
   local bs = ""
   local i, len
 
@@ -44,45 +44,53 @@ function recase (s, newcase)
 end
 
 
+
 -- Basic stack operations
-stack = {}
+local stack, metatable
 
-local metatable = {}
+stack = {
+  -- Pops and Pushes must balance, so instead of pushing `nil', which
+  -- already means "no entry" and cause the matching pop to remove an
+  -- unmatched value beneath the "missing" nil, use stack.empty:
+  empty = math.huge,
 
--- Pops and Pushes must balance, so instead of pushing `nil', which
--- already means "no entry" and cause the matching pop to remove an
--- unmatched value beneath the "missing" nil, use stack.empty:
-stack.empty = math.huge
+  -- Return a new stack, optionally initialised with elements from t.
+  new = function (t)
+    return setmetatable (t or {}, metatable)
+  end,
 
--- Return a new stack, optionally initialised with elements from t.
-function stack.new (t)
-  return setmetatable (t or {}, metatable)
-end
+  -- Push v on top of a stack, creating an empty cell when v is nil.
+  push = function (self, v)
+    table.insert (self, v or stack.empty)
+    return self[#self]
+  end,
 
--- Push v on top of a stack, creating an empty cell when v is nil.
-function stack:push (v)
-  table.insert (self, v or stack.empty)
-  return self[#self]
-end
+  -- Pop and return the top of a stack, or nil for empty cells.
+  pop = function (self)
+    local v = table.remove (self)
+    return v ~= stack.empty and v or nil
+  end,
 
--- Pop and return the top of a stack, or nil for empty cells.
-function stack:pop ()
-  local v = table.remove (self)
-  return v ~= stack.empty and v or nil
-end
+  -- Return the value from the top of a stack, ignoring empty cells.
+  top = function (self)
+    if #self < 1 then return nil end
+    local n = 0
+    while n + 1 < #self and self[#self - n] == stack.empty do
+      n = n + 1
+    end
+    assert (n < #self)
+    local v = self[#self - n]
+    return v ~= stack.empty and v or nil
+  end,
+}
 
--- Return the value from the top of a stack, ignoring empty cells.
-function stack:top ()
-  if #self < 1 then return nil end
-  local n = 0
-  while n + 1 < #self and self[#self - n] == stack.empty do
-    n = n + 1
-  end
-  assert (n < #self)
-  local v = self[#self - n]
-  return v ~= stack.empty and v or nil
-end
 
 -- Metamethods for stack tables
 -- stack:method ()
-metatable.__index = stack
+metatable = { __index = stack }
+
+return {
+  iscallable = iscallable,
+  recase     = recase,
+  stack      = stack,
+}

@@ -21,6 +21,7 @@
 (localvar set "require 'std.set'")
 
 (localvar FileString "require 'zile.FileString'")
+(localvar recase "require 'zile.lib'.recase")
 
 
 (defsubr search-forward (string)

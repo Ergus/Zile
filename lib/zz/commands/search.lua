@@ -20,6 +20,7 @@
 local set = require "std.set"
 
 local FileString = require "zile.FileString"
+local recase     = require "zile.lib".recase
 
 local eval  = require "zz.eval"
 local Defun = eval.Defun

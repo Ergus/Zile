@@ -37,6 +37,7 @@ local table = require "std.table"
 local clone, empty = table.clone, table.empty
 
 local compile_rex = require "zile.bundle".compile_rex
+local stack       = require "zile.lib".stack
 
 
 -- Metamethods for syntax parsers state.

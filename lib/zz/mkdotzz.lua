@@ -17,9 +17,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-local io = require "std.io".monkey_patch ()
-
-require "zile.lib"
+local io         = require "std.io".monkey_patch ()
+local iscallable = require "zile.lib".iscallable
 
 -- required to load zz.commands
 require "zile.history"
