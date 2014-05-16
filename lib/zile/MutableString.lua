@@ -259,6 +259,7 @@ local _functions = {
   insert  = insert,
   move    = move,
   rchr    = rchr,
+  remove  = remove,
   replace = replace,
   rfind   = rfind,
   set     = set,
