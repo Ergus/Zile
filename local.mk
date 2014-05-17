@@ -127,6 +127,7 @@ dist_classes_DATA +=					\
 
 dist_modules_DATA +=					\
 	$(srcdir)/doc/modules/zile.bundle.html		\
+	$(srcdir)/doc/modules/zile.lib.html		\
 	$(srcdir)/doc/modules/zile.syntax.html		\
 	$(srcdir)/doc/modules/zile.zlisp.html		\
 	$(srcdir)/doc/modules/zemacs.eval.html		\
