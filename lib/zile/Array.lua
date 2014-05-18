@@ -111,6 +111,29 @@ local _functions = {
     self.used = n
     return self
   end,
+
+
+  --- Set `n` elements starting at `from` to `v`.
+  -- @function set
+  -- @int from index of first element to set
+  -- @int v value to store
+  -- @int n number of elements to set
+  -- @treturn Array the array
+  set = function (self, from, v, n)
+    argscheck ("set", {"Array", "number", "number", "number"},
+               {self, from, v, n})
+
+    local used = self.used
+    if from < 0 then from = from + used + 1 end
+    assert (from > 0 and from <= used)
+
+    local a, i = self.array, from + n - 1
+    while i >= from do
+      a[i] = v
+      i = i - 1
+    end
+    return self
+  end,
 }
 
 

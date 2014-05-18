@@ -362,3 +362,111 @@ specify Array:
         for i = 51, #a do
           expect (a[i]).to_be (0)
         end
+
+- describe set:
+  - context when called as a module function:
+    - it diagnoses missing arguments: |
+        expect (Array.set ()).
+          to_error "bad argument #1 to 'set' (Array expected, got no value)"
+        expect (Array.set (array)).
+          to_error "bad argument #2 to 'set' (number expected, got no value)"
+        expect (Array.set (array, 1)).
+          to_error "bad argument #3 to 'set' (number expected, got no value)"
+        expect (Array.set (array, 1, 0)).
+          to_error "bad argument #4 to 'set' (number expected, got no value)"
+    - it diagnoses wrong argument types: |
+        expect (Array.set (100)).
+          to_error "bad argument #1 to 'set' (Array expected, got number)"
+        expect (Array.set (array, "bogus")).
+          to_error "bad argument #2 to 'set' (number expected, got string)"
+        expect (Array.set (array, 1, {})).
+          to_error "bad argument #3 to 'set' (number expected, got table)"
+        expect (Array.set (array, 1, 0, function () end)).
+          to_error "bad argument #4 to 'set' (number expected, got function)"
+    - it changes the value of a subsequence of elements: |
+        array = Array (100)
+        Array.set (array, 25, 1, 50)
+        for i = 1, #array do
+          if i >= 25 and i < 75 then
+            expect (array[i]).to_be (1)
+          else
+            expect (array[i]).to_be (0)
+          end
+        end
+    - it understands negative from index: |
+        array = Array (100)
+        Array.set (array, -50, 1, 50)
+        for i = 1, #array do
+          if i <= 50 then
+            expect (array[i]).to_be (0)
+          else
+            expect (array[i]).to_be (1)
+          end
+        end
+    - it does not affect the prototype array elements: |
+        a = array (100)
+        Array.set (a, 25, 1, 50)
+        for i = 3, #array do
+          expect (array[i]).to_be (array[i - 1] + array[i - 2])
+        end
+    - it does not affect elements outside range being set: |
+        a = array (100)
+        Array.set (a, 25, 1, 50)
+        for i = 1, #a do
+          if i >= 25 and i < 75 then
+            expect (a[i]).to_be (1)
+          elseif i <= #array then
+            expect (a[i]).to_be (array[i])
+          else
+            expect (a[i]).to_be (0)
+          end
+        end
+  - context when called as an object method:
+    - it diagnoses missing arguments: |
+        expect (array:set ()).
+          to_error "bad argument #2 to 'set' (number expected, got no value)"
+        expect (array:set (1)).
+          to_error "bad argument #3 to 'set' (number expected, got no value)"
+        expect (array:set (1, 0)).
+          to_error "bad argument #4 to 'set' (number expected, got no value)"
+    - it diagnoses wrong argument types: |
+        expect (array:set "bogus").
+          to_error "bad argument #2 to 'set' (number expected, got string)"
+        expect (array:set (1, {})).
+          to_error "bad argument #3 to 'set' (number expected, got table)"
+        expect (array:set (1, 0, function () end)).
+          to_error "bad argument #4 to 'set' (number expected, got function)"
+    - it changes the value of a subsequence of elements: |
+        array = Array (100):set (25, 1, 50)
+        for i = 1, #array do
+          if i >= 25 and i < 75 then
+            expect (array[i]).to_be (1)
+          else
+            expect (array[i]).to_be (0)
+          end
+        end
+    - it understands negative from index: |
+        array = Array (100):set (-50, 1, 50)
+        for i = 1, #array do
+          if i <= 50 then
+            expect (array[i]).to_be (0)
+          else
+            expect (array[i]).to_be (1)
+          end
+        end
+    - it does not affect the prototype array elements: |
+        a = array (100):set (25, 1, 50)
+        for i = 3, #array do
+          expect (array[i]).to_be (array[i - 1] + array[i - 2])
+        end
+    - it does not affect elements outside range being set: |
+        a = array (100):set (25, 1, 50)
+        for i = 1, #a do
+          if i >= 25 and i < 75 then
+            expect (a[i]).to_be (1)
+          elseif i <= #array then
+            expect (a[i]).to_be (array[i])
+          else
+            expect (a[i]).to_be (0)
+          end
+        end
