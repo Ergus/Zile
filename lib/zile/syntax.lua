@@ -36,6 +36,7 @@
 local table = require "std.table"
 local clone, empty = table.clone, table.empty
 
+local Array       = require "zile.Array"
 local compile_rex = require "zile.bundle".compile_rex
 local stack       = require "zile.lib".stack
 
@@ -87,8 +88,8 @@ local state = {
     bp.syntax[0] = bp.syntax[0] or {
       -- parser state for the current line
       caps      = stack.new {},
-      colors    = stack.new (),
-      highlight = stack.new (),
+      colors    = Array (),
+      highlight = Array (),
       pats      = stack.new {bp.grammar.patterns},
     }
   end,
@@ -118,8 +119,8 @@ local state = {
 
         -- Take a copy of the parser state for the current line.
         caps      = clone (syntax[n].caps),
-        colors    = clone (syntax[n].colors),
-        highlight = clone (syntax[n].highlight),
+        colors    = syntax[n].colors (),
+        highlight = syntax[n].highlight (),
         pats      = clone (syntax[n].pats),
       },
     }
@@ -256,7 +257,7 @@ local function parse (lexer)
     if b then
       -- If there are subexpressions, push those on the pattern stack.
       if matched.patterns then
-        lexer:push_op ("push", b, colors:push (matched.colors))
+        lexer:push_op ("push", b, colors:push (matched.colors or 0))
         begincaps:push {caps = caps, begin = lexer.s}
         pats:push (matched.patterns)
       end
@@ -299,15 +300,15 @@ local function highlight (lexer)
 
   for i = 0, #lexer.s do
     -- set the color at this position before it can be popped.
-    attrs[i] = highlight:top ()
+    attrs[i] = highlight[-1]
     for _,v in ipairs (ops[i] or {}) do
       if v.push then
         highlight:push (v.push)
         -- but, override the initial color if a new one is pushed.
-        attrs[i] = highlight:top ()
+        attrs[i] = highlight[-1]
 
       elseif v.pop then
-        assert (v.pop == highlight:top ())
+        assert (v.pop == highlight[-1])
         highlight:pop ()
       end
     end
