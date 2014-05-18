@@ -280,12 +280,9 @@ specify Array:
         array:push (-273)
         expect (array[-1]).to_be (-273)
         expect (#array).to_be (count + 2)
-    - it returns itself: |
-        count = #array
-        array:push (42):push (-273)
-        expect (array[-1]).to_be (-273)
-        expect (array[-2]).to_be (42)
-        expect (#array).to_be (count + 2)
+    - it returns pushed value: |
+        expect (array:push (42)).to_be (42)
+        expect (array:push (-273)).to_be (-273)
     - it does not perturb existing elements: |
         array:push (42)
         for i = 3, #array - 1 do

@@ -89,7 +89,7 @@ local _functions = {
     local a, used = self.array, self.used + 1
     self:realloc (used)
     a[used] = elem
-    return self
+    return elem
   end,
 
 
