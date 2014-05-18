@@ -114,7 +114,7 @@ end
 -- @int n number of empty bytes to insert
 local function insert (self, from, n)
   assert (from <= #self + 1)
-  self:set_len (#self + n)
+  self:realloc (#self + n)
   self:move (from + n, from, #self + 1 - (from + n))
   self:set (from, '\0', n)
 end
@@ -141,7 +141,7 @@ local function remove (self, from, n)
   local b, e, eob = from, from + n, #self + 1
   assert (e <= eob)
   self:move (e, b, eob - e)
-  self:set_len (#self - n)
+  self:realloc (#self - n)
 end
 
 
@@ -225,7 +225,7 @@ end
 
 --- Change the number of bytes allocated to be at least `n`.
 -- @int n the number of bytes required
-local function set_len (self, n)
+local function realloc (self, n)
   local a = self.buf
   if n > a.length or n < a.length / 2 then
     a:realloc (n + allocation_chunk_size)
@@ -264,7 +264,7 @@ local _functions = {
   replace = replace,
   rfind   = rfind,
   set     = set,
-  set_len = set_len,
+  realloc = realloc,
   sub     = sub,
 }
 
