@@ -138,7 +138,7 @@ dist_modules_DATA +=					\
 ## as a sentinel file.
 $(dist_doc_DATA) $(dist_classes_DATA) $(dist_modules_DATA): $(srcdir)/doc/.ldocs
 
-$(srcdir)/doc/.ldocs: $(srcdir/doc) $(ldoc_DEPS)
+$(srcdir)/doc/.ldocs: $(srcdir)/doc $(ldoc_DEPS)
 	test -d $(srcdir)/doc || mkdir $(srcdir)/doc
 	touch $@
 	$(LDOC) -c build-aux/config.ld -d $(abs_srcdir)/doc .
