@@ -18,8 +18,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-local posix  = require "posix"
-local std    = require "specl.std"
+local posix = require "posix"
+local spawn = posix.sys and posix.sys.spawn or posix.spawn 
+
+local std   = require "specl.std"
 
 local Process = require "specl.shell".Process
 local Object, escape_pattern, slurp =
@@ -91,7 +93,7 @@ local function edit (self, code, bufcontent)
 
   local redirects = ">" .. fout .. " 2>" .. ferr
 
-  local status = posix.spawn (table.concat ({
+  local status = spawn (table.concat ({
     self.command, self.args, fbuf, "--load", fcode, redirects
   }, " "))
 
