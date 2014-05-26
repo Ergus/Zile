@@ -17,6 +17,13 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+local posix    = require "posix"
+
+local timeradd = posix.sys and posix.sys.timeradd or posix.timeradd
+local timercmp = posix.sys and posix.sys.timercmp or posix.timercmp
+
+
 -- Maximum time to avoid screen updates when catching up with buffered
 -- input, in milliseconds.
 local MAX_RESYNC_MS = 500
@@ -53,10 +60,10 @@ function getkey (delay)
   local now = posix.gettimeofday ()
   local keycode = getkeystroke (0)
 
-  if not keycode or posix.timercmp (now, next_refresh) >= 0 then
+  if not keycode or timercmp (now, next_refresh) >= 0 then
     term_redisplay ()
     term_refresh ()
-    next_refresh = posix.timeradd (now, refresh_wait)
+    next_refresh = timeradd (now, refresh_wait)
   end
 
   if not keycode then
