@@ -17,6 +17,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+local posix = require "posix"
+
+local euidaccess = posix.sys and posix.sys.euidaccess or posix.euidaccess
+
 local io      = require "std.io"
 local list    = require "std.list"
 local set     = require "std.set"
@@ -47,7 +51,7 @@ end
 
 -- Return nonzero if file exists and can be written.
 local function check_writable (filename)
-  local ok = posix.euidaccess (filename, "w")
+  local ok = euidaccess (filename, "w")
   return ok and ok >= 0
 end
 
