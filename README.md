@@ -1,6 +1,7 @@
 # GNU Zile
 
 [![travis-ci status](https://secure.travis-ci.org/gvvaughan/zile.png?branch=master)](http://travis-ci.org/gvvaughan/zile/builds)
+[![Stories in Ready](https://badge.waffle.io/gvvaughan/zile.png?label=ready&title=Ready)](https://waffle.io/gvvaughan/zile)
 
 GNU Zile is free software, licensed under the GNU GPL.
 
