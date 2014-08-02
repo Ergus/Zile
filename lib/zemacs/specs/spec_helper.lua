@@ -19,7 +19,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local posix = require "posix"
-local spawn = posix.sys and posix.sys.spawn or posix.spawn 
+local spawn = posix.sys and posix.sys.spawn or posix.spawn
 
 local std   = require "specl.std"
 
