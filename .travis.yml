@@ -22,15 +22,15 @@ install:
   - sudo apt-get install liblua5.2-dev
   - sudo apt-get install libonig-dev
 
-  # Install a recent luarocks release locally.
-  - wget http://luarocks.org/releases/$LUAROCKS_BASE.tar.gz
-  - tar zxvpf $LUAROCKS_BASE.tar.gz
-  - ( cd $LUAROCKS_BASE;
+  # Install a luarocks beta locally for everything else.
+  - git clone --depth=1 https://github.com/keplerproject/luarocks.git
+  # LuaRocks configure --with-lua argument is just a prefix!
+  - ( cd luarocks;
       ./configure
-        --prefix=$HOME --lua-version=$LUA_SUFFIX --lua-suffix=$LUA_SUFFIX
-        --with-lua-include=$LUA_INCDIR;
-      make;
-      sudo make install; )
+      --prefix=$HOME --with-lua=/usr --lua-version=$LUA_SUFFIX
+      --lua-suffix=$LUA_SUFFIX --with-lua-include=$LUA_INCDIR;
+      make build;
+      make install; )
 
 # Configure and build.
 script:

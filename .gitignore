@@ -28,6 +28,7 @@
 /doc
 /lib/zile/version.lua
 /m4/
+!/m4/ax_compare_version.m4
 /maint.mk
 /zile*.tar.gz
 /zile*.tar.gz.directive*
