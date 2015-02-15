@@ -1,4 +1,5 @@
-(forward-line 2)
+(forward-line)
+(forward-line)
 (indent-relative)
 (insert "f")
 (indent-relative)

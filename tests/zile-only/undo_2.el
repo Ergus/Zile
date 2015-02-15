@@ -1,6 +1,0 @@
-; undo in Emacs undoes everything from the start of the script (cf. fill-paragraph_2.el)
-(insert "a")
-(undo)
-(insert "b")
-(save-buffer)
-(save-buffers-kill-emacs)

@@ -1,211 +1,180 @@
-GNU Zile NEWS                                    -*- outline -*-
+GNU Zile NEWS                                         -*- outline -*-
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+
+* Noteworthy changes in release 2.4.11 (2014-02-26) [stable]
+
+** Bug fixes
+
+  Fix timeradd macro for systems that need it (thanks to Craig
+  Phillips for the report and fix).
+
+
+* Noteworthy changes in release 2.4.10 (2014-02-25) [stable]
+
+** Bug fixes
+
+  Actually use libgc. All of the previous 2.4 releases were eating all
+  your memory.
+
+  Fix speed of search on large buffers (previously, the entire buffer
+  was copied for each search). The fix was copied from Zee.
+
+  Make query-replace and save file prompt handling closer to Emacs.
+
+  Fix many printf format bugs in user functions, thanks to GCC.
+
+** Build-related
+
+  Use pkgconfig to find libgc.
+
+  Improve use of GCC warnings.
+
 ** Miscellaneous
 
- - Zile has a new backronym: Zile Implements Lua Editors.
+  Some code clean-up.
 
-   The Zile project is being rewritten as a toolkit for developing
-   text editors in Lua.
 
- - Now that the Lua implementation has feature parity with the older
-   C implementation, the C implementation is being moth-balled.  All
-   future releases will be made from the Lua implementation.
+* Noteworthy changes in release 2.4.9 (2012-10-01) [stable]
 
- - The release numbers will be single integers for consistency with
-   the other Lua projects I maintain (not coincidentally, all are
-   dependencies of GNU Zile).  The final C Zile releases were 2.4.x,
-   and the first Lua Zile release was version 3.
+** Bug fixes
 
-** Incompatible changes
+  Fix crash on out-of-range goto-char.
 
-  - Now that GNU Zile is the text editor support infrastructure, the
-    editor formerly known as Zile has been renamed to Zemacs, a light-
-    weight micro-Emacs that has feature parity with the legacy C Zile
-    implementation.  There is no 'zile' executable any more, it has
-    been superseded by 'zemacs'.
+  Set mark on insert-file.
 
-  - Zlisp now uses a more Emacs-24-like 'shell-command-on-region'
-    implementation, where the replace parameter is now the fifth
-    argument (rather than the fourth), and adds a new fourth parameter
-    which can specify an output buffer other than only current buffer
-    or temporary '*Shell Command Output*' buffer.
+  Minor documentation fixes.
+
+  Build system cleanups.
+
+
+* Noteworthy changes in release 2.4.8 (2012-07-13) [stable]
 
 ** New features
 
-  - New "bundle" loading scheme for JSON-like Lua format tables with
-    `require`.
+  Improve feedback during large pastes.
 
-  - Beginnings of LDoc generated api documentation of Zile modules.
-
-  - Legacy Zemacs tests are migrating to Specl and have significantly
-    better coverage now.
-
-*** Build-related
-
-  - Now fully relocatable, with all resources found using the
-    package.path directories. This means the distributions work out of
-    box (./lib/zemacs/zemacs) without running configure or make.  It
-    also means the lua source rock installs directly by copying files
-    into the rocks tree.
-
-  - LuaRocks install doesn't copy config.ld to $docdir.
-
-*** Zile
-
-  - Cursor movement on moderate to large size files is a good order of
-    magnitude faster, by virtue of using Alien buffers and calling C
-    `memmem` and `memrchr` to find buffer line-ends etc.
-
-  - Vast improvements to speed of search functions.
-
-*** Zz
-
-  - A new editor, currently heavily based on Zemacs, but with the zlisp
-    evaluator removed in favour of direct Lua evaluation.
-
-  - UI coloring bundle file format, and a slightly more colorful default
-    interface for Zz.
-
-  - Syntax highlighting bundle file format, which can be made by
-    mechanically translating existing TextMate Language files, though
-    not all TextMate Language file features are supported yet.
-
-    Note that, for compatibility with TextMate Language definitions, the
-    highlighter (and thus Zz) now require lrex-oniguruma.  However, this
-    also makes for trivial compatibility with hundreds of existing
-    file formats - subject to mechanical translation of the TextMate
-    sources.
-
-  - Syntax highlighting modes for Lua sources and diff/patch files.
-
-*** Zemacs
-
-  - Support for FAQ, COPYING and NEWS browsing in editor with \C-h\C-f,
-    \C-h\C-c and \C-h\C-n (or F1 prefix equivalents).
-
-  - In docstrings for interactive commands and user configurable
-    variables, \\[command-name] is now expanded to a key-binding for
-    `command-name` by "\C-hf", "\C-hv" etc.  just like Emacs. For
-    example, see the documentation for `start-kbd-macro` and
-    `end-kbd-macro`.
-
-  - `describe-function` now shows bound keys and function signatures
-    in displayed help text.
-
-  - `describe-variable` now shows original values and notification for
-    buffer-local variables.
-
-  - New `*Messages*` buffer accumulates minibuf messages.  Maximum
-    number of retained messages is limited according to new variable,
-    `message-log-max`.  \C-h v message-log-max RET for details.
-
-*** Zlisp
-
-  - Now has a fully functional reader and evaluator so that, for
-    example, calling functions with arguments that are themselves
-    function calls or variables works as expected.
-
-  - Zlisp strings support embedded double-quotes with backslash escapes,
-    for example: "a \"quoted\" substring".
-
-  - `beginning-of-line` and `end-of-line` now support optional argument
-    for stepping over lines before moving point to beginning or end of
-    that line resp.
-
-  - `copy-region-as-kill` understands it's parameters now, and copies
-    the described region correctly.
-
-  - `eval-expression` displays the result of the expression it evaluates
-    in the mini-buffer upon completion.
-
-  - `forward-line` now returns the number of requested line moves that
-    were not actioned, and treats a non-empty line at the end of a file
-    correctly.
-
-  - `message` now treats it's first argument as a format-string, and
-    plugs % specifiers with values of the remaining args.
-
-  - `query-replace-regexp` works like `query-replace` but treats the
-    search string argument as a regular expression.
-
-  - `save-buffers-kill-emacs` accepts an optional prefix argument; when
-    non-nil save all modified buffers without asking.
-
-  - `where-is` accepts an optional `insert` argument; when non-nil
-    insert the result into the current buffer instead of the echo area.
-
-  - New functions: `buffer-size`, `mark`, `point`, `point-max`,
-    `point-min`.
-    \C-h f ... RET for details.
-
-*** Zlc
-
-  - `defsubr` parameter lists now support &optional and &rest parameters.
-
-  - `interactive` supports a "Nprompt: " and "p", making argument checking
-    and reading more consistent across zlisp function implementations.
-
-** Bug fixes
-
- - zemacs 'universal-argument' guards against non-ASCII keys, so you
-   can execute a key sequences like "\M-35\RIGHT" without inducing a
-   "char out of range" crash.
-
- - Removed latent infinite loops in fallback `MutableString:find` and
-   `MutableString:rfind` (when the C library doesn't provide `memmem` or
-   `memrchr` resp.).
-
- - No longer mangles the last character of a multi-line buffer when
-   using fallback `MutableString:find`.
-
-
-* Noteworthy changes in release 3 (2013-09-25) [alpha]
-
-** Bug fixes
-
-  Arrow keys work properly when resuming from M-x debug.
-
-
-* Noteworthy changes in release 2.5.0.50 (2011-09-20) [alpha]
-
-** Bug fixes
-
-  Many bugs have been fixed.
+  Various minor code improvements.
 
 ** Build-related
 
-  Many bugs have been fixed. Building against the required Lua
-  libraries has been simplified; the required libraries can now all be
-  installed as LuaRocks.
+  Fix a bug in parallel builds.
 
-  Since C development has now been moved to the 2.4 series, the Lua
-  series is now numbered 2.5.x.
+  Update gnulib to fix building with glibc 2.16.
+
+  Various minor fixes and improvements.
+
+  Use more GCC attributes.
 
 
-* Noteworthy changes in release 2.4.0.50 (2011-05-04) [alpha]
+* Noteworthy changes in release 2.4.7 (2012-03-20) [stable]
 
 ** Bug fixes
 
-  Many bugs have been fixed.
+  Fix a potential crash and cosmetic bug in global-set-key when used
+  interactively.
 
 ** Build-related
 
-  The build system is now non-recursive (thanks to Gary Vaughan).
+  Add lots more tests.
 
 
-* Noteworthy changes in release 2.4.2 (2011-10-03) [stable]
+* Noteworthy changes in release 2.4.6 (2012-02-18) [stable]
 
 ** Bug fixes
 
-  Fix a basic performance bug introduced in 2.4.0.60.
+   Fix a crash in non-incremental search the first time it is used
+   interactively.
+
+
+* Noteworthy changes in release 2.4.5 (2012-02-08) [stable]
+
+** Bug fixes
+
+  Fix an egregious bug resulting in a crash whenever a non-existent
+  file was edited.
+
+  Fix other potential crash bugs in the low-level text-handling
+  routine estr_replace.
+
+
+* Noteworthy changes in release 2.4.4 (2012-02-03) [stable]
+
+** New features
+
+  find-file and find-file-read-only now work non-interactively.
+
+** Build-related
+
+  Minor build system fixes (thanks to Nelson Beebe for one).
+
+** Miscellaneous
+
+  Some code clean-up.
+
+  Slight speed improvement to general editing operations.
+
+
+* Noteworthy changes in release 2.4.3 (2011-12-20) [stable]
+
+** Bug fixes
+
+  Fix a crash on certain terminals.
+
+  Fix a recently-introduced display bug in isearch.
+
+
+* Noteworthy changes in release 2.4.2 (2011-10-05) [stable]
+
+** Bug fixes
+
+  Fix some serious display performance bugs introduced in 2.4.0.60.
 
 ** Build-related
 
   Don't enable Valgrind by default, and explain that correct
   suppressions are needed to use it successfully.
 
+
+* Noteworthy changes in release 2.4.1 (2011-09-20) [stable]
+
+  This is the first release in a new stable series.
+
+** Bug fixes
+
+  Fix a long-standing bug in uniarg handling in macros.
+
+  Fix display of percentage position in buffer.
+
+  Fix display of search string in query-replace.
+
+  Fix poor performance of fill-paragraph.
+
+  Fix handling of Backspace/^H by looking at termcap kbs setting.
+
+** Build-related
+
+  Several fixes and improvements were made to the build system.
+
+* Noteworthy changes in release 2.4.0.60 (2011-08-19) [beta]
+
+  This release is a major update, upping the dependencies from C89 to
+  C99, from POSIX-1.2001 to POSIX-1.2008 (though in fact Zile will
+  still build on many other POSIX and non-POSIX systems thanks to
+  gnulib), and adding a dependency on libgc. Together these changes
+  have allowed the removal of hundreds of lines of code and the
+  elimination of whole classes of bug (in particular, classic
+  memory-management bugs); overall, combined with continued
+  simplification, Zile 2.4.0.60 is well over 1,000 lines of code, or
+  10%, shorter than the previous stable release, 2.3.24.
+
+  Several old bugs have been fixed, a few more esoteric features
+  removed, and Emacs-compliance has been improved. However, the major
+  rewrite has almost certainly introduced new bugs which have not yet
+  been found and fixed, hence the alpha status of this release.
+  Distribution packagers are encouraged to try packaging this version
+  to find any problems with the updated build system and dependencies.
 
 * Noteworthy changes in release 2.3.24 (2011-04-29) [stable]
 
@@ -230,16 +199,6 @@ GNU Zile NEWS                                    -*- outline -*-
 
   As usual, various bits of code cleanup and simplification.
 
-
-* Noteworthy changes in release 2.4.0alpha1 (2011-03-25) [alpha]
-
-** Major changes
-
-  This release is completely rewritten in Lua. No doubt it introduces
-  lots of bugs, but it is intended to be functionally identical to the
-  C version.
-
-
 * Noteworthy changes in release 2.3.23 (2011-03-14) [stable]
 
 ** Bug fixes
@@ -252,12 +211,10 @@ GNU Zile NEWS                                    -*- outline -*-
   Turn on more compiler and build system, and run-time checks (thanks,
   gnulib!).
 
-
 * Noteworthy changes in release 2.3.22 (2011-03-03)
 
 This release fixes a bug in forward regex isearch introduced recently,
 and makes the build system use silent rules by default.
-
 
 Release 2.3.21
 

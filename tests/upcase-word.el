@@ -1,3 +1,6 @@
-(upcase-word 4)
+(upcase-word 1)
+(upcase-word 1)
+(upcase-word 1)
+(upcase-word 1)
 (save-buffer)
 (save-buffers-kill-emacs)

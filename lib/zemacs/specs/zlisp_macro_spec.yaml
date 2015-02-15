@@ -1,8 +1,0 @@
-specify zlisp/macro:
-- describe start-kbd-macro:
-
-- describe end-kbd-macro:
-
-- describe call-last-kbd-macro:
-
-- describe execute-kbd-macro:
