@@ -2,6 +2,10 @@ GNU Zile NEWS                                         -*- outline -*-
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+** Bug fixes
+
+  Remove obsolete variable transient-mark-mode.
+
 
 * Noteworthy changes in release 2.4.11 (2014-02-26) [stable]
 
