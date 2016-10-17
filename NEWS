@@ -2,6 +2,10 @@ GNU Zile NEWS                                         -*- outline -*-
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+** Bug fixes
+
+  Document correct location of dotzile.sample in man page.
+
 
 * Noteworthy changes in release 2.4.12 (2016-10-17) [stable]
 
