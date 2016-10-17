@@ -1,6 +1,6 @@
 # Source Makefile.am
 #
-# Copyright (c) 1997-2012 Free Software Foundation, Inc.
+# Copyright (c) 1997-2016 Free Software Foundation, Inc.
 #
 # This file is part of GNU Zile.
 #
@@ -20,7 +20,7 @@
 # MA 02111-1301, USA.
 
 edit = sed \
-	-e 's|@pkgdatadir[@]|$(pkgdatadir)|g'
+	-e 's|@docdir[@]|$(docdir)|g'
 
 MAINTAINERCLEANFILES += $(srcdir)/doc/zile.1.in doc/zile.1
 DISTCLEANFILES += doc/zile.1
