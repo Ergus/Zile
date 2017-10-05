@@ -105,23 +105,8 @@ AX_WITH_PROG([HELP2MAN], [help2man], [help2man])
 dnl Code complexity reports
 AC_PATH_PROG([PMCCABE], [pmccabe], [false])
 
-dnl Valgrind
-AC_ARG_ENABLE([valgrind],
-  [AS_HELP_STRING([--enable-valgrind],
-                  [use Valgrind to run tests])],
-  [case $enableval in
-     yes|no) ;;
-     *)      AC_MSG_ERROR([bad value $enableval for --enable-valgrind]) ;;
-   esac],
-  [])
-if test "$enable_valgrind" = "yes"; then
-  AX_WITH_PROG([VALGRIND], [valgrind])
-  if test -n "$VALGRIND"; then
-    VALGRIND="$VALGRIND -q --error-exitcode=1"
-  else
-    AC_MSG_ERROR([can't find valgrind])
-  fi
-fi
+dnl Valgrind: don't check leaks, we're using a garbage collector
+gl_cv_opt_valgrind_tests="-q --error-exitcode=1 --leak-check=no"
 
 dnl Checks for functions and headers
 AC_HEADER_STDC
