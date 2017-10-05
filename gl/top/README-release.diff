@@ -26,7 +26,7 @@
  
 -    git diff
 +To make a release automatically, you need ncftp, and woger, from
-+http://rrt.sc3d.org/Software/woger
++https://rrt.sc3d.org/Software/woger
  
 -* Ensure that you've pushed all changes that belong in the release:
 +Here are the steps we (maintainers) follow when making a release.
@@ -38,7 +38,7 @@
 +  are in your PATH.  See the buildreq list in bootstrap.conf for
 +  the complete list of tools.
  
--    http://hydra.nixos.org/jobset/gnu/@PACKAGE@-master
+-    https://hydra.nixos.org/project/gnu/@PACKAGE@-master
 +* Start from a clean, up-to-date git directory on the branch you want
 +  to release from, ensure that you have no uncommitted diffs, have
 +  pushed all changes that belong in the release, and that all tests
@@ -54,7 +54,7 @@
 +* Check that the NixOS/Hydra autobuilder is reporting all is well:
  
 -    make check syntax-check distcheck
-+    http://hydra.nixos.org/jobset/gnu/zile-BRANCH
++    https://hydra.nixos.org/jobset/gnu/zile-BRANCH
  
  * To (i) set the date, version number, and release TYPE on line 3 of
    NEWS, (ii) commit that, and (iii) tag the release, run
@@ -118,5 +118,5 @@
 -  to update the on-line manual accessible at
 +* Run:
  
--    http://www.gnu.org/software/@PACKAGE@/manual/
+-    https://www.gnu.org/software/@PACKAGE@/manual/
 +    make dorelease
