@@ -93,6 +93,7 @@ dist-hook: $(changelog)
 distcheck-hook: syntax-check
 
 dorelease:
+	git push origin master tag v$(cat .prev-version)
 	woger gnu upload=ftp.gnu.org package=$(PACKAGE) package_name="$(PACKAGE_NAME)" version=$(VERSION) email=~/announce-$(PACKAGE)-$(VERSION) dist_type="tar.gz"
 
 CYCLO_SRCS = $(srcdir)/src/*.[ch]
