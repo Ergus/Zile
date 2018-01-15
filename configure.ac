@@ -1,6 +1,6 @@
 dnl configure.ac
 dnl
-dnl Copyright (c) 1997-2014 Free Software Foundation, Inc.
+dnl Copyright (c) 1997-2016 Free Software Foundation, Inc.
 dnl
 dnl This file is part of GNU Zile.
 dnl
@@ -22,7 +22,7 @@ dnl MA 02111-1301, USA.
 AC_PREREQ([2.61])
 
 dnl Initialise autoconf and automake
-AC_INIT(Zile, 2.4.11, bug-zile@gnu.org)
+AC_INIT(Zile, 2.4.14, bug-zile@gnu.org)
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall std-options])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -105,23 +105,8 @@ AX_WITH_PROG([HELP2MAN], [help2man], [help2man])
 dnl Code complexity reports
 AC_PATH_PROG([PMCCABE], [pmccabe], [false])
 
-dnl Valgrind
-AC_ARG_ENABLE([valgrind],
-  [AS_HELP_STRING([--enable-valgrind],
-                  [use Valgrind to run tests])],
-  [case $enableval in
-     yes|no) ;;
-     *)      AC_MSG_ERROR([bad value $enableval for --enable-valgrind]) ;;
-   esac],
-  [])
-if test "$enable_valgrind" = "yes"; then
-  AX_WITH_PROG([VALGRIND], [valgrind])
-  if test -n "$VALGRIND"; then
-    VALGRIND="$VALGRIND -q --error-exitcode=1"
-  else
-    AC_MSG_ERROR([can't find valgrind])
-  fi
-fi
+dnl Valgrind: don't check leaks, we're using a garbage collector
+gl_cv_opt_valgrind_tests="-q --error-exitcode=1 --leak-check=no"
 
 dnl Checks for functions and headers
 AC_HEADER_STDC

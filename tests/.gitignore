@@ -2,3 +2,9 @@ site.exp
 site.bak
 zile.log
 zile.sum
+/_Noreturn.h
+/arg-nonnull.h
+/c++defs.h
+/dummy.c
+/unused-parameter.h
+/warn-on-use.h

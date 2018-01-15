@@ -26,6 +26,7 @@
 #include <stdbool.h>
 #include <limits.h>
 #include <string.h>
+#include <gc/gc.h>
 #include "xalloc.h"
 #include "xvasprintf.h"
 #include "size_max.h"
@@ -33,12 +34,6 @@
 #include "hash.h"
 #include "gl_xlist.h"
 #include "unused-parameter.h"
-
-#ifdef HAVE_GC_H
-#include <gc.h>
-#else
-#include <gc/gc.h>
-#endif
 
 #include "astr.h"
 #include "estr.h"

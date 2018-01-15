@@ -64,7 +64,7 @@ const_astr_new_nstr (const char *s, size_t n)
   astr as;
   as = (astr) XZALLOC (struct astr);
   as->len = n;
-  as->text = s;
+  as->text = (char *) s;
   return as;
 }
 

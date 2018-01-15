@@ -3,6 +3,34 @@ GNU Zile NEWS                                         -*- outline -*-
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
 
+* Noteworthy changes in release 2.4.14 (2017-10-06) [stable]
+
+** Bug fixes
+
+  Update gnulib to cope with printf restrictions on macOS 10.13
+  (Bug #52173; thanks fxcoudert)
+
+** Build-related
+
+  Use gnulib valgrind-tests module to run tests.
+
+  Add pushing release tag to dorelease target.
+
+
+* Noteworthy changes in release 2.4.13 (2016-10-18) [stable]
+
+** Bug fixes
+
+  Document correct location of dotzile.sample in man page.
+
+
+* Noteworthy changes in release 2.4.12 (2016-10-17) [stable]
+
+** Bug fixes
+
+  Remove obsolete variable transient-mark-mode.
+
+
 * Noteworthy changes in release 2.4.11 (2014-02-26) [stable]
 
 ** Bug fixes
