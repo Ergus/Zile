@@ -100,7 +100,7 @@ fi
 
 dnl help2man
 dnl Set a value even if not found, so that an invocation via build-aux/missing works
-AX_WITH_PROG([HELP2MAN], [help2man], [help2man])
+AC_PATH_PROG([HELP2MAN], [help2man], [help2man])
 
 dnl Code complexity reports
 AC_PATH_PROG([PMCCABE], [pmccabe], [false])
@@ -145,7 +145,7 @@ AH_BOTTOM([
 ])
 
 dnl Emacs
-AX_WITH_PROG([EMACSPROG], [emacs])
+AC_PATH_PROG([EMACSPROG], [emacs])
 if test -n "$EMACSPROG"; then
   emacs_min_version=23.1
   emacs_version=`$EMACSPROG --version 2>&1 | head -n 1 | cut -d' ' -f3`
@@ -157,7 +157,7 @@ if test -n "$EMACSPROG"; then
 fi
 
 dnl Perl
-AX_WITH_PROG([PERL], [perl])
+AC_PATH_PROG([PERL], [perl])
 if test -z "$PERL"; then
   AC_MSG_FAILURE([cannot find perl])
 fi
