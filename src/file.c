@@ -500,7 +500,7 @@ backup_and_write (Buffer bp, const char *filename)
   /* Make backup of original file. */
   int fd, backup = get_variable_bool ("make-backup-files");
   if (!get_buffer_backup (bp) && backup
-      && (fd = open (filename, O_RDWR, 0)) != -1)
+      && (fd = open (filename, O_RDWR)) != -1)
     {
       close (fd);
 
