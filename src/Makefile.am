@@ -27,6 +27,7 @@ LDADD = $(builddir)/lib/lib$(PACKAGE).a $(LIB_ACL) $(LIB_EACCESS) $(LIBINTL) $(C
 
 BUILT_SOURCES =						\
 	src/tbl_funcs.h					\
+	src/tbl_opts.h					\
 	src/tbl_vars.h
 
 bin_PROGRAMS = src/zile
