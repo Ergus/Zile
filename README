@@ -176,14 +176,9 @@ Zile development sources are maintained at the GNU Savannah git server:
 
   > [git://git.sv.gnu.org/zile.git][gitbrowser]
 
-You can fetch a read-only copy with either:
+You can fetch a read-only copy with:
 
     git clone git://git.sv.gnu.org/zile.git
-
-or using the CVS pserver protocol:
-
-    cvs -d:pserver:anonymous@pserver.git.sv.gnu.org:/srv/git/zile.git \
-        co -d zile HEAD
 
 If you are behind a firewall that blocks the git protocol, you can force
 git to transparently rewrite all savannah references to use http:
@@ -192,8 +187,12 @@ git to transparently rewrite all savannah references to use http:
 	git://git.sv.gnu.org/
 
 When you are building GNU Zile from a git checkout, you first need to
-run the `bootstrap` script to generate various files that are shipped in
-release tarballs, but not checked in to git.
+checkout git submodules:
+
+    git submodule update --init --recursive
+
+then run the `bootstrap` script to generate various files that are shipped
+in release tarballs, but not checked in to git.
 
 Normally, you just need to run `./bootstrap`, and it will either get
 everything ready so that you can then run `./configure` as would for a
