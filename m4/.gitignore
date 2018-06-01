@@ -6,7 +6,6 @@
 /chown.m4
 /close.m4
 /codeset.m4
-/configmake.m4
 /copy-file.m4
 /d-ino.m4
 /dirent_h.m4
@@ -211,3 +210,5 @@
 /utime_h.m4
 /utimens.m4
 /utimes.m4
+/getpagesize.m4
+/configmake.m4
