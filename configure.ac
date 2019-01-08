@@ -19,7 +19,7 @@ dnl along with GNU Zile; see the file COPYING.  If not, write to the
 dnl Free Software Foundation, Fifth Floor, 51 Franklin Street, Boston,
 dnl MA 02111-1301, USA.
 
-AC_PREREQ([2.61])
+AC_PREREQ([2.63])
 
 dnl Initialise autoconf and automake
 AC_INIT(Zile, 2.4.14, bug-zile@gnu.org)

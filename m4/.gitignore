@@ -212,3 +212,5 @@
 /utimes.m4
 /getpagesize.m4
 /configmake.m4
+/__inline.m4
+/sh-filename.m4

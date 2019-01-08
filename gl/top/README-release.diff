@@ -1,6 +1,6 @@
---- gnulib/top/README-release	2014-02-05 00:22:05.000000000 +0000
-+++ HACKING	2016-10-18 12:35:29.819722294 +0100
-@@ -1,35 +1,37 @@
+--- gnulib/top/README-release	2019-01-08 12:34:27.004822339 +0000
++++ HACKING	2017-10-05 22:00:38.243139860 +0100
+@@ -1,36 +1,37 @@
 -Here are most of the steps we (maintainers) follow when making a release.
 +                      GNU Zile developers' notes
 +                      --------------------------
@@ -50,15 +50,16 @@
 -    ./bootstrap && ./configure
 +  (Make sure you have any needed Valgrind suppressions files.)
  
--* Pre-release testing: ensure that the following command succeeds:
+-* Pre-release testing: ensure that the following commands succeed:
 +* Check that the NixOS/Hydra autobuilder is reporting all is well:
  
--    make check syntax-check distcheck
+-    c=check ve=check-very-expensive; git grep -q "^$ve:\$" && c=$ve
+-    make $c syntax-check distcheck
 +    https://hydra.nixos.org/jobset/gnu/zile-BRANCH
  
  * To (i) set the date, version number, and release TYPE on line 3 of
    NEWS, (ii) commit that, and (iii) tag the release, run
-@@ -44,57 +46,11 @@
+@@ -45,57 +46,11 @@
  
      make release RELEASE='X.Y TYPE'
  
