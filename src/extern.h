@@ -271,6 +271,7 @@ const_astr term_minibuf_read (const char *prompt, const char *value, size_t pos,
                               Completion cp, History hp);
 
 /* term_redisplay.c ------------------------------------------------------- */
+extern size_t first_column;
 void term_redraw_cursor (void);
 void term_redisplay (void);
 void term_finish (void);
@@ -290,6 +291,7 @@ const char *get_variable_doc (const char *var, const char **defval);
 const char *get_variable (const char *var);
 const char *get_variable_bp (Buffer bp, const char *var);
 bool get_variable_bool (const char *var);
+void toggle_variable_bool (const char *var);
 
 /* window.c --------------------------------------------------------------- */
 #define FIELD(ty, field)                                \

@@ -220,6 +220,16 @@ Just C-u as argument means to use the current column.
 }
 END_DEFUN
 
+DEFUN ("toggle-linum-mode", toggle_linum_mode)
+/*+
+Toggle `linum-mode' to specified argument.
++*/
+{
+	toggle_variable_bool ("linum-mode");
+}
+END_DEFUN
+
+
 DEFUN_NONINTERACTIVE ("set-mark", set_mark)
 /*+
 Set this buffer's mark to point.

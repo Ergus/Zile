@@ -41,14 +41,17 @@ make_char_printable (char c, int x, int cur_tab_width)
 }
 
 static void
-draw_line (size_t line, size_t startcol, Window wp,
+draw_line (size_t line, Window wp,
            size_t o, Region r, int highlight, size_t cur_tab_width)
 {
-  term_move (line, 0);
+  const size_t startcol = get_window_start_column (wp);
+  const size_t first_column = get_window_first_column (wp);
+
+  term_move (line, first_column);
 
   /* Draw body of line. */
   size_t x, i, line_len = buffer_line_len (get_window_bp (wp), o);
-  for (x = 0, i = startcol;; i++)
+  for (x = first_column, i = startcol;; i++)
     {
       term_attrset (highlight && region_contains (r, o + i) ? FONT_REVERSE : FONT_NORMAL);
       if (i >= line_len || x >= get_window_ewidth (wp))
@@ -161,40 +164,66 @@ draw_status_line (size_t line, Window wp)
 static void
 draw_window (size_t topline, Window wp)
 {
-  size_t i, o;
+  size_t line, j, o;
   Region r;
   int highlight = calculate_highlight_region (wp, &r);
+  Buffer bp = get_window_bp (wp);
 
   /* Find the first line to display on the first screen line. */
-  for (o = buffer_start_of_line (get_window_bp (wp), window_o (wp)), i = get_window_topdelta (wp);
-       i > 0 && o > 0;
-       assert ((o = buffer_prev_line (get_window_bp (wp), o)) != SIZE_MAX), --i)
+  for (o = buffer_start_of_line (bp, window_o (wp)), line = get_window_topdelta (wp);
+       line > 0 && o > 0;
+       assert ((o = buffer_prev_line (bp, o)) != SIZE_MAX), --line)
     ;
 
   /* Draw the window lines. */
-  size_t cur_tab_width = tab_width (get_window_bp (wp));
-  for (i = topline; i < get_window_eheight (wp) + topline; ++i)
+  size_t cur_tab_width = tab_width (bp);
+
+  // =====================
+  const size_t window_eheight = get_window_eheight (wp);
+  const bool linum_mode = get_variable_bool("linum-mode");
+  const size_t buffer_first_line = offset_to_line (bp, o);
+  size_t first_column = 0;
+
+  if (linum_mode)
     {
+      const size_t buffer_last_line = buffer_first_line + window_eheight;
+
+      char *max_linum = xasprintf("%lu", buffer_last_line);
+      first_column += strlen(max_linum) + 1;
+    }
+
+  set_window_first_column(wp, first_column);
+  // ====================
+
+  for (j = 0; j < window_eheight; ++j)
+    {
+      line = j + topline;
       /* Clear the line. */
-      term_move (i, 0);
+      term_move (line, 0);
       term_clrtoeol ();
 
       /* If at the end of the buffer, don't write any text. */
       if (o == SIZE_MAX)
         continue;
 
-      draw_line (i, get_window_start_column (wp), wp, o, r, highlight, cur_tab_width);
+      if (linum_mode) {
+	      char buff[16];
+	      sprintf (buff, "%*lu", first_column - 1, buffer_first_line + j);
+	      term_addstr(buff);
+      }
+
+      draw_line (line, wp, o, r, highlight, cur_tab_width);
 
       if (get_window_start_column (wp) > 0)
         {
-          term_move (i, 0);
+          term_move (line, first_column);
           term_addstr("$");
         }
 
-      o = buffer_next_line (get_window_bp (wp), o);
+      o = buffer_next_line (bp, o);
     }
 
-  set_window_all_displayed (wp, o >= get_buffer_size (get_window_bp (wp)));
+  set_window_all_displayed (wp, o >= get_buffer_size (bp));
 
   /* Draw the status line only if there is available space after the
      buffer text space. */
@@ -259,7 +288,8 @@ term_redisplay (void)
 void
 term_redraw_cursor (void)
 {
-  term_move (cur_topline + get_window_topdelta (cur_wp), col);
+  term_move (cur_topline + get_window_topdelta (cur_wp),
+             col + get_window_first_column(cur_wp));
 }
 
 /*

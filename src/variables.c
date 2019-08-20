@@ -167,6 +167,14 @@ get_variable_bool (const char *var)
   return false;
 }
 
+void
+toggle_variable_bool (const char *var)
+{
+  const bool p = get_variable_bool (var);
+  set_variable (var, (p ? "nil" : "t"));
+
+}
+
 const_astr
 minibuf_read_variable_name (const char *fmt, ...)
 {
