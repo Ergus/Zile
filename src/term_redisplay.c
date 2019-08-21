@@ -46,26 +46,30 @@ draw_line (size_t line, Window wp,
            size_t fill_column_indicator_column)
 {
   /* Draw body of line. */
-  const size_t first_column_wp = get_window_first_column (wp);
+  const size_t first_column_wp = get_window_first_column (wp); // Start column to draw text
+  const size_t start_column_wp = get_window_start_column (wp); // First text column to display
+  // Effective portion of the window to write text
+  // TODO: if get_window_ewidth (wp) <= first_column_wp this will produce an error
+  const size_t window_ewidth_wp = get_window_ewidth (wp) - first_column_wp;
 
-  size_t x = first_column_wp,
-    i = get_window_start_column (wp),
+  size_t x = 0,
+    i = start_column_wp,
     line_len = buffer_line_len (get_window_bp (wp), o);
 
-  term_move (line, x);
-    /* Draw start of line if . */
-  if (i > 0)
+  term_move (line, first_column_wp);
+  if (i > 0) // There is horizontal scroll
     {
       term_addch ('$');
       ++x;
       ++i;
     }
 
-  while (i < line_len && x < get_window_ewidth (wp))
+  term_attrset (highlight && region_contains (r, o + i) ? FONT_REVERSE : FONT_NORMAL);
+
+  while (i < line_len && x < window_ewidth_wp)
     {
       term_attrset (highlight && region_contains (r, o + i) ? FONT_REVERSE : FONT_NORMAL);
-      if (i >= line_len || x >= get_window_ewidth (wp))
-        break;
+
       char c = get_buffer_char (get_window_bp (wp), o + i);
       if (isprint (c))
         {
@@ -81,37 +85,39 @@ draw_line (size_t line, Window wp,
       ++i;
     }
 
-  if (x >= term_width ())
+  if (first_column_wp + x >= term_width ()) // We filled the whole visible line
     {
       term_move (line, term_width () - 1);
       term_attrset (FONT_NORMAL);
       term_addstr ("$");
     }
-  else
+  else // There is space after the displayed text
     {
-      const size_t indicator_x = fill_column_indicator_column + first_column_wp;
+      const long indicator_column_x =
+	fill_column_indicator_column - start_column_wp;
 
-      if (0 < fill_column_indicator_column &&
-          indicator_x < get_window_ewidth (wp))
+      if (0 < fill_column_indicator_column &&     // Enabled indicator
+          indicator_column_x >= 0 &&              // Indicator horizontal visible
+          indicator_column_x <= window_ewidth_wp) // window not too stretch
 	{
-	  while (x < indicator_x)
+	  while (x < indicator_column_x)          // Fill before indicator
 	    {
 	      term_addch (' ');
 	      ++x;
 	    }
-	  if (indicator_x && x == indicator_x)
+          if (x == indicator_column_x)            // Set indicator
 	    {
 	      term_addch ('|');
 	      ++x;
 	    }
 	}
-      while (x < get_window_ewidth (wp))
+      while (x <= window_ewidth_wp)               // Erase the rest of the line
 	{
 	  term_addch (' ');
 	  ++x;
 	}
     }
-  term_attrset (FONT_NORMAL);
+  term_attrset (FONT_NORMAL);                     // Restore default face
 }
 
 static int
@@ -280,10 +286,10 @@ term_redisplay (void)
   Buffer bp = get_window_bp (cur_wp);
 
   const size_t tab_width_bp = tab_width (bp);
-  const size_t ew = get_window_ewidth (cur_wp);
+  const size_t ew = get_window_ewidth (cur_wp) - get_window_first_column (cur_wp);
 
   size_t o = window_o (cur_wp);
-  size_t lineo = o - get_buffer_line_o (bp);
+  const size_t lineo = o - get_buffer_line_o (bp);
   size_t lastcol = 0;
   col = 0;
   o -= lineo;
@@ -301,7 +307,8 @@ term_redisplay (void)
             col += strlen (make_char_printable (get_buffer_char (bp, o + p), col, tab_width_bp));
         }
 
-      if (col >= ew - 1 || (lp / (ew / 3)) + 2 < lineo / (ew / 3))
+      if (col >= ew - 1 ||        // Col crosses window border
+          (lp / (ew / 3)) + 2 < lineo / (ew / 3))
         {
           set_window_start_column (cur_wp, lp + 1);
           col = lastcol;
@@ -331,7 +338,7 @@ void
 term_redraw_cursor (void)
 {
   term_move (cur_topline + get_window_topdelta (cur_wp),
-             col + get_window_first_column(cur_wp));
+             get_window_first_column(cur_wp) + col);
 }
 
 /*
