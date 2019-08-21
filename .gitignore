@@ -34,3 +34,6 @@ zile*.tar.gz
 zile*.tar.gz.directive*
 zile*.tar.gz.sig
 build
+GPATH
+GRTAGS
+GTAGS

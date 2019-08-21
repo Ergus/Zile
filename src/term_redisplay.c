@@ -139,26 +139,27 @@ make_mode_line_flags (Window wp)
   return "--";
 }
 
-static char *
-make_screen_pos (Window wp)
+static void
+make_screen_pos (char * screen_pos, Window wp)
 {
-  bool tv = window_top_visible (wp);
-  bool bv = window_bottom_visible (wp);
+  const bool tv = window_top_visible (wp);
+  const bool bv = window_bottom_visible (wp);
 
   if (tv && bv)
-    return xasprintf ("All");
+    strcpy (screen_pos, "All");
   else if (tv)
-    return xasprintf ("Top");
+    strcpy (screen_pos, "Top");
   else if (bv)
-    return xasprintf ("Bot");
+    strcpy (screen_pos, "Bot");
   else
-    return xasprintf ("%2d%%",
-                      (int) ((float) 100.0 * window_o (wp) / get_buffer_size (get_window_bp (wp))));
+    snprintf (screen_pos, 4, "%2d%%",
+              (int) ((float) 100.0 * window_o (wp) / get_buffer_size (get_window_bp (wp))));
 }
 
 static void
 draw_status_line (size_t line, Window wp)
 {
+  Buffer bp = get_window_bp (wp);
   term_attrset (FONT_REVERSE);
 
   term_move (line, 0);
@@ -174,17 +175,20 @@ draw_status_line (size_t line, Window wp)
     eol_type = ":";
 
   term_move (line, 0);
-  size_t n = offset_to_line (get_window_bp (wp), window_o (wp));
-  astr as = astr_fmt ("--%s%2s  %-15s   %s %-9s (Fundamental",
-                      eol_type, make_mode_line_flags (wp), get_buffer_name (get_window_bp (wp)),
-                      make_screen_pos (wp), astr_cstr (astr_fmt ("(%zu,%zu)", n + 1,
-                                                                 get_goalc_bp (get_window_bp (wp), window_o (wp)))));
+  size_t n = offset_to_line (bp, window_o (wp));
 
-  if (get_buffer_autofill (get_window_bp (wp)))
+  char screen_pos[4];
+  make_screen_pos (screen_pos, wp);
+  astr as = astr_fmt ("--%s%2s  %-15s   %s %-9s (Fundamental",
+                      eol_type, make_mode_line_flags (wp), get_buffer_name (bp),
+                      screen_pos, astr_cstr (astr_fmt ("(%zu,%zu)", n + 1,
+		                                                 get_goalc_bp (bp, window_o (wp)))));
+
+  if (get_buffer_autofill (bp))
     astr_cat_cstr (as, " Fill");
   if (thisflag & FLAG_DEFINING_MACRO)
     astr_cat_cstr (as, " Def");
-  if (get_buffer_isearch (get_window_bp (wp)))
+  if (get_buffer_isearch (bp))
     astr_cat_cstr (as, " Isearch");
 
   astr_cat_char (as, ')');
@@ -274,15 +278,17 @@ term_redisplay (void)
 {
   /* Calculate the start column if the line at point has to be truncated. */
   Buffer bp = get_window_bp (cur_wp);
-  size_t lastcol = 0, t = tab_width (bp);
+
+  const size_t tab_width_bp = tab_width (bp);
+  const size_t ew = get_window_ewidth (cur_wp);
+
   size_t o = window_o (cur_wp);
   size_t lineo = o - get_buffer_line_o (bp);
-
+  size_t lastcol = 0;
   col = 0;
   o -= lineo;
   set_window_start_column (cur_wp, 0);
 
-  size_t ew = get_window_ewidth (cur_wp);
   for (size_t lp = lineo; lp != SIZE_MAX; --lp)
     {
       col = 0;
@@ -292,7 +298,7 @@ term_redisplay (void)
           if (isprint (c))
             col++;
           else
-            col += strlen (make_char_printable (get_buffer_char (bp, o + p), col, t));
+            col += strlen (make_char_printable (get_buffer_char (bp, o + p), col, tab_width_bp));
         }
 
       if (col >= ew - 1 || (lp / (ew / 3)) + 2 < lineo / (ew / 3))
