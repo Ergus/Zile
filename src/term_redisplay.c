@@ -210,7 +210,6 @@ draw_window (size_t topline, Window wp)
   /* Draw the window lines. */
   size_t cur_tab_width = tab_width (bp);
 
-  // =====================
   const size_t window_eheight = get_window_eheight (wp);
   const bool linum_mode = get_variable_bool("linum-mode");
   const size_t buffer_first_line = offset_to_line (bp, o);
@@ -226,14 +225,15 @@ draw_window (size_t topline, Window wp)
 
   if (linum_mode)
     {
+      char buff[STR_SIZE];
       const size_t buffer_last_line = buffer_first_line + window_eheight;
 
-      char *max_linum = xasprintf("%lu", buffer_last_line);
-      first_column += strlen(max_linum) + 1;
+      snprintf(buff, STR_SIZE, "%lu", buffer_last_line);
+
+      first_column += strlen(buff) + 1;
     }
 
   set_window_first_column(wp, first_column);
-  // ====================
 
   for (j = 0; j < window_eheight; ++j)
     {
@@ -248,8 +248,9 @@ draw_window (size_t topline, Window wp)
 
       if (linum_mode)
 	{
-	  char buff[16];
-	  sprintf (buff, "%*lu", first_column - 1, buffer_first_line + j);
+	  char buff[STR_SIZE];
+	  snprintf (buff, STR_SIZE, "%*lu",
+	            first_column - 1, buffer_first_line + j);
 	  term_addstr(buff);
 	}
 

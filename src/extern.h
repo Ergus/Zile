@@ -21,6 +21,10 @@
 
 #include "gl_xlist.h"
 
+#ifndef STR_SIZE
+#define STR_SIZE 32
+#endif
+
 /* FIXME: Split this header up into per-module headers. Rename data structure headers to avoid clashes. */
 
 /* basic.c ---------------------------------------------------------------- */
