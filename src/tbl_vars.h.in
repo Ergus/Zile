@@ -30,6 +30,7 @@ X ("tab-always-indent", "t", false, "Controls the operation of the \@kbd{TAB} ke
 X ("indent-tabs-mode", "t", true, "If non-nil, insert-tab inserts \"real\" tabs; otherwise, it always inserts\nspaces.")
 X ("fill-column", "70", true, "Column beyond which automatic line-wrapping should happen.\nAutomatically becomes buffer-local when set in any fashion.")
 X ("linum-mode", "t", true, "If non-nil display the line numbers.")
+X ("fill-column-indicator-mode", "t", true, "Display an indicator in the fill-column column.")
 X ("auto-fill-mode", "nil", false, "If non-nil, Auto Fill Mode is automatically enabled.")
 X ("kill-whole-line", "nil", false, "If non-nil, `kill-line' with no arg at beg of line kills the whole line.")
 X ("case-fold-search", "t", true, "Non-nil means searches ignore case.")

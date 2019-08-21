@@ -42,16 +42,26 @@ make_char_printable (char c, int x, int cur_tab_width)
 
 static void
 draw_line (size_t line, Window wp,
-           size_t o, Region r, int highlight, size_t cur_tab_width)
+           size_t o, Region r, int highlight, size_t cur_tab_width,
+           size_t fill_column_indicator_column)
 {
-  const size_t startcol = get_window_start_column (wp);
-  const size_t first_column = get_window_first_column (wp);
-
-  term_move (line, first_column);
-
   /* Draw body of line. */
-  size_t x, i, line_len = buffer_line_len (get_window_bp (wp), o);
-  for (x = first_column, i = startcol;; i++)
+  const size_t first_column_wp = get_window_first_column (wp);
+
+  size_t x = first_column_wp,
+    i = get_window_start_column (wp),
+    line_len = buffer_line_len (get_window_bp (wp), o);
+
+  term_move (line, x);
+    /* Draw start of line if . */
+  if (i > 0)
+    {
+      term_addch ('$');
+      ++x;
+      ++i;
+    }
+
+  while (i < line_len && x < get_window_ewidth (wp))
     {
       term_attrset (highlight && region_contains (r, o + i) ? FONT_REVERSE : FONT_NORMAL);
       if (i >= line_len || x >= get_window_ewidth (wp))
@@ -60,7 +70,7 @@ draw_line (size_t line, Window wp,
       if (isprint (c))
         {
           term_addch (c);
-          x++;
+          ++x;
         }
       else
         {
@@ -68,9 +78,9 @@ draw_line (size_t line, Window wp,
           term_addstr (s);
           x += strlen (s);
         }
+      ++i;
     }
 
-  /* Draw end of line. */
   if (x >= term_width ())
     {
       term_move (line, term_width () - 1);
@@ -78,7 +88,29 @@ draw_line (size_t line, Window wp,
       term_addstr ("$");
     }
   else
-    term_addstr (xasprintf ("%*s", (int) (get_window_ewidth (wp) - x), ""));
+    {
+      const size_t indicator_x = fill_column_indicator_column + first_column_wp;
+
+      if (0 < fill_column_indicator_column &&
+          indicator_x < get_window_ewidth (wp))
+	{
+	  while (x < indicator_x)
+	    {
+	      term_addch (' ');
+	      ++x;
+	    }
+	  if (indicator_x && x == indicator_x)
+	    {
+	      term_addch ('|');
+	      ++x;
+	    }
+	}
+      while (x < get_window_ewidth (wp))
+	{
+	  term_addch (' ');
+	  ++x;
+	}
+    }
   term_attrset (FONT_NORMAL);
 }
 
@@ -183,6 +215,14 @@ draw_window (size_t topline, Window wp)
   const bool linum_mode = get_variable_bool("linum-mode");
   const size_t buffer_first_line = offset_to_line (bp, o);
   size_t first_column = 0;
+  size_t fill_column_indicator = 0;
+
+  if (get_variable_bool ("fill-column-indicator-mode"))
+    {
+      long res = 0;
+      if (lisp_to_number (get_variable_bp (bp, "fill-column"), &res))
+	fill_column_indicator = res;
+    }
 
   if (linum_mode)
     {
@@ -206,19 +246,14 @@ draw_window (size_t topline, Window wp)
       if (o == SIZE_MAX)
         continue;
 
-      if (linum_mode) {
-	      char buff[16];
-	      sprintf (buff, "%*lu", first_column - 1, buffer_first_line + j);
-	      term_addstr(buff);
-      }
+      if (linum_mode)
+	{
+	  char buff[16];
+	  sprintf (buff, "%*lu", first_column - 1, buffer_first_line + j);
+	  term_addstr(buff);
+	}
 
-      draw_line (line, wp, o, r, highlight, cur_tab_width);
-
-      if (get_window_start_column (wp) > 0)
-        {
-          term_move (line, first_column);
-          term_addstr("$");
-        }
+      draw_line (line, wp, o, r, highlight, cur_tab_width, fill_column_indicator);
 
       o = buffer_next_line (bp, o);
     }

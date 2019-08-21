@@ -225,7 +225,16 @@ DEFUN ("toggle-linum-mode", toggle_linum_mode)
 Toggle `linum-mode' to specified argument.
 +*/
 {
-	toggle_variable_bool ("linum-mode");
+  toggle_variable_bool ("linum-mode");
+}
+END_DEFUN
+
+DEFUN ("toggle-fill-column-indicator-mode", toggle_fill_column_indicator_mode)
+/*+
+Toggle `fill-column-indicator-mode' to specified argument.
++*/
+{
+  toggle_variable_bool ("fill-column-indicator-mode");
 }
 END_DEFUN
 
