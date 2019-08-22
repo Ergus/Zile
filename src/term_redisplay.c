@@ -29,15 +29,15 @@
 #include "main.h"
 #include "extern.h"
 
-static const char *
-make_char_printable (char c, int x, int cur_tab_width)
+static int
+make_char_printable (char *out, char c, int x, int cur_tab_width)
 {
   if (c == '\t')
-    return xasprintf ("%*s", cur_tab_width - x % cur_tab_width, "");
+    return snprintf (out, STR_SIZE, "%*s", cur_tab_width - x % cur_tab_width, "");
   if (c >= 0 && c <= '\33')
-    return xasprintf ("^%c", '@' + c);
-  else
-    return xasprintf ("\\%o", c & 0xff);
+    return snprintf (out, STR_SIZE, "^%c", '@' + c);
+
+  return snprintf (out, STR_SIZE, "\\%o", c & 0xff);
 }
 
 static void
@@ -78,9 +78,11 @@ draw_line (size_t line, Window wp,
         }
       else
         {
-          const char *s = make_char_printable (c, x, cur_tab_width);
-          term_addstr (s);
-          x += strlen (s);
+	  char buffer[STR_SIZE];
+          const int ret = make_char_printable (buffer, c, x, cur_tab_width);
+	  assert(ret > 0);
+          term_addstr (buffer);
+          x += (ret - 1);
         }
       ++i;
     }
@@ -136,11 +138,13 @@ calculate_highlight_region (Window wp, Region *rp)
 static const char *
 make_mode_line_flags (Window wp)
 {
-  if (get_buffer_modified (get_window_bp (wp)) && get_buffer_readonly (get_window_bp (wp)))
+  const Buffer bp = get_window_bp (wp);
+
+  if (get_buffer_modified (bp) && get_buffer_readonly (bp))
     return "%*";
-  else if (get_buffer_modified (get_window_bp (wp)))
+  if (get_buffer_modified (bp))
     return "**";
-  else if (get_buffer_readonly (get_window_bp (wp)))
+  if (get_buffer_readonly (bp))
     return "%%";
   return "--";
 }
@@ -304,7 +308,13 @@ term_redisplay (void)
           if (isprint (c))
             col++;
           else
-            col += strlen (make_char_printable (get_buffer_char (bp, o + p), col, tab_width_bp));
+	    {
+	      char buff[STR_SIZE];
+	      const int ret =
+		make_char_printable (buff, get_buffer_char (bp, o + p), col, tab_width_bp);
+	      assert(ret > 0);
+	      col += (ret - 1);
+	    }
         }
 
       if (col >= ew - 1 ||        // Col crosses window border
