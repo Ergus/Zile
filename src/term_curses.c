@@ -43,7 +43,13 @@
 
 static gl_list_t key_buf;
 
+#ifdef MOUSE_ON
+MEVENT mevent;
+#endif
+
 static char backspace_code = 0177;
+
+
 
 size_t
 term_buf_len (void)
@@ -239,12 +245,12 @@ codetokey (int c)
 }
 
 static size_t
-keytocodes (size_t key, int ** codevec)
+keytocodes (size_t key, int *codevec)
 {
   if (key == KBD_NOKEY)
     return 0;
 
-  int *p = *codevec = XCALLOC (2, int);
+  int *p = codevec;
 
   if (key & KBD_META)				/* META */
     *p++ = '\33';
@@ -365,7 +371,7 @@ keytocodes (size_t key, int ** codevec)
       break;
     }
 
-  return p - *codevec;
+  return p - codevec;
 }
 
 static int
@@ -419,7 +425,8 @@ term_getkey_unfiltered (int delay)
 void
 term_ungetkey (size_t key)
 {
-  int * codes = NULL;
-  for (size_t i = keytocodes (key, &codes); i > 0; i--)
+  // TODO: This 2 is based in original code and it is completely arbitrary.
+  int codes[2];
+  for (size_t i = keytocodes (key, codes); i > 0; i--)
     gl_list_add_last (key_buf, (void *)(ptrdiff_t) codes[i - 1]);
 }

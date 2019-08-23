@@ -35,8 +35,6 @@
 
 #include "astr.h"
 
-#define ALLOCATION_CHUNK_SIZE	16
-
 /*
  * The implementation of astr.
  */
@@ -66,6 +64,13 @@ const_astr_new_nstr (const char *s, size_t n)
   as->len = n;
   as->text = (char *) s;
   return as;
+}
+
+void
+astr_free (astr in)
+{
+  free(in->text);
+  free(in);
 }
 
 const char *

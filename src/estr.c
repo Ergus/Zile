@@ -60,6 +60,12 @@ estr_new (const_astr as, const char *eol)
   return es;
 }
 
+void
+estr_free (estr in)
+{
+  astr_free(in->as);
+}
+
 astr
 estr_get_as (const_estr es)
 {

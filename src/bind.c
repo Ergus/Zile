@@ -429,6 +429,8 @@ init_default_bindings (void)
 (global-set-key \"\\C-y\" 'yank)\
 ");
   lisp_loadstring (as);
+
+  astr_free(as);
 }
 
 DEFUN_ARGS ("global-set-key", global_set_key,
@@ -494,12 +496,15 @@ walk_bindings_tree (Binding tree, gl_list_t keys,
             }
           astr_cat (key, chordtodesc (p->key));
           process (key, p, st);
+	  astr_free(key);
         }
       else
         {
-          gl_list_add_last (keys, chordtodesc (p->key));
+	  astr str = chordtodesc (p->key);
+          gl_list_add_last (keys, str);
           walk_bindings_tree (p, keys, process, st);
           assert (gl_list_remove_at (keys, gl_list_size (keys) - 1));
+	  astr_free(str);
         }
     }
 }
@@ -538,7 +543,7 @@ Argument is a command name.
 +*/
 {
   const_astr name = minibuf_read_function_name ("Where is command: ");
-  gather_bindings_state g;
+  gather_bindings_state g = {NULL, NULL};
 
   ok = leNIL;
 
@@ -557,6 +562,10 @@ Argument is a command name.
           ok = leT;
         }
     }
+
+  if (g.bindings)
+    astr_free (g.bindings);
+
 }
 END_DEFUN
 

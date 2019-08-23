@@ -187,12 +187,15 @@ draw_status_line (size_t line, Window wp)
   term_move (line, 0);
   size_t n = offset_to_line (bp, window_o (wp));
 
-  char screen_pos[4];
+  char screen_pos[4];   // Position
   make_screen_pos (screen_pos, wp);
+
+  char line_col[STR_SIZE];
+  snprintf(line_col, STR_SIZE, "(%zu,%zu)", n + 1, get_goalc_bp (bp, window_o (wp)));
+
   astr as = astr_fmt ("--%s%2s  %-15s   %s %-9s (Fundamental",
                       eol_type, make_mode_line_flags (wp), get_buffer_name (bp),
-                      screen_pos, astr_cstr (astr_fmt ("(%zu,%zu)", n + 1,
-		                                                 get_goalc_bp (bp, window_o (wp)))));
+                      screen_pos, line_col);
 
   if (get_buffer_autofill (bp))
     astr_cat_cstr (as, " Fill");
@@ -205,6 +208,8 @@ draw_status_line (size_t line, Window wp)
   term_addstr (astr_cstr (as));
 
   term_attrset (FONT_NORMAL);
+
+  astr_free(as);
 }
 
 static void

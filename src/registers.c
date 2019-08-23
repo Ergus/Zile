@@ -31,7 +31,7 @@
 
 #define NUM_REGISTERS	256
 
-static estr regs[NUM_REGISTERS];
+static estr regs[NUM_REGISTERS] = {};
 
 DEFUN_ARGS ("copy-to-register", copy_to_register,
             INT_ARG (reg))
@@ -125,7 +125,10 @@ write_registers_list (va_list ap _GL_UNUSED_PARAMETER)
           s++;
         int len = MIN (20, MAX (0, ((int) get_window_ewidth (cur_wp)) - 6)) + 1;
 
-        bprintf ("Register %s contains ", astr_cstr (astr_fmt (isprint (i) ? "%c" : "\\%o", (int) i)));
+	char buff[STR_SIZE];
+	snprintf(buff, STR_SIZE, "%s", (isprint (i) ? "%c" : "\\%o", (int) i));
+
+        bprintf ("Register %s contains ", buff);
         if (strlen (s) > 0)
           bprintf ("text starting with\n    %.*s\n", len, s);
         else if (s != astr_cstr (estr_get_as (regs[i])))

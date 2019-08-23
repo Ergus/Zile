@@ -173,5 +173,7 @@ Display documentation of the command invoked by a key sequence.
         write_temp_buffer ("*Help*", true,
                            write_key_description, name, doc, astr_cstr (binding));
     }
+
+  astr_free (binding);
 }
 END_DEFUN

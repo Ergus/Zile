@@ -26,6 +26,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#define ALLOCATION_CHUNK_SIZE	16
+
 /*
  * The astr library provides dynamically allocated null-terminated C
  * strings.
@@ -53,6 +55,11 @@ astr astr_new (void);
  * Make a new string from a C null-terminated string.
  */
 astr astr_new_cstr (const char *s);
+
+/*
+ * Release string memory.
+ */
+void astr_free(astr in);
 
 /*
  * Make a new constant string from a counted C string.
