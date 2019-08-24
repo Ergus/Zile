@@ -31,4 +31,4 @@ FIELD(size_t, fheight)
 FIELD(size_t, ewidth)		/* The effective width and height of the window. */
 FIELD(size_t, eheight)
 FIELD(bool, all_displayed)	/* The bottom of the buffer is visible */
-FIELD(size_t, first_column) /* The mark is active. */
+FIELD(size_t, first_column)     /* First effective column. */

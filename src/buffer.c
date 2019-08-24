@@ -87,7 +87,7 @@ get_buffer_pt (Buffer bp)
   return bp->pt;
 }
 
-static void
+void
 set_buffer_pt (Buffer bp, size_t o)
 {
   if (o < bp->pt)

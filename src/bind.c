@@ -570,7 +570,6 @@ Argument is a command name.
 
   if (g.bindings)
     astr_free (g.bindings);
-
 }
 END_DEFUN
 

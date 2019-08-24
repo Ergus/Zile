@@ -234,6 +234,33 @@ This command selects the window one step away in that order.
 }
 END_DEFUN
 
+
+bool
+get_window_in_position (int x, int y, int *rx, int *ry)
+{
+  //minibuf_write ("%d %d %d", mouse_event.x, mouse_event.y, mouse_event.z );
+
+  int first_line = 0;
+  int last_line = 0;
+  int cont = 0;
+  for (Window wp = head_wp; wp != NULL; wp = get_window_next (wp)) {
+    last_line += get_window_fheight(wp);
+
+    if (last_line >= y) {
+      minibuf_write ("Selected window %d",  cont);
+      set_current_window (wp);
+      *rx = x - get_window_first_column(wp);
+      *ry = y - first_line;
+      return true;
+    }
+
+    first_line = last_line;
+    ++cont;
+  }
+
+  return false;
+}
+
 /*
  * This function creates the scratch buffer and window when there are
  * no other windows (and possibly no other buffers).

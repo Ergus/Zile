@@ -321,7 +321,7 @@ size_t window_o (Window wp);
 bool window_top_visible (Window wp);
 _GL_ATTRIBUTE_PURE bool window_bottom_visible (Window wp);
 void window_resync (Window wp);
-
+bool get_window_in_position (int x, int y, int *rx, int *ry);
 /*
  * Declare external Zile functions.
  */

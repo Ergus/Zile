@@ -73,7 +73,27 @@ DEFUN ("mouse-set-point", mouse_set_point)
 Set point in mouse position
 +*/
 {
-  minibuf_write ("%d %d %d", mouse_event.x, mouse_event.y, mouse_event.z );
+  int rx, ry;
+
+  get_window_in_position (mouse_event.x, mouse_event.y, &rx, &ry);
+
+  move_line (ry - get_window_topdelta (cur_wp));
+
+  size_t col = 0, i;
+  const size_t t = tab_width (cur_bp);
+  const size_t lino = get_buffer_line_o (cur_bp);
+  const size_t len  = buffer_line_len (cur_bp, get_buffer_pt (cur_bp));
+
+  for (i = lino; i < lino + len; i++)
+    if (col >= rx)
+      break;
+    else if (get_buffer_char (cur_bp, i) == '\t')
+      for (size_t w = t - col % t; w > 0 && ++col < rx; w--);
+    else
+      ++col;
+
+  set_buffer_pt (cur_bp, i);
+
 }
 END_DEFUN
 

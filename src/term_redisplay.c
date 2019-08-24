@@ -33,11 +33,11 @@ static int
 make_char_printable (char *out, char c, int x, int cur_tab_width)
 {
   if (c == '\t')
-    return snprintf (out, STR_SIZE, "%*s", cur_tab_width - x % cur_tab_width, "");
+    return snprintf (out, STR_SIZE, "%*s", cur_tab_width - x % cur_tab_width, "") ;
   if (c >= 0 && c <= '\33')
-    return snprintf (out, STR_SIZE, "^%c", '@' + c);
+    return snprintf (out, STR_SIZE, "^%c", '@' + c) ;
 
-  return snprintf (out, STR_SIZE, "\\%o", c & 0xff);
+  return snprintf (out, STR_SIZE, "\\%o", c & 0xff) - 1; // The -1 is because it converts 2 elements
 }
 
 static void
@@ -82,7 +82,7 @@ draw_line (size_t line, Window wp,
           const int ret = make_char_printable (buffer, c, x, cur_tab_width);
 	  assert(ret > 0);
           term_addstr (buffer);
-          x += (ret - 1);
+          x += ret;
         }
       ++i;
     }
@@ -318,7 +318,7 @@ term_redisplay (void)
 	      const int ret =
 		make_char_printable (buff, get_buffer_char (bp, o + p), col, tab_width_bp);
 	      assert(ret > 0);
-	      col += (ret - 1);
+	      col += ret;
 	    }
         }
 
