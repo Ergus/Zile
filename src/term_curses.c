@@ -43,13 +43,7 @@
 
 static gl_list_t key_buf;
 
-#ifdef MOUSE_ON
-MEVENT mevent;
-#endif
-
 static char backspace_code = 0177;
-
-
 
 size_t
 term_buf_len (void)
@@ -136,6 +130,9 @@ term_init (void)
   char *kbs = tigetstr("kbs");
   if (kbs && strlen (kbs) == 1)
     backspace_code = *kbs;
+  #ifdef MOUSE_ON
+  mouse_enable();
+  #endif
 }
 
 void
@@ -150,6 +147,10 @@ codetokey (int c)
 {
   switch (c)
     {
+#ifdef MOUSE_ON
+    case KEY_MOUSE:
+      return mouse_codetokey();
+#endif
     case '\0':			/* C-@ */
       return KBD_CTRL | '@';
     case '\1':
@@ -258,6 +259,12 @@ keytocodes (size_t key, int *codevec)
 
   switch (key)
     {
+#ifdef MOUSE_ON
+    case KBD_MOUSE:
+      if (!mouse_keytocodes(p))
+	return 0;
+      break;
+#endif
     case KBD_CTRL | '@':			/* C-@ */
       *p++ = '\0';
       break;
@@ -393,7 +400,6 @@ get_char (int delay)
       do {
 #endif
         c = getch ();
-
 #ifdef KEY_RESIZE
         if (c == KEY_RESIZE)
           resize_windows ();
@@ -417,7 +423,7 @@ int
 term_getkey_unfiltered (int delay)
 {
   keypad (stdscr, false);
-  int key = get_char (delay);
+  const int key = get_char (delay);
   keypad (stdscr, true);
   return key;
 }

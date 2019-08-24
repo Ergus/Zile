@@ -47,6 +47,7 @@ src_zile_function_SOURCE_FILES =			\
 	src/gc_veneer.c					\
 	src/lisp.c					\
 	src/macro.c					\
+	src/mouse.c					\
 	src/redisplay.c					\
 	src/registers.c					\
 	src/search.c					\

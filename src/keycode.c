@@ -36,8 +36,12 @@
 astr
 chordtodesc (size_t key)
 {
-  astr as = astr_new ();
+#ifdef MOUSE_ON
+  if (key == KBD_MOUSE)
+    return mouse_chordtodesc (key);
+#endif
 
+  astr as = astr_new ();
   if (key & KBD_CTRL)
     astr_cat_cstr (as, "C-");
   if (key & KBD_META)
@@ -138,6 +142,7 @@ chordtodesc (size_t key)
  * Array of key names
  */
 static const char *keyname[] = {
+  "\\MOUSE",
   "\\BACKSPACE",
   "\\C-",
   "\\DELETE",
@@ -178,6 +183,7 @@ static const char *keyname[] = {
  * Array of key codes in the same order as keyname above
  */
 static int keycode[] = {
+  KBD_MOUSE,
   KBD_BS,
   KBD_CTRL,
   KBD_DEL,

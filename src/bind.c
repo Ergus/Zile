@@ -137,8 +137,10 @@ do_binding_completion (astr as)
       unsigned arg = abs (last_uniarg);
       do
         {
-          bs = astr_fmt ("%c %s", arg % 10 + '0', astr_cstr (bs));
+          astr tmp = astr_fmt ("%c %s", arg % 10 + '0', astr_cstr (bs));
           arg /= 10;
+	  free (bs);
+	  bs = tmp;
         }
       while (arg != 0);
 
@@ -153,6 +155,7 @@ do_binding_completion (astr as)
   size_t key = getkey (GETKEY_DEFAULT);
   minibuf_clear ();
 
+  astr_free (bs);
   return key;
 }
 
@@ -177,6 +180,7 @@ get_key_sequence (void)
         break;
       as = keyvectodesc (keys);
       gl_list_add_last (keys, (void *) do_binding_completion (as));
+      astr_free (as);
     }
 
   return keys;
@@ -427,6 +431,7 @@ init_default_bindings (void)
 (global-set-key \"\\F1w\" 'where-is)\
 (global-set-key \"\\C-x\\C-w\" 'write-file)\
 (global-set-key \"\\C-y\" 'yank)\
+(global-set-key \"\\MOUSE\" 'mouse-set-point)\
 ");
   lisp_loadstring (as);
 

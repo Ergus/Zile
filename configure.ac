@@ -85,6 +85,14 @@ else
 fi
 AC_SUBST([ISYSTEM])
 
+dnl mouse support
+AC_ARG_ENABLE([mouse],
+    AS_HELP_STRING([--enable-mouse], [Enable mouse support (experimental)]))
+
+AS_IF([test "x$enable_mouse" = "xyes"], [
+  AC_DEFINE([MOUSE_ON], 1, [Define this to enable mouse support.])
+])
+
 dnl Extra debugging
 AC_ARG_ENABLE(debug,
   [AS_HELP_STRING([--enable-debug],

@@ -177,6 +177,12 @@ void prepare_history (History hp);
 const char *previous_history_element (History hp);
 const char *next_history_element (History hp);
 
+/* mouse.c --------------------------------------------------------------- */
+void mouse_enable();
+size_t mouse_codetokey();
+bool mouse_keytocodes(int *codevec);
+astr mouse_chordtodesc (size_t key);
+
 /* keycode.c -------------------------------------------------------------- */
 astr chordtodesc (size_t key);
 gl_list_t keystrtovec (const char *key);
@@ -252,6 +258,9 @@ void recenter (Window wp);
 void init_search (void);
 
 /* term_curses.c ---------------------------------------------------------- */
+#ifdef MOUSE_ON
+astr mousetodesc (size_t key);
+#endif
 size_t term_buf_len (void);
 void term_init (void);
 void term_close (void);
@@ -312,7 +321,6 @@ size_t window_o (Window wp);
 bool window_top_visible (Window wp);
 _GL_ATTRIBUTE_PURE bool window_bottom_visible (Window wp);
 void window_resync (Window wp);
-
 
 /*
  * Declare external Zile functions.

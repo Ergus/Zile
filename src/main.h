@@ -227,6 +227,7 @@ typedef le * (*Function) (long uniarg, bool is_uniarg, le * list);
 #define KBD_F10                         00431
 #define KBD_F11                         00432
 #define KBD_F12                         00433
+#define KBD_MOUSE                       00631
 
 /*--------------------------------------------------------------------------
  * Miscellaneous stuff.
