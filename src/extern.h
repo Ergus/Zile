@@ -62,6 +62,7 @@ const_astr get_buffer_pre_point (Buffer bp);
 const_astr get_buffer_post_point (Buffer bp);
 _GL_ATTRIBUTE_PURE size_t get_buffer_pt (Buffer bp);
 _GL_ATTRIBUTE_PURE size_t get_buffer_size (Buffer bp);
+void set_buffer_pt (Buffer bp, size_t o);
 _GL_ATTRIBUTE_PURE const char *get_buffer_eol (Buffer bp);
 _GL_ATTRIBUTE_PURE size_t buffer_prev_line (Buffer bp, size_t o);
 _GL_ATTRIBUTE_PURE size_t buffer_next_line (Buffer bp, size_t o);
@@ -87,6 +88,7 @@ bool warn_if_readonly_buffer (void);
 #include "region.h"
 #undef FIELD
 _GL_ATTRIBUTE_PURE Region region_new (size_t o1, size_t o2);
+void region_free (Region in);
 Region calculate_the_region (void);
 bool delete_region (const Region r);
 _GL_ATTRIBUTE_PURE bool region_contains (Region r, size_t o);
@@ -178,9 +180,10 @@ const char *previous_history_element (History hp);
 const char *next_history_element (History hp);
 
 /* mouse.c --------------------------------------------------------------- */
-void mouse_enable();
-size_t mouse_codetokey();
-bool mouse_keytocodes(int *codevec);
+void mouse_enable ();
+void mouse_disable ();
+size_t mouse_codetokey ();
+bool mouse_keytocodes (int *codevec);
 astr mouse_chordtodesc (size_t key);
 
 /* keycode.c -------------------------------------------------------------- */
@@ -263,6 +266,11 @@ astr mousetodesc (size_t key);
 #endif
 size_t term_buf_len (void);
 void term_init (void);
+
+void term_attron (int pair);
+void term_attroff (int pair);
+void term_attr_reset ();
+
 void term_close (void);
 void term_move (size_t y, size_t x);
 void term_clrtoeol (void);

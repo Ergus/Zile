@@ -40,9 +40,15 @@ make_char_printable (char *out, char c, int x, int cur_tab_width)
   return snprintf (out, STR_SIZE, "\\%o", c & 0xff) - 1; // The -1 is because it converts 2 elements
 }
 
+static int
+get_face_region (int highlight, Region region, size_t i)
+{
+  return highlight && region_contains (region, i) ? FONT_REGION : FONT_NORMAL;
+}
+
 static void
 draw_line (size_t line, Window wp,
-           size_t o, Region r, int highlight, size_t cur_tab_width,
+           size_t o, Region region, int highlight, size_t cur_tab_width,
            size_t fill_column_indicator_column)
 {
   /* Draw body of line. */
@@ -64,11 +70,19 @@ draw_line (size_t line, Window wp,
       ++i;
     }
 
-  term_attrset (highlight && region_contains (r, o + i) ? FONT_REVERSE : FONT_NORMAL);
+  size_t cur_font = get_face_region (highlight, region, o + i);
+  // Change face;
+  term_attron (cur_font);
 
   while (i < line_len && x < window_ewidth_wp)
     {
-      term_attrset (highlight && region_contains (r, o + i) ? FONT_REVERSE : FONT_NORMAL);
+      const size_t new_font = get_face_region (highlight, region, o + i);
+      if (cur_font != new_font)
+	{
+	  term_attroff (cur_font);
+	  term_attron (new_font);
+	  cur_font = new_font;
+	}
 
       char c = get_buffer_char (get_window_bp (wp), o + i);
       if (isprint (c))
@@ -90,7 +104,7 @@ draw_line (size_t line, Window wp,
   if (first_column_wp + x >= term_width ()) // We filled the whole visible line
     {
       term_move (line, term_width () - 1);
-      term_attrset (FONT_NORMAL);
+      term_attr_reset ();
       term_addstr ("$");
     }
   else // There is space after the displayed text
@@ -119,7 +133,7 @@ draw_line (size_t line, Window wp,
 	  ++x;
 	}
     }
-  term_attrset (FONT_NORMAL);                     // Restore default face
+  term_attr_reset ();                     // Restore default face
 }
 
 static int
@@ -170,7 +184,7 @@ static void
 draw_status_line (size_t line, Window wp)
 {
   Buffer bp = get_window_bp (wp);
-  term_attrset (FONT_REVERSE);
+  term_attron (FONT_STATUS);
 
   term_move (line, 0);
   for (size_t i = 0; i < get_window_ewidth (wp); ++i)
@@ -207,7 +221,7 @@ draw_status_line (size_t line, Window wp)
   astr_cat_char (as, ')');
   term_addstr (astr_cstr (as));
 
-  term_attrset (FONT_NORMAL);
+  term_attr_reset ();
 
   astr_free(as);
 }
@@ -216,8 +230,8 @@ static void
 draw_window (size_t topline, Window wp)
 {
   size_t line, j, o;
-  Region r;
-  int highlight = calculate_highlight_region (wp, &r);
+  Region region;
+  const int highlight = calculate_highlight_region (wp, &region);
   Buffer bp = get_window_bp (wp);
 
   /* Find the first line to display on the first screen line. */
@@ -273,7 +287,7 @@ draw_window (size_t topline, Window wp)
 	  term_addstr(buff);
 	}
 
-      draw_line (line, wp, o, r, highlight, cur_tab_width, fill_column_indicator);
+      draw_line (line, wp, o, region, highlight, cur_tab_width, fill_column_indicator);
 
       o = buffer_next_line (bp, o);
     }
@@ -364,7 +378,7 @@ term_finish (void)
 {
   term_move (term_height () - 1, 0);
   term_clrtoeol ();
-  term_attrset (FONT_NORMAL);
+  term_attr_reset ();
   term_refresh ();
   term_close ();
 }

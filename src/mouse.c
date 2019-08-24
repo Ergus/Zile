@@ -24,10 +24,17 @@
 static MEVENT mouse_event;
 
 void
-mouse_enable()
+mouse_enable ()
 {
-  mousemask(ALL_MOUSE_EVENTS, NULL);
+  if (has_mouse ())
+    mousemask(ALL_MOUSE_EVENTS, NULL);
 }
+
+void
+mouse_disable ()
+{
+}
+
 
 size_t
 mouse_codetokey()

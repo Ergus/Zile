@@ -88,17 +88,6 @@ term_addstr (const char *s)
 }
 
 void
-term_attrset (size_t attr)
-{
-  int attrs = 0;
-  if (attr & FONT_REVERSE)
-    attrs |= A_REVERSE;
-  if (attr & FONT_UNDERLINE)
-    attrs |= A_UNDERLINE;
-  attrset (attrs);
-}
-
-void
 term_beep (void)
 {
   beep ();
@@ -116,6 +105,44 @@ term_height (void)
   return (size_t) LINES;
 }
 
+static void
+term_colors_enable ()
+{
+  if (has_colors())
+    {
+      
+      start_color ();
+      init_pair(FONT_NORMAL, COLOR_WHITE, COLOR_BLACK);
+      init_pair(FONT_REGION, COLOR_WHITE, COLOR_BLUE);
+      init_pair(FONT_STATUS, COLOR_WHITE, COLOR_GREEN);
+      init_pair(FONT_REVERSE, COLOR_BLACK, COLOR_WHITE);
+    }
+  else
+    {
+      init_pair(FONT_NORMAL, COLOR_WHITE, COLOR_BLACK);
+      init_pair(FONT_REGION, COLOR_BLACK, COLOR_WHITE);
+      init_pair(FONT_STATUS, COLOR_BLACK, COLOR_WHITE);
+      init_pair(FONT_REVERSE, COLOR_BLACK, COLOR_WHITE);
+    }
+}
+
+void
+term_attron (int pair)
+{
+  attron(COLOR_PAIR(pair));
+}
+
+void
+term_attroff (int pair)
+{
+  attroff(COLOR_PAIR(pair));
+}
+
+void term_attr_reset ()
+{
+  attrset (COLOR_PAIR(FONT_NORMAL));
+}
+
 void
 term_init (void)
 {
@@ -130,6 +157,9 @@ term_init (void)
   char *kbs = tigetstr("kbs");
   if (kbs && strlen (kbs) == 1)
     backspace_code = *kbs;
+
+  term_colors_enable ();
+
   #ifdef MOUSE_ON
   mouse_enable();
   #endif
@@ -138,6 +168,9 @@ term_init (void)
 void
 term_close (void)
 {
+  #ifdef MOUSE_ON
+  mouse_disable();
+  #endif
   /* Finish with ncurses. */
   endwin ();
 }

@@ -242,10 +242,30 @@ typedef le * (*Function) (long uniarg, bool is_uniarg, le * list);
                                            with no number. */
 #define FLAG_DEFINING_MACRO	0020	/* We are defining a macro. */
 
+enum tria {
+  unset = -1,
+  no_set,
+  set
+};
+
 /* Zile font codes */
-#define FONT_NORMAL		0000
-#define FONT_REVERSE		0001
-#define FONT_UNDERLINE		0002
+enum default_faces {
+  FONT_NORMAL = 0,
+  FONT_REGION,
+  FONT_STATUS,
+  FONT_REVERSE,
+  FONT_LINUM,
+  FONT_INDICATOR,
+  FONT_GUARD
+};
+
+struct face {
+  char name;
+  int id, fg, bg, attr;
+  enum tria underline;
+};
+
+struct face faces_list[FONT_GUARD];
 
 /* Custom exit code */
 #define EXIT_CRASH	2
