@@ -28,6 +28,7 @@
 
 #include "main.h"
 #include "extern.h"
+#include "completion.h"
 
 static History files_history = NULL;
 static char *minibuf_contents = NULL;

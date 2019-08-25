@@ -46,20 +46,6 @@ void init_default_bindings (void);
 /* buffer.c --------------------------------------------------------------- */
 
 /* completion.c ----------------------------------------------------------- */
-#define FIELD(ty, field)                                        \
-  ty get_completion_ ## field (const Completion cp);            \
-  void set_completion_ ## field (Completion cp, ty field);
-#define FIELD_STR(field)                                        \
-  char *get_completion_ ## field (const Completion cp);         \
-  void set_completion_ ## field (Completion cp, const char *field);
-#include "completion.h"
-#undef FIELD
-#undef FIELD_STR
-_GL_ATTRIBUTE_PURE int completion_strcmp (const void *p1, const void *p2);
-Completion completion_new (bool fileflag);
-void completion_scroll_up (void);
-void completion_scroll_down (void);
-completion_code completion_try (Completion cp, astr search, bool popup_when_complete);
 
 /* editfns.c -------------------------------------------------------------- */
 _GL_ATTRIBUTE_PURE bool is_empty_line (void);

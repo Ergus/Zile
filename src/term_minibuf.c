@@ -29,6 +29,7 @@
 #include "extern.h"
 
 #include "buffer.h"
+#include "completion.h"
 
 void
 term_minibuf_write (const char *s)

@@ -34,108 +34,14 @@
 #include "main.h"
 #include "extern.h"
 
-
-/*
- * Structure
- */
-struct Completion
-{
-#define FIELD(ty, name) ty name;
-#define FIELD_STR(name) char *name;
 #include "completion.h"
-#undef FIELD
-#undef FIELD_STR
-};
 
-#define FIELD(ty, field)                        \
-  GETTER (Completion, completion, ty, field)    \
-  SETTER (Completion, completion, ty, field)
-
-#define FIELD_STR(field)                                  \
-  GETTER (Completion, completion, char *, field)          \
-  STR_SETTER (Completion, completion, field)
-
-#include "completion.h"
-#undef FIELD
-#undef FIELD_STR
-
-/*
- * List methods for completions and matches
- */
-int
-completion_strcmp (const void *p1, const void *p2)
-{
-  return strcmp ((const char *) p1, (const char *) p2);
-}
+// ================ Static ================================
 
 static bool
 completion_STREQ (const void *p1, const void *p2)
 {
   return STREQ ((const char *) p1, (const char *) p2);
-}
-
-/*
- * Allocate a new completion structure.
- */
-Completion
-completion_new (bool fileflag)
-{
-  Completion cp = (Completion) XZALLOC (struct Completion);
-
-  cp->completions = gl_list_create_empty (GL_LINKED_LIST,
-                                          completion_STREQ, NULL,
-                                          NULL, false);
-  cp->matches = gl_list_create_empty (GL_LINKED_LIST,
-                                      completion_STREQ, NULL,
-                                      NULL, false);
-
-  if (fileflag)
-    {
-      cp->path = astr_new ();
-      cp->flags |= CFLAG_FILENAME;
-    }
-
-  return cp;
-}
-
-/*
- * Scroll completions up.
- */
-void
-completion_scroll_up (void)
-{
-  Window old_wp = cur_wp;
-  Window wp = find_window ("*Completions*");
-  assert (wp != NULL);
-  set_current_window (wp);
-  if (FUNCALL (scroll_up) == leNIL)
-    {
-      FUNCALL (beginning_of_buffer);
-      window_resync (cur_wp);
-    }
-  set_current_window (old_wp);
-
-  term_redisplay ();
-}
-
-/*
- * Scroll completions down.
- */
-void
-completion_scroll_down (void)
-{
-  Window old_wp = cur_wp;
-  Window wp = find_window ("*Completions*");
-  assert (wp != NULL);
-  set_current_window (wp);
-  if (FUNCALL (scroll_down) == leNIL)
-    {
-      FUNCALL (end_of_buffer);
-      window_resync (cur_wp);
-    }
-  set_current_window (old_wp);
-
-  term_redisplay ();
 }
 
 /*
@@ -226,10 +132,10 @@ completion_readdir (Completion cp, astr path)
           astr as = astr_new_cstr (d->d_name);
           struct stat st;
           if (stat (xasprintf ("%s%s", astr_cstr (pdir), d->d_name), &st) == 0 &&
-              S_ISDIR (st.st_mode))
+	      S_ISDIR (st.st_mode))
             astr_cat_char (as, '/');
           gl_sortedlist_add (cp->completions, completion_strcmp,
-                             xstrdup (astr_cstr (as)));
+	                     xstrdup (astr_cstr (as)));
         }
       closedir (dir);
 
@@ -238,6 +144,83 @@ completion_readdir (Completion cp, astr path)
 
   return dir != NULL;
 }
+
+
+// ================ Externals ================================
+
+/*
+ * List methods for completions and matches
+ */
+int
+completion_strcmp (const void *p1, const void *p2)
+{
+  return strcmp ((const char *) p1, (const char *) p2);
+}
+
+/*
+ * Allocate a new completion structure.
+ */
+Completion
+completion_new (bool fileflag)
+{
+  Completion cp = (Completion) XZALLOC (struct Completion);
+
+  cp->completions = gl_list_create_empty (GL_LINKED_LIST,
+                                          completion_STREQ, NULL,
+                                          NULL, false);
+  cp->matches = gl_list_create_empty (GL_LINKED_LIST,
+                                      completion_STREQ, NULL,
+                                      NULL, false);
+
+  if (fileflag)
+    {
+      cp->path = astr_new ();
+      cp->flags |= CFLAG_FILENAME;
+    }
+
+  return cp;
+}
+
+/*
+ * Scroll completions up.
+ */
+void
+completion_scroll_up (void)
+{
+  Window old_wp = cur_wp;
+  Window wp = find_window ("*Completions*");
+  assert (wp != NULL);
+  set_current_window (wp);
+  if (FUNCALL (scroll_up) == leNIL)
+    {
+      FUNCALL (beginning_of_buffer);
+      window_resync (cur_wp);
+    }
+  set_current_window (old_wp);
+
+  term_redisplay ();
+}
+
+/*
+ * Scroll completions down.
+ */
+void
+completion_scroll_down (void)
+{
+  Window old_wp = cur_wp;
+  Window wp = find_window ("*Completions*");
+  assert (wp != NULL);
+  set_current_window (wp);
+  if (FUNCALL (scroll_down) == leNIL)
+    {
+      FUNCALL (end_of_buffer);
+      window_resync (cur_wp);
+    }
+  set_current_window (old_wp);
+
+  term_redisplay ();
+}
+
 
 /*
  * Match completions.

@@ -31,6 +31,7 @@
 #include "extern.h"
 
 #include "buffer.h"
+#include "completion.h"
 
 /*
  * Variable type.

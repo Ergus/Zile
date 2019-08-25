@@ -28,6 +28,7 @@
 #include "main.h"
 #include "extern.h"
 
+#include "completion.h"
 
 /*
  * Zile Lisp functions.

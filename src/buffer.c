@@ -34,6 +34,7 @@
 #include "region.h"
 
 #include "buffer.h"
+#include "completion.h"
 // ================ Static ================================
 
 static inline size_t
