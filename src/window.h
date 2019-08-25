@@ -22,6 +22,8 @@
    Free Software Foundation, Fifth Floor, 51 Franklin Street, Boston,
    MA 02111-1301, USA.  */
 
+#include "main.h"
+
 #define WINDOW_FIELDS							\
   FIELD(Window, next)		/* The next window in window list. */	\
   FIELD(Buffer, bp)		/* The buffer displayed in window. */	\
@@ -37,13 +39,13 @@
   FIELD(bool, all_displayed)	/* The bottom of the buffer is visible */ \
   FIELD(size_t, first_column)     /* First effective column. */
 
-struct Window
+typedef struct Window
 {
 #define FIELD(ty, name) ty name;
 WINDOW_FIELDS
 #undef FIELD
   int lastpointn;		/* The last point line number. */
-};
+} *Window;
 
 #define FIELD(ty, field)                        \
   IGETTER (Window, window, ty, field)            \

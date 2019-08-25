@@ -28,6 +28,7 @@
 
 #include "buffer.h"
 #include "window.h"
+#include "term_curses.h"
 
 void
 resize_windows (void)

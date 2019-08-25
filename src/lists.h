@@ -23,7 +23,7 @@
 #define LISTS_H
 
 /* FIXME: Use proper cons cells. */
-struct le
+typedef struct le
 {
   /* either data or a branch */
   struct le *branch;
@@ -32,8 +32,7 @@ struct le
 
   /* for the next in the list in the current parenlevel */
   struct le *next;
-};
-typedef struct le le;
+} le;
 
 le *leNew (const char *text);
 

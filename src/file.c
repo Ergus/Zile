@@ -37,7 +37,13 @@
 #include "main.h"
 #include "extern.h"
 
+#include "file.h"
+
 #include "buffer.h"
+#include "variables.h"
+#include "getkey.h"
+#include "minibuf.h"
+#include "undo.h"
 
 bool
 exist_file (const char *filename)

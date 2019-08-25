@@ -37,6 +37,10 @@
 #include "completion.h"
 
 #include "window.h"
+#include "file.h"
+#include "buffer.h"
+#include "line.h"
+
 // ================ Static ================================
 
 static bool

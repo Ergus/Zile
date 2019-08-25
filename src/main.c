@@ -37,6 +37,15 @@
 #include "extern.h"
 
 #include "buffer.h"
+#include "basic.h"
+#include "window.h"
+#include "editfns.h"
+#include "bind.h"
+#include "variables.h"
+#include "file.h"
+#include "line.h"
+#include "minibuf.h"
+#include "term_curses.h"
 
 #define ZILE_COPYRIGHT_STRING \
   "Copyright (C) 2014 Free Software Foundation, Inc."

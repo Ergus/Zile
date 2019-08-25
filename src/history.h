@@ -1,6 +1,5 @@
-
-#ifndef MOUSE_H
-#define MOUSE_H
+#ifndef HISTORY_H
+#define HISTORY_H
 
 /*
  * Copyright (C) 2019  Jimmy Aguilar Mena
@@ -19,21 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include "gl_linked_list.h"
+#include "main.h"
 
-void
-mouse_enable ();
+struct History
+{
+  gl_list_t elements;		/* Elements (strings). */
+  ptrdiff_t sel;		/* Selected element. */
+};
 
-void
-mouse_disable ();
-
-size_t
-mouse_codetokey ();
-
-bool
-mouse_keytocodes (int *p);
-
-astr
-mouse_chordtodesc (size_t key);
+History history_new (void);
+void add_history_element (History hp, const char *string);
+void prepare_history (History hp);
+const char *previous_history_element (History hp);
+const char *next_history_element (History hp);
 
 #endif

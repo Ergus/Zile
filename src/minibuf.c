@@ -26,9 +26,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "minibuf.h"
+
 #include "main.h"
 #include "extern.h"
 #include "completion.h"
+#include "editfns.h"
+#include "getkey.h"
+#include "file.h"
+#include "term_curses.h"
+#include "term_minibuf.h"
+#include "history.h"
 
 static History files_history = NULL;
 static char *minibuf_contents = NULL;

@@ -38,6 +38,8 @@
 #include <term.h>
 #include "gl_array_list.h"
 
+#include "term_curses.h"
+
 #include "main.h"
 #include "extern.h"
 

@@ -32,6 +32,8 @@
 #include "window.h"
 #include "buffer.h"
 #include "marker.h"
+#include "minibuf.h"
+#include "term_curses.h"
 
 /*
  * Set the current window and his buffer as the current buffer.

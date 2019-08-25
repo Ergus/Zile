@@ -35,6 +35,8 @@
 #include "gl_xlist.h"
 #include "unused-parameter.h"
 
+#include "eval.h"
+
 #include "astr.h"
 #include "estr.h"
 #include "lists.h"
@@ -45,7 +47,6 @@
  * Main editor structures.
  *--------------------------------------------------------------------------*/
 
-/* Opaque types. */
 typedef struct Region *Region;
 typedef struct Marker *Marker;
 typedef struct History *History;
@@ -55,6 +56,13 @@ typedef struct Binding *Binding;
 typedef struct Buffer *Buffer;
 typedef struct Window *Window;
 typedef struct Completion *Completion;
+
+
+/* Opaque types. */
+extern char *prog_name;
+extern Window cur_wp, head_wp;
+extern Buffer cur_bp, head_bp;
+extern int thisflag, lastflag, last_uniarg;
 
 typedef enum
 {
@@ -127,10 +135,6 @@ typedef enum
  * `uniarg' is the universal argument, if any, whose presence is
  * indicated by `is_uniarg'.
  */
-typedef le * (*Function) (long uniarg, bool is_uniarg, le * list);
-
-/* Turn a bool into a Lisp boolean */
-#define bool_to_lisp(b) ((b) ? leT : leNIL)
 
 /* Define an interactive function. */
 #define DEFUN(zile_func, c_func) \

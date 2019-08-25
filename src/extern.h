@@ -27,88 +27,24 @@
 
 /* FIXME: Split this header up into per-module headers. Rename data structure headers to avoid clashes. */
 
-/* basic.c ---------------------------------------------------------------- */
-size_t get_goalc_bp (Buffer bp, size_t o);
-size_t get_goalc (void);
-bool previous_line (void);
-bool next_line (void);
-
-/* bind.c ----------------------------------------------------------------- */
-_GL_ATTRIBUTE_PURE Function last_command (void);
-void set_this_command (Function cmd);
-size_t do_binding_completion (astr as);
-gl_list_t get_key_sequence (void);
-Function get_function_by_keys (gl_list_t keys);
-le *call_command (Function f, int uniarg, bool uniflag, le *branch);
-void get_and_run_command (void);
-void init_default_bindings (void);
 
 /* buffer.c --------------------------------------------------------------- */
 
 /* completion.c ----------------------------------------------------------- */
 
 /* editfns.c -------------------------------------------------------------- */
-_GL_ATTRIBUTE_PURE bool is_empty_line (void);
-_GL_ATTRIBUTE_PURE bool is_blank_line (void);
-_GL_ATTRIBUTE_PURE int following_char (void);
-_GL_ATTRIBUTE_PURE int preceding_char (void);
-_GL_ATTRIBUTE_PURE bool bobp (void);
-_GL_ATTRIBUTE_PURE bool eobp (void);
-_GL_ATTRIBUTE_PURE bool bolp (void);
-_GL_ATTRIBUTE_PURE bool eolp (void);
-void ding (void);
 
 /* eval.c ----------------------------------------------------------------- */
-extern le *leNIL, *leT;
-_GL_ATTRIBUTE_PURE size_t countNodes (le * branch);
-void leEval (le * list);
-le *execute_with_uniarg (int uniarg, bool (*forward) (void), bool (*backward) (void));
-le *move_with_uniarg (int uniarg, bool (*move) (ptrdiff_t dir));
-le *execute_function (const char *name, int uniarg, bool is_uniarg);
-_GL_ATTRIBUTE_PURE Function get_function (const char *name);
-_GL_ATTRIBUTE_PURE const char *get_function_doc (const char *name);
-_GL_ATTRIBUTE_PURE bool get_function_interactive (const char *name);
-_GL_ATTRIBUTE_PURE const char *get_function_name (Function p);
-_GL_ATTRIBUTE_FORMAT_PRINTF(1, 2) const_astr minibuf_read_function_name (const char *fmt, ...);
-void init_eval (void);
 
 /* file.c ----------------------------------------------------------------- */
-bool exist_file (const char *filename);
-astr get_home_dir (void);
-astr agetcwd (void);
-bool expand_path (astr path);
-astr compact_path (astr path);
-bool find_file (const char *filename);
-void _Noreturn zile_exit (bool doabort);
 
 /* funcs.c ---------------------------------------------------------------- */
-void set_mark_interactive (void);
-void write_temp_buffer (const char *name, bool show, void (*func) (va_list ap), ...);
 
 /* getkey.c --------------------------------------------------------------- */
-void pushkey (size_t key);
-void ungetkey (size_t key);
-_GL_ATTRIBUTE_PURE size_t lastkey (void);
-size_t getkeystroke (int delay);
-size_t getkey (int delay);
-size_t getkey_unfiltered (int delay);
-void waitkey (void);
-void init_getkey (void);
-void destroy_getkey (void);
 
 /* history.c -------------------------------------------------------------- */
-History history_new (void);
-void add_history_element (History hp, const char *string);
-void prepare_history (History hp);
-const char *previous_history_element (History hp);
-const char *next_history_element (History hp);
 
 /* mouse.c --------------------------------------------------------------- */
-void mouse_enable ();
-void mouse_disable ();
-size_t mouse_codetokey ();
-bool mouse_keytocodes (int *codevec);
-astr mouse_chordtodesc (size_t key);
 
 /* keycode.c -------------------------------------------------------------- */
 astr chordtodesc (size_t key);
@@ -119,50 +55,14 @@ astr keyvectodesc (gl_list_t keys);
 void *zile_calloc(size_t n, size_t s);
 
 /* line.c ----------------------------------------------------------------- */
-bool insert_newline (void);
-bool intercalate_newline (void);
-int fill_break_line (void);
-_GL_ATTRIBUTE_FORMAT_PRINTF(1, 2) void bprintf (const char *fmt, ...);
 
 /* lisp.c ----------------------------------------------------------------- */
-void init_lisp (void);
-void lisp_loadstring (astr as);
-bool lisp_loadfile (const char *file);
-bool lisp_to_number (const char *s, long *res);
 
-/* macro.c ---------------------------------------------------------------- */
-void cancel_kbd_macro (void);
-void add_cmd_to_macro (void);
-void add_key_to_cmd (size_t key);
-void remove_key_from_cmd (void);
 
-/* main.c ----------------------------------------------------------------- */
-extern char *prog_name;
-extern Window cur_wp, head_wp;
-extern Buffer cur_bp, head_bp;
-extern int thisflag, lastflag, last_uniarg;
 
 /* marker.c --------------------------------------------------------------- */
 
 /* minibuf.c -------------------------------------------------------------- */
-void init_minibuf (void);
-_GL_ATTRIBUTE_PURE bool minibuf_no_error (void);
-void minibuf_refresh (void);
-_GL_ATTRIBUTE_FORMAT_PRINTF(1, 2) void minibuf_write (const char *fmt, ...);
-_GL_ATTRIBUTE_FORMAT_PRINTF(1, 2) void minibuf_error (const char *fmt, ...);
-_GL_ATTRIBUTE_FORMAT_PRINTF(1, 3) const_astr minibuf_read (const char *fmt, const char *value, ...);
-_GL_ATTRIBUTE_FORMAT_PRINTF(1, 2) long minibuf_read_number (const char *fmt, ...);
-bool minibuf_test_in_completions (const char *ms, gl_list_t completions);
-_GL_ATTRIBUTE_FORMAT_PRINTF(1, 2) int minibuf_read_yesno (const char *fmt, ...);
-_GL_ATTRIBUTE_FORMAT_PRINTF(1, 5) const_astr minibuf_read_completion (const char *fmt, const char *value, Completion cp,
-                                                                      History hp, ...);
-_GL_ATTRIBUTE_FORMAT_PRINTF(1, 0) const_astr minibuf_vread_completion (const char *fmt, const char *value, Completion cp,
-                                                                       History hp, const char *empty_err,
-                                                                       bool (*test) (const char *s, gl_list_t completions),
-                                                                       const char *invalid_err, va_list ap);
-_GL_ATTRIBUTE_FORMAT_PRINTF(1, 4) const_astr minibuf_read_filename (const char *fmt, const char *value,
-                                                                    const char *file, ...);
-void minibuf_clear (void);
 
 /* redisplay.c ------------------------------------------------------------ */
 void resize_windows (void);
@@ -172,35 +72,8 @@ void recenter (Window wp);
 void init_search (void);
 
 /* term_curses.c ---------------------------------------------------------- */
-#ifdef MOUSE_ON
-astr mousetodesc (size_t key);
-#endif
-size_t term_buf_len (void);
-void term_init (void);
-
-void term_attron (int pair);
-void term_attroff (int pair);
-void term_attr_reset ();
-
-void term_close (void);
-void term_move (size_t y, size_t x);
-void term_clrtoeol (void);
-void term_refresh (void);
-void term_clear (void);
-void term_addch (char c);
-void term_addstr (const char *s);
-void term_attrset (size_t attr);
-void term_beep (void);
-_GL_ATTRIBUTE_PURE size_t term_width (void);
-_GL_ATTRIBUTE_PURE size_t term_height (void);
-size_t term_getkey (int delay);
-int term_getkey_unfiltered (int delay);
-void term_ungetkey (size_t key);
 
 /* term_minibuf.c --------------------------------------------------------- */
-void term_minibuf_write (const char *fmt);
-const_astr term_minibuf_read (const char *prompt, const char *value, size_t pos,
-                              Completion cp, History hp);
 
 /* term_redisplay.c ------------------------------------------------------- */
 extern size_t first_column;
@@ -209,21 +82,6 @@ void term_redisplay (void);
 void term_finish (void);
 
 /* undo.c ----------------------------------------------------------------- */
-extern bool undo_nosave;
-void undo_start_sequence (void);
-void undo_end_sequence (void);
-void undo_save_block (size_t o, size_t osize, size_t size);
-void undo_set_unchanged (Undo up);
-
-/* variables.c ------------------------------------------------------------ */
-void init_variables (void);
-_GL_ATTRIBUTE_FORMAT_PRINTF(1, 2) const_astr minibuf_read_variable_name (const char *fmt, ...);
-void set_variable (const char *var, const char *val);
-const char *get_variable_doc (const char *var, const char **defval);
-const char *get_variable (const char *var);
-const char *get_variable_bp (Buffer bp, const char *var);
-bool get_variable_bool (const char *var);
-void toggle_variable_bool (const char *var);
 
 /* window.c --------------------------------------------------------------- */
 /*

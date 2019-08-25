@@ -1,6 +1,5 @@
-
-#ifndef MOUSE_H
-#define MOUSE_H
+#ifndef TERM_MINIBUF_H
+#define TERM_MINIBUF_H
 
 /*
  * Copyright (C) 2019  Jimmy Aguilar Mena
@@ -19,21 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include "main.h"
 
-void
-mouse_enable ();
+void term_minibuf_write (const char *fmt);
+const_astr term_minibuf_read (const char *prompt, const char *value,
+                              size_t pos, Completion cp, History hp);
 
-void
-mouse_disable ();
-
-size_t
-mouse_codetokey ();
-
-bool
-mouse_keytocodes (int *p);
-
-astr
-mouse_chordtodesc (size_t key);
 
 #endif

@@ -24,14 +24,11 @@
 #include <stdlib.h>
 #include "gl_linked_list.h"
 
+#include "history.h"
+
 #include "main.h"
 #include "extern.h"
 
-struct History
-{
-  gl_list_t elements;		/* Elements (strings). */
-  ptrdiff_t sel;		/* Selected element. */
-};
 
 History history_new (void)
 {

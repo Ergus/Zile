@@ -26,11 +26,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "line.h"
+
 #include "main.h"
 #include "extern.h"
 
 #include "buffer.h"
 #include "marker.h"
+#include "basic.h"
+#include "editfns.h"
+#include "variables.h"
+#include "minibuf.h"
 
 static void
 insert_expanded_tab (void)

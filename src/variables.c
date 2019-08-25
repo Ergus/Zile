@@ -30,8 +30,11 @@
 #include "main.h"
 #include "extern.h"
 
+#include "variables.h"
+
 #include "buffer.h"
 #include "completion.h"
+#include "minibuf.h"
 
 /*
  * Variable type.

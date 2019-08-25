@@ -31,6 +31,10 @@
 #include "buffer.h"
 #include "marker.h"
 #include "window.h"
+#include "editfns.h"
+#include "variables.h"
+#include "getkey.h"
+#include "minibuf.h"
 
 /* Return true if there are no upper-case letters in the given string.
    If `regex' is true, ignore escaped characters. */

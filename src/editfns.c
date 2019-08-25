@@ -24,7 +24,12 @@
 #include "main.h"
 #include "extern.h"
 
+#include "editfns.h"
+
 #include "buffer.h"
+#include "variables.h"
+#include "macro.h"
+#include "term_curses.h"
 
 bool
 is_empty_line (void)

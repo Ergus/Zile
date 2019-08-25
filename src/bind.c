@@ -33,20 +33,17 @@
 #include "extern.h"
 
 #include "buffer.h"
-
+#include "editfns.h"
+#include "getkey.h"
+#include "line.h"
+#include "macro.h"
+#include "minibuf.h"
+#include "undo.h"
+#include "bind.h"
 /*--------------------------------------------------------------------------
  * Key binding.
  *--------------------------------------------------------------------------*/
 
-struct Binding
-{
-  size_t key; /* The key code (for every level except the root). */
-  Function func; /* The function for this key (if a leaf node). */
-
-  /* Branch vector, number of items, max number of items. */
-  Binding *vec;
-  size_t vecnum, vecmax;
-};
 
 static Binding root_bindings;
 

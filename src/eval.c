@@ -25,23 +25,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "eval.h"
+
 #include "main.h"
 #include "extern.h"
 
 #include "completion.h"
-
+#include "bind.h"
+#include "variables.h"
+#include "minibuf.h"
+#include "history.h"
 /*
  * Zile Lisp functions.
  */
-
-struct fentry
-{
-  const char *name;		/* The function name. */
-  Function func;		/* The function pointer. */
-  bool interactive;             /* Whether function can be used interactively. */
-  const char *doc;		/* Documentation string. */
-};
-typedef struct fentry fentry;
 
 static fentry fentry_table[] = {
 #define X(zile_name, c_name, interactive, doc)   \
@@ -92,9 +88,6 @@ get_function_name (Function p)
       return fentry_table[i].name;
   return NULL;
 }
-
-
-le *leNIL, *leT;
 
 size_t
 countNodes (le * branch)

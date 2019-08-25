@@ -1,6 +1,5 @@
-
-#ifndef MOUSE_H
-#define MOUSE_H
+#ifndef LINE_H
+#define LINE_H
 
 /*
  * Copyright (C) 2019  Jimmy Aguilar Mena
@@ -19,21 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include <stdbool.h>
 
-void
-mouse_enable ();
-
-void
-mouse_disable ();
-
-size_t
-mouse_codetokey ();
-
-bool
-mouse_keytocodes (int *p);
-
-astr
-mouse_chordtodesc (size_t key);
+bool insert_newline (void);
+bool intercalate_newline (void);
+int fill_break_line (void);
+_GL_ATTRIBUTE_FORMAT_PRINTF(1, 2) void bprintf (const char *fmt, ...);
 
 #endif

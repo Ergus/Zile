@@ -31,6 +31,7 @@
 
 #include "buffer.h"
 #include "window.h"
+#include "minibuf.h"
 
 DEFUN ("beginning-of-line", beginning_of_line)
 /*+

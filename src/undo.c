@@ -21,24 +21,18 @@
 
 #include <config.h>
 
+#include "undo.h"
+
 #include "main.h"
 #include "extern.h"
 
 #include "buffer.h"
+#include "bind.h"
+#include "minibuf.h"
 
 /*
  * Undo action
  */
-struct Undo
-{
-  Undo next;       /* Next undo delta in list. */
-  void *type;      /* The type of undo delta. */
-  size_t o;        /* Buffer offset of the undo delta. */
-  bool unchanged;  /* Flag indicating that reverting this undo leaves
-                      the buffer in an unchanged state. */
-  estr text;       /* Old text. */
-  size_t size;     /* Size of replacement text. */
-};
 
 /*
  * Save a reverse delta for doing undo.

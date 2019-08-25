@@ -25,7 +25,9 @@
 #undef lines
 
 #include "main.h"
+
 #include "region.h"
+#include "marker.h"
 
 #define BUFFER_FIELDS							\
     /* Dynamically allocated string fields of Buffer. */		\
@@ -56,7 +58,7 @@
 #define MIN_GAP 1024 /* Minimum gap size after resize. */
 #define MAX_GAP 4096 /* Maximum permitted gap size. */
 
-struct Buffer
+typedef struct Buffer
 {
 #define FIELD(ty, name) ty name;
 #define FIELD_STR(name) char *name;
@@ -65,7 +67,7 @@ struct Buffer
 #undef FIELD_STR
   size_t pt;         /* The point. */
   size_t gap;        /* Size of gap after point. */
-};
+} *Buffer;
 
 #define FIELD(ty, field)                         \
   IGETTER (Buffer, buffer, ty, field)             \
@@ -129,5 +131,7 @@ bool move_char (ptrdiff_t dir);
 bool move_line (ptrdiff_t n);
 _GL_ATTRIBUTE_PURE size_t offset_to_line (Buffer bp, size_t offset);
 void goto_offset (size_t o);
+
+void write_temp_buffer (const char *name, bool show, void (*func) (va_list ap), ...);
 
 #endif

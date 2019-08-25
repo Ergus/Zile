@@ -24,34 +24,12 @@
 #include <assert.h>
 #include <sys/time.h>
 
+#include "getkey.h"
+
 #include "main.h"
 #include "extern.h"
-
-/* Maximum time to avoid screen updates when catching up with buffered
-   input, in milliseconds. */
-#define MAX_RESYNC_MS 500
-
-/* These are not required for POSIX.1-2001, and not always defined in
-   the system headers. */
-#ifndef timeradd
-#  define timeradd(_a, _b, _result)				\
-   do {								\
-	(_result)->tv_sec  = (_a)->tv_sec + (_b)->tv_sec;	\
-	(_result)->tv_usec = (_a)->tv_usec + (_b)->tv_usec;	\
-	if ((_result)->tv_usec > 1000000) {			\
-	  ++(_result)->tv_sec;					\
-	  (_result)->tv_usec -= 1000000;			\
-	}							\
-   }                                                            \
-   while (0)
-#endif
-
-#ifndef timercmp
-#  define timercmp(_a, _b, _CMP)				\
-   (((_a)->tv_sec == (_b)->tv_sec)				\
-    ? ((_a)->tv_usec _CMP (_b)->tv_usec)			\
-    : ((_a)->tv_sec  _CMP (_b)->tv_sec))
-#endif
+#include "macro.h"
+#include "term_curses.h"
 
 static size_t _last_key;
 

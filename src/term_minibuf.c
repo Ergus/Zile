@@ -25,12 +25,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "term_minibuf.h"
+
 #include "main.h"
 #include "extern.h"
 
 #include "buffer.h"
 #include "completion.h"
 #include "window.h"
+#include "editfns.h"
+#include "getkey.h"
+#include "minibuf.h"
+#include "term_curses.h"
+#include "history.h"
+
 void
 term_minibuf_write (const char *s)
 {

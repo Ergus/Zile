@@ -29,6 +29,12 @@
 #include "extern.h"
 
 #include "buffer.h"
+#include "marker.h"
+#include "basic.h"
+#include "bind.h"
+#include "editfns.h"
+#include "variables.h"
+#include "minibuf.h"
 
 static estr kill_ring_text;
 

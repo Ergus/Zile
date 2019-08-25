@@ -1,6 +1,5 @@
-
-#ifndef MOUSE_H
-#define MOUSE_H
+#ifndef VARIABLES_H
+#define VARIABLES_H
 
 /*
  * Copyright (C) 2019  Jimmy Aguilar Mena
@@ -19,21 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+void init_variables (void);
+_GL_ATTRIBUTE_FORMAT_PRINTF(1, 2) const_astr minibuf_read_variable_name (const char *fmt, ...);
+void set_variable (const char *var, const char *val);
+const char *get_variable_doc (const char *var, const char **defval);
+const char *get_variable (const char *var);
+const char *get_variable_bp (Buffer bp, const char *var);
+bool get_variable_bool (const char *var);
+void toggle_variable_bool (const char *var);
 
-void
-mouse_enable ();
-
-void
-mouse_disable ();
-
-size_t
-mouse_codetokey ();
-
-bool
-mouse_keytocodes (int *p);
-
-astr
-mouse_chordtodesc (size_t key);
 
 #endif

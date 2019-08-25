@@ -1,6 +1,5 @@
-
-#ifndef MOUSE_H
-#define MOUSE_H
+#ifndef BIND_H
+#define BIND_H
 
 /*
  * Copyright (C) 2019  Jimmy Aguilar Mena
@@ -19,21 +18,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include "main.h"
 
-void
-mouse_enable ();
+struct Binding
+{
+  size_t key; /* The key code (for every level except the root). */
+  Function func; /* The function for this key (if a leaf node). */
 
-void
-mouse_disable ();
+  /* Branch vector, number of items, max number of items. */
+  Binding *vec;
+  size_t vecnum, vecmax;
+};
 
-size_t
-mouse_codetokey ();
 
-bool
-mouse_keytocodes (int *p);
-
-astr
-mouse_chordtodesc (size_t key);
+_GL_ATTRIBUTE_PURE Function last_command (void);
+void set_this_command (Function cmd);
+size_t do_binding_completion (astr as);
+gl_list_t get_key_sequence (void);
+Function get_function_by_keys (gl_list_t keys);
+le *call_command (Function f, int uniarg, bool uniflag, le *branch);
+void get_and_run_command (void);
+void init_default_bindings (void);
 
 #endif

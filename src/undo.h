@@ -1,6 +1,5 @@
-
-#ifndef MOUSE_H
-#define MOUSE_H
+#ifndef UNDO_H
+#define UNDO_H
 
 /*
  * Copyright (C) 2019  Jimmy Aguilar Mena
@@ -19,21 +18,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include "main.h"
 
-void
-mouse_enable ();
+struct Undo
+{
+  Undo next;       /* Next undo delta in list. */
+  void *type;      /* The type of undo delta. */
+  size_t o;        /* Buffer offset of the undo delta. */
+  bool unchanged;  /* Flag indicating that reverting this undo leaves
+                      the buffer in an unchanged state. */
+  estr text;       /* Old text. */
+  size_t size;     /* Size of replacement text. */
+};
 
-void
-mouse_disable ();
 
-size_t
-mouse_codetokey ();
-
-bool
-mouse_keytocodes (int *p);
-
-astr
-mouse_chordtodesc (size_t key);
+extern bool undo_nosave;
+void undo_start_sequence (void);
+void undo_end_sequence (void);
+void undo_save_block (size_t o, size_t osize, size_t size);
+void undo_set_unchanged (Undo up);
 
 #endif

@@ -28,12 +28,12 @@
   FIELD(Buffer, bp)		/* Buffer that marker points into. */	\
 
 
-struct Marker
+typedef struct Marker
 {
 #define FIELD(ty, name) ty name;
   MARKER_FIELDS
 #undef FIELD
-};
+} *Marker;
 
 #define FIELD(ty, field)                         \
   IGETTER (Marker, marker, ty, field)             \

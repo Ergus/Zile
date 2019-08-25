@@ -31,6 +31,9 @@
 
 #include "buffer.h"
 #include "window.h"
+#include "getkey.h"
+#include "line.h"
+#include "minibuf.h"
 
 #define NUM_REGISTERS	256
 

@@ -1,6 +1,5 @@
-
-#ifndef MOUSE_H
-#define MOUSE_H
+#ifndef EDITFNS_H
+#define EDITFNS_H
 
 /*
  * Copyright (C) 2019  Jimmy Aguilar Mena
@@ -19,21 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+_GL_ATTRIBUTE_PURE bool is_empty_line (void);
+_GL_ATTRIBUTE_PURE bool is_blank_line (void);
+_GL_ATTRIBUTE_PURE int following_char (void);
+_GL_ATTRIBUTE_PURE int preceding_char (void);
+_GL_ATTRIBUTE_PURE bool bobp (void);
+_GL_ATTRIBUTE_PURE bool eobp (void);
+_GL_ATTRIBUTE_PURE bool bolp (void);
+_GL_ATTRIBUTE_PURE bool eolp (void);
+void ding (void);
 
-void
-mouse_enable ();
-
-void
-mouse_disable ();
-
-size_t
-mouse_codetokey ();
-
-bool
-mouse_keytocodes (int *p);
-
-astr
-mouse_chordtodesc (size_t key);
 
 #endif

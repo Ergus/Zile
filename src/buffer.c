@@ -37,6 +37,13 @@
 #include "completion.h"
 #include "marker.h"
 #include "window.h"
+#include "basic.h"
+#include "bind.h"
+#include "editfns.h"
+#include "variables.h"
+#include "file.h"
+#include "minibuf.h"
+#include "undo.h"
 // ================ Static ================================
 
 static inline size_t
@@ -725,4 +732,57 @@ goto_offset (size_t o)
       set_buffer_goalc (cur_bp, get_goalc ());
       thisflag |= FLAG_NEED_RESYNC;
     }
+}
+
+void
+write_temp_buffer (const char *name, bool show, void (*func) (va_list ap), ...)
+{
+  /* Popup a window with the buffer "name". */
+  Window old_wp = cur_wp;
+  Buffer old_bp = cur_bp;
+  Window wp = find_window (name);
+  if (show && wp)
+    set_current_window (wp);
+  else
+    {
+      Buffer bp = find_buffer (name);
+      if (show)
+        set_current_window (popup_window ());
+      if (bp == NULL)
+        {
+          bp = buffer_new ();
+          set_buffer_name (bp, name);
+        }
+      switch_to_buffer (bp);
+    }
+
+  /* Remove the contents of that buffer. */
+  Buffer new_bp = buffer_new ();
+  set_buffer_name (new_bp, get_buffer_name (cur_bp));
+  kill_buffer (cur_bp);
+  cur_bp = new_bp;
+  set_window_bp (cur_wp, cur_bp);
+
+  /* Make the buffer a temporary one. */
+  set_buffer_needname (cur_bp, true);
+  set_buffer_noundo (cur_bp, true);
+  set_buffer_nosave (cur_bp, true);
+  set_temporary_buffer (cur_bp);
+
+  /* Use the "callback" routine. */
+  va_list ap;
+  va_start (ap, func);
+  func (ap);
+  va_end (ap);
+
+  FUNCALL (beginning_of_buffer);
+  set_buffer_readonly (cur_bp, true);
+  set_buffer_modified (cur_bp, false);
+
+  /* Restore old current window. */
+  set_current_window (old_wp);
+
+  /* If we're not showing the new buffer, switch back to the old one. */
+  if (!show)
+    switch_to_buffer (old_bp);
 }

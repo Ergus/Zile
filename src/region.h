@@ -22,18 +22,22 @@
    Free Software Foundation, Fifth Floor, 51 Franklin Street, Boston,
    MA 02111-1301, USA.  */
 
+struct Window;
+typedef struct Window *Window;
+
+
 #include "main.h"
 
 #define REGION_FIELDS				\
   FIELD(size_t, start)				\
   FIELD(size_t, end)
 
-struct Region
+typedef struct Region
 {
 #define FIELD(ty, name) ty name;
   REGION_FIELDS
 #undef FIELD
-};
+} *Region;
 
 #define FIELD(ty, field)                         \
   IGETTER(Region, region, ty, field)             \

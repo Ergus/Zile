@@ -27,16 +27,14 @@
 #include <stdlib.h>
 #include "gl_array_list.h"
 
+#include "macro.h"
+
 #include "main.h"
 #include "extern.h"
-
-
-struct Macro
-{
-  gl_list_t keys;	/* List of keystrokes. */
-  char *name;		/* Name of the macro. */
-  Macro next;		/* Next macro in the list. */
-};
+#include "bind.h"
+#include "getkey.h"
+#include "minibuf.h"
+#include "term_curses.h"
 
 static Macro cur_mp = NULL, cmd_mp = NULL;
 

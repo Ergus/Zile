@@ -1,6 +1,5 @@
-
-#ifndef MOUSE_H
-#define MOUSE_H
+#ifndef TERM_CURSES_H
+#define TERM_CURSES_H
 
 /*
  * Copyright (C) 2019  Jimmy Aguilar Mena
@@ -19,21 +18,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+size_t term_buf_len (void);
+void term_init (void);
 
-void
-mouse_enable ();
+void term_attron (int pair);
+void term_attroff (int pair);
+void term_attr_reset ();
 
-void
-mouse_disable ();
-
-size_t
-mouse_codetokey ();
-
-bool
-mouse_keytocodes (int *p);
-
-astr
-mouse_chordtodesc (size_t key);
+void term_close (void);
+void term_move (size_t y, size_t x);
+void term_clrtoeol (void);
+void term_refresh (void);
+void term_clear (void);
+void term_addch (char c);
+void term_addstr (const char *s);
+void term_attrset (size_t attr);
+void term_beep (void);
+_GL_ATTRIBUTE_PURE size_t term_width (void);
+_GL_ATTRIBUTE_PURE size_t term_height (void);
+size_t term_getkey (int delay);
+int term_getkey_unfiltered (int delay);
+void term_ungetkey (size_t key);
 
 #endif

@@ -22,6 +22,8 @@
    Free Software Foundation, Fifth Floor, 51 Franklin Street, Boston,
    MA 02111-1301, USA.  */
 
+#include "main.h"
+
 // Dynamically allocated string fields of Completion.
 #define COMPLETION_FIELDS						\
   FIELD_STR(match)		/* The match buffer. */			\
@@ -34,6 +36,7 @@
   FIELD(int, flags)		/* Completion flags. */			\
   FIELD(astr, path)		/* Path for a filename completion. */
 
+#include "main.h"
 
 struct Completion
 {

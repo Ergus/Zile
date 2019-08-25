@@ -1,6 +1,5 @@
-
-#ifndef MOUSE_H
-#define MOUSE_H
+#ifndef FILE_H
+#define FILE_H
 
 /*
  * Copyright (C) 2019  Jimmy Aguilar Mena
@@ -19,21 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
-
-void
-mouse_enable ();
-
-void
-mouse_disable ();
-
-size_t
-mouse_codetokey ();
-
-bool
-mouse_keytocodes (int *p);
-
-astr
-mouse_chordtodesc (size_t key);
+bool exist_file (const char *filename);
+astr get_home_dir (void);
+astr agetcwd (void);
+bool expand_path (astr path);
+astr compact_path (astr path);
+bool find_file (const char *filename);
+void _Noreturn zile_exit (bool doabort);
 
 #endif

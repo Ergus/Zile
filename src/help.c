@@ -31,6 +31,12 @@
 #include "main.h"
 #include "extern.h"
 
+#include "bind.h"
+#include "variables.h"
+#include "buffer.h"
+#include "line.h"
+#include "minibuf.h"
+
 static void
 write_function_description (va_list ap)
 {
