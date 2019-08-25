@@ -36,6 +36,7 @@
 
 #include "completion.h"
 
+#include "window.h"
 // ================ Static ================================
 
 static bool

@@ -143,19 +143,6 @@ extern Buffer cur_bp, head_bp;
 extern int thisflag, lastflag, last_uniarg;
 
 /* marker.c --------------------------------------------------------------- */
-#define FIELD(ty, field)                                \
-  ty get_marker_ ## field (const Marker cp);            \
-  void set_marker_ ## field (Marker cp, ty field);
-#include "marker.h"
-#undef FIELD
-Marker marker_new (void);
-void unchain_marker (const Marker marker);
-void move_marker (Marker marker, Buffer bp, size_t o);
-Marker copy_marker (const Marker marker);
-Marker point_marker (void);
-void push_mark (void);
-void pop_mark (void);
-void set_mark (void);
 
 /* minibuf.c -------------------------------------------------------------- */
 void init_minibuf (void);
@@ -239,25 +226,11 @@ bool get_variable_bool (const char *var);
 void toggle_variable_bool (const char *var);
 
 /* window.c --------------------------------------------------------------- */
-#define FIELD(ty, field)                                \
-  ty get_window_ ## field (const Window wp);            \
-  void set_window_ ## field (Window wp, ty field);
-#include "window.h"
-#undef FIELD
-void create_scratch_window (void);
-Window find_window (const char *name);
-Window popup_window (void);
-void set_current_window (Window wp);
-void delete_window (Window del_wp);
-size_t window_o (Window wp);
-bool window_top_visible (Window wp);
-_GL_ATTRIBUTE_PURE bool window_bottom_visible (Window wp);
-void window_resync (Window wp);
-bool get_window_in_position (int x, int y, int *rx, int *ry);
 /*
  * Declare external Zile functions.
  */
-#define X(zile_name, c_name, interactive, doc)   \
+
+#define X(zile_name, c_name, interactive, doc)			\
   le *F_ ## c_name (long uniarg, bool is_uniarg, le * l);
 #include "tbl_funcs.h"
 #undef X

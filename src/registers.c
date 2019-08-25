@@ -30,6 +30,7 @@
 #include "extern.h"
 
 #include "buffer.h"
+#include "window.h"
 
 #define NUM_REGISTERS	256
 

@@ -25,6 +25,7 @@
 #include "extern.h"
 #include "region.h"
 #include "buffer.h"
+#include "marker.h"
 
 /*
  * Make a region from two offsets.

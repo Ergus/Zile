@@ -35,6 +35,8 @@
 
 #include "buffer.h"
 #include "completion.h"
+#include "marker.h"
+#include "window.h"
 // ================ Static ================================
 
 static inline size_t

@@ -29,6 +29,8 @@
 #include "extern.h"
 
 #include "buffer.h"
+#include "marker.h"
+#include "window.h"
 
 /* Return true if there are no upper-case letters in the given string.
    If `regex' is true, ignore escaped characters. */

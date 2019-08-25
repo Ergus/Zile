@@ -1,3 +1,6 @@
+#ifndef MARKER_H
+#define MARKER_H
+
 /* Marker fields
 
    Copyright (c) 2009-2011 Free Software Foundation, Inc.
@@ -19,6 +22,33 @@
    Free Software Foundation, Fifth Floor, 51 Franklin Street, Boston,
    MA 02111-1301, USA.  */
 
-FIELD(Marker, next)		/* Used to chain all markers in the buffer. */
-FIELD(size_t, o)		/* Marker offset within buffer. */
-FIELD(Buffer, bp)		/* Buffer that marker points into. */
+#define MARKER_FIELDS							\
+  FIELD(Marker, next)		/* Used to chain all markers in the buffer. */ \
+  FIELD(size_t, o)		/* Marker offset within buffer. */	\
+  FIELD(Buffer, bp)		/* Buffer that marker points into. */	\
+
+
+struct Marker
+{
+#define FIELD(ty, name) ty name;
+  MARKER_FIELDS
+#undef FIELD
+};
+
+#define FIELD(ty, field)                         \
+  IGETTER (Marker, marker, ty, field)             \
+  ISETTER (Marker, marker, ty, field)
+
+MARKER_FIELDS
+#undef FIELD
+
+Marker marker_new (void);
+void unchain_marker (const Marker marker);
+void move_marker (Marker marker, Buffer bp, size_t o);
+Marker copy_marker (const Marker marker);
+Marker point_marker (void);
+void push_mark (void);
+void pop_mark (void);
+void set_mark (void);
+
+#endif

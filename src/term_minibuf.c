@@ -30,7 +30,7 @@
 
 #include "buffer.h"
 #include "completion.h"
-
+#include "window.h"
 void
 term_minibuf_write (const char *s)
 {

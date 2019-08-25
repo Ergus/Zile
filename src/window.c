@@ -29,25 +29,9 @@
 #include "main.h"
 #include "extern.h"
 
+#include "window.h"
 #include "buffer.h"
-
-/*
- * Structure
- */
-struct Window
-{
-#define FIELD(ty, name) ty name;
-#include "window.h"
-#undef FIELD
-  int lastpointn;		/* The last point line number. */
-};
-
-#define FIELD(ty, field)                        \
-  GETTER (Window, window, ty, field)            \
-  SETTER (Window, window, ty, field)
-
-#include "window.h"
-#undef FIELD
+#include "marker.h"
 
 /*
  * Set the current window and his buffer as the current buffer.

@@ -29,25 +29,8 @@
 #include "main.h"
 #include "extern.h"
 
+#include "marker.h"
 #include "buffer.h"
-
-/*
- * Structure
- */
-
-struct Marker
-{
-#define FIELD(ty, name) ty name;
-#include "marker.h"
-#undef FIELD
-};
-
-#define FIELD(ty, field)                         \
-  GETTER (Marker, marker, ty, field)             \
-  SETTER (Marker, marker, ty, field)
-
-#include "marker.h"
-#undef FIELD
 
 Marker
 marker_new (void)

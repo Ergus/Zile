@@ -35,6 +35,8 @@
 
 #include "region.h"
 #include "buffer.h"
+#include "marker.h"
+#include "window.h"
 
 DEFUN ("suspend-emacs", suspend_emacs)
 /*+

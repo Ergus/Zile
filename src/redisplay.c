@@ -27,6 +27,7 @@
 #include "extern.h"
 
 #include "buffer.h"
+#include "window.h"
 
 void
 resize_windows (void)

@@ -30,6 +30,7 @@
 #include "extern.h"
 
 #include "buffer.h"
+#include "window.h"
 
 DEFUN ("beginning-of-line", beginning_of_line)
 /*+

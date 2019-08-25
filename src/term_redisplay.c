@@ -30,6 +30,8 @@
 #include "extern.h"
 
 #include "buffer.h"
+#include "marker.h"
+#include "window.h"
 
 static int
 make_char_printable (char *out, char c, int x, int cur_tab_width)

@@ -25,6 +25,7 @@
 #include "mouse.h"
 
 #include "buffer.h"
+#include "window.h"
 
 static MEVENT mouse_event;
 

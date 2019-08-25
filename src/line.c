@@ -30,6 +30,7 @@
 #include "extern.h"
 
 #include "buffer.h"
+#include "marker.h"
 
 static void
 insert_expanded_tab (void)
