@@ -41,6 +41,8 @@
 #include "main.h"
 #include "extern.h"
 
+#include "mouse.h"
+
 static gl_list_t key_buf;
 
 static char backspace_code = 0177;
@@ -110,7 +112,6 @@ term_colors_enable ()
 {
   if (has_colors())
     {
-      
       start_color ();
       init_pair(FONT_NORMAL, COLOR_WHITE, COLOR_BLACK);
       init_pair(FONT_REGION, COLOR_WHITE, COLOR_BLUE);

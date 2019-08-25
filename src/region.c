@@ -23,21 +23,8 @@
 
 #include "main.h"
 #include "extern.h"
-
-
-struct Region
-{
-#define FIELD(ty, name) ty name;
 #include "region.h"
-#undef FIELD
-};
-
-#define FIELD(ty, field)                  \
-  GETTER (Region, region, ty, field)      \
-  SETTER (Region, region, ty, field)
-
-#include "region.h"
-#undef FIELD
+#include "buffer.h"
 
 /*
  * Make a region from two offsets.
@@ -55,15 +42,6 @@ size_t
 get_region_size (const Region r)
 {
   return get_region_end (r) - get_region_start (r);
-}
-
-/*
- * Return the region between point and mark.
- */
-Region
-calculate_the_region (void)
-{
-  return region_new (get_buffer_pt (cur_bp), get_marker_o (get_buffer_mark (cur_bp)));
 }
 
 bool

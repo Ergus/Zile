@@ -36,6 +36,8 @@
 #include "main.h"
 #include "extern.h"
 
+#include "buffer.h"
+
 #define ZILE_COPYRIGHT_STRING \
   "Copyright (C) 2014 Free Software Foundation, Inc."
 

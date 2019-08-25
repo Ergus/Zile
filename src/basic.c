@@ -29,6 +29,8 @@
 #include "main.h"
 #include "extern.h"
 
+#include "buffer.h"
+
 DEFUN ("beginning-of-line", beginning_of_line)
 /*+
 Move point to beginning of current line.

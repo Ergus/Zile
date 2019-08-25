@@ -24,6 +24,8 @@
 #include "main.h"
 #include "extern.h"
 
+#include "buffer.h"
+
 bool
 is_empty_line (void)
 {

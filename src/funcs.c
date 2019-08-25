@@ -33,6 +33,8 @@
 #include "main.h"
 #include "extern.h"
 
+#include "region.h"
+#include "buffer.h"
 
 DEFUN ("suspend-emacs", suspend_emacs)
 /*+

@@ -37,6 +37,8 @@
 #include "main.h"
 #include "extern.h"
 
+#include "buffer.h"
+
 bool
 exist_file (const char *filename)
 {

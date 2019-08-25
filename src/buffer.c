@@ -31,77 +31,10 @@
 #include "extern.h"
 #include "memrmem.h"
 
-
-/*
- * Buffer structure
- */
-struct Buffer
-{
-#define FIELD(ty, name) ty name;
-#define FIELD_STR(name) char *name;
-#include "buffer.h"
-#undef FIELD
-#undef FIELD_STR
-  size_t pt;         /* The point. */
-  estr text;         /* The text. */
-  size_t gap;        /* Size of gap after point. */
-};
-
-#define FIELD(ty, field)                         \
-  GETTER (Buffer, buffer, ty, field)             \
-  SETTER (Buffer, buffer, ty, field)
-
-#define FIELD_STR(field)                         \
-  GETTER (Buffer, buffer, char *, field)         \
-  STR_SETTER (Buffer, buffer, field)
+#include "region.h"
 
 #include "buffer.h"
-#undef FIELD
-#undef FIELD_STR
-
-/* Buffer methods that know about the gap. */
-
-void
-set_buffer_text (Buffer bp, estr es)
-{
-  bp->text = es;
-}
-
-const_astr
-get_buffer_pre_point (Buffer bp)
-{
-  return const_astr_new_nstr (astr_cstr (estr_get_as (bp->text)), bp->pt);
-}
-
-const_astr
-get_buffer_post_point (Buffer bp)
-{
-  size_t post_gap = bp->pt + bp->gap;
-  const_astr as = estr_get_as (bp->text);
-  return const_astr_new_nstr (astr_cstr (as) + post_gap, astr_len (as) - post_gap);
-}
-
-size_t
-get_buffer_pt (Buffer bp)
-{
-  return bp->pt;
-}
-
-void
-set_buffer_pt (Buffer bp, size_t o)
-{
-  if (o < bp->pt)
-    {
-      astr_move (estr_get_as (bp->text), o + bp->gap, o, bp->pt - o);
-      astr_set (estr_get_as (bp->text), o, '\0', MIN (bp->pt - o, bp->gap));
-    }
-  else if (o > bp->pt)
-    {
-      astr_move (estr_get_as (bp->text), bp->pt, bp->pt + bp->gap, o - bp->pt);
-      astr_set (estr_get_as (bp->text), o + bp->gap - MIN (o - bp->pt, bp->gap), '\0', MIN (o - bp->pt, bp->gap));
-    }
-  bp->pt = o;
-}
+// ================ Static ================================
 
 static inline size_t
 realo_to_o (Buffer bp, size_t o)
@@ -120,24 +53,80 @@ o_to_realo (Buffer bp, size_t o)
   return o < bp->pt ? o : o + bp->gap;
 }
 
-size_t
-get_buffer_size (Buffer bp)
+// Move the given buffer to head.
+static void
+move_buffer_to_head (Buffer bp)
 {
-  return realo_to_o (bp, astr_len (estr_get_as (bp->text)));
+  Buffer prev = NULL;
+  for (Buffer it = head_bp; it != bp; prev = it, it = it->next)
+    ;
+  if (prev)
+    {
+      prev->next = bp->next;
+      bp->next = head_bp;
+      head_bp = bp;
+    }
 }
 
-size_t
-buffer_line_len (Buffer bp, size_t o)
+// Go to the goal column.  Take care of expanding tabulations.
+static void
+goto_goalc (void)
 {
-  return realo_to_o (bp, estr_end_of_line (bp->text, o_to_realo (bp, o))) -
-    realo_to_o (bp, estr_start_of_line (bp->text, o_to_realo (bp, o)));
+  size_t i, col = 0, t = tab_width (cur_bp);
+
+  for (i = get_buffer_line_o (cur_bp);
+       i < get_buffer_line_o (cur_bp) + buffer_line_len (cur_bp, get_buffer_pt (cur_bp));
+       i++)
+    if (col == get_buffer_goalc (cur_bp))
+      break;
+    else if (get_buffer_char (cur_bp, i) == '\t')
+      for (size_t w = t - col % t; w > 0 && ++col < get_buffer_goalc (cur_bp); w--)
+        ;
+    else
+      ++col;
+
+  set_buffer_pt (cur_bp, i);
 }
 
-/*
- * Replace `del' chars after point with `es'.
- */
-#define MIN_GAP 1024 /* Minimum gap size after resize. */
-#define MAX_GAP 4096 /* Maximum permitted gap size. */
+
+// ========================================================
+
+// Insert the character `c' at point in the current buffer.
+bool
+insert_char (int c)
+{
+  const char ch = (char) c;
+  return insert_estr (estr_new (const_astr_new_nstr (&ch, 1), coding_eol_lf));
+}
+
+bool
+delete_char (void)
+{
+  deactivate_mark ();
+
+  if (eobp ())
+    {
+      minibuf_error ("End of buffer");
+      return false;
+    }
+
+  if (warn_if_readonly_buffer ())
+    return false;
+
+  if (eolp ())
+    {
+      replace_estr (strlen (get_buffer_eol (cur_bp)), estr_empty);
+      thisflag |= FLAG_NEED_RESYNC;
+    }
+  else
+    replace_estr (1, estr_empty);
+
+  set_buffer_modified (cur_bp, true);
+
+  return true;
+}
+
+// Replace `del' chars after point with `es'.
 bool
 replace_estr (size_t del, const_estr es)
 {
@@ -188,11 +177,45 @@ insert_estr (const_estr es)
   return replace_estr (0, es);
 }
 
-char
-get_buffer_char (Buffer bp, size_t o)
+// ========================================================
+
+const_astr
+get_buffer_pre_point (Buffer bp)
 {
-  return astr_get (estr_get_as (bp->text), o_to_realo (bp, o));
+  return const_astr_new_nstr (astr_cstr (estr_get_as (bp->text)), bp->pt);
 }
+
+const_astr
+get_buffer_post_point (Buffer bp)
+{
+  size_t post_gap = bp->pt + bp->gap;
+  const_astr as = estr_get_as (bp->text);
+  return const_astr_new_nstr (astr_cstr (as) + post_gap, astr_len (as) - post_gap);
+}
+
+void
+set_buffer_pt (Buffer bp, size_t o)
+{
+  if (o < bp->pt)
+    {
+      astr_move (estr_get_as (bp->text), o + bp->gap, o, bp->pt - o);
+      astr_set (estr_get_as (bp->text), o, '\0', MIN (bp->pt - o, bp->gap));
+    }
+  else if (o > bp->pt)
+    {
+      astr_move (estr_get_as (bp->text), bp->pt, bp->pt + bp->gap, o - bp->pt);
+      astr_set (estr_get_as (bp->text), o + bp->gap - MIN (o - bp->pt, bp->gap), '\0', MIN (o - bp->pt, bp->gap));
+    }
+  bp->pt = o;
+}
+
+size_t
+get_buffer_pt (Buffer bp)
+{
+  return bp->pt;
+}
+
+//  =======================================================
 
 size_t
 buffer_prev_line (Buffer bp, size_t o)
@@ -219,21 +242,40 @@ buffer_end_of_line (Buffer bp, size_t o)
 }
 
 size_t
+buffer_line_len (Buffer bp, size_t o)
+{
+  return realo_to_o (bp, estr_end_of_line (bp->text, o_to_realo (bp, o))) -
+    realo_to_o (bp, estr_start_of_line (bp->text, o_to_realo (bp, o)));
+}
+
+// ========================================================
+
+size_t
+get_buffer_size (Buffer bp)
+{
+  return realo_to_o (bp, astr_len (estr_get_as (bp->text)));
+}
+
+char
+get_buffer_char (Buffer bp, size_t o)
+{
+  return astr_get (estr_get_as (bp->text), o_to_realo (bp, o));
+}
+
+size_t
 get_buffer_line_o (Buffer bp)
 {
   return realo_to_o (bp, estr_start_of_line (bp->text, o_to_realo (bp, bp->pt)));
 }
 
-
-/* Buffer methods that don't know about the gap. */
-
+// Buffer methods that don't know about the gap.
 const char *
 get_buffer_eol (Buffer bp)
 {
   return estr_get_eol (bp->text);
 }
 
-/* Get the buffer region as an estr. */
+// Get the buffer region as an estr.
 estr
 get_buffer_region (Buffer bp, Region r)
 {
@@ -248,50 +290,8 @@ get_buffer_region (Buffer bp, Region r)
   return estr_new (as, get_buffer_eol (bp));
 }
 
-/*
- * Insert the character `c' at point in the current buffer.
- */
-bool
-insert_char (int c)
-{
-  const char ch = (char) c;
-  return insert_estr (estr_new (const_astr_new_nstr (&ch, 1), coding_eol_lf));
-}
 
-bool
-delete_char (void)
-{
-  deactivate_mark ();
-
-  if (eobp ())
-    {
-      minibuf_error ("End of buffer");
-      return false;
-    }
-
-  if (warn_if_readonly_buffer ())
-    return false;
-
-  if (eolp ())
-    {
-      replace_estr (strlen (get_buffer_eol (cur_bp)), estr_empty);
-      thisflag |= FLAG_NEED_RESYNC;
-    }
-  else
-    replace_estr (1, estr_empty);
-
-  set_buffer_modified (cur_bp, true);
-
-  return true;
-}
-
-void
-insert_buffer (Buffer bp)
-{
-  /* Copy text to avoid problems when bp == cur_bp. */
-  insert_estr (estr_new (get_buffer_pre_point (bp), get_buffer_eol (bp)));
-  insert_estr (estr_new (get_buffer_post_point (bp), get_buffer_eol (bp)));
-}
+// ========================================================
 
 /*
  * Allocate a new buffer structure, set the default local
@@ -313,19 +313,7 @@ buffer_new (void)
   return bp;
 }
 
-/*
- * Unchain the buffer's markers.
- */
-void
-destroy_buffer (Buffer bp)
-{
-  while (bp->markers)
-    unchain_marker (bp->markers);
-}
-
-/*
- * Initialise a buffer
- */
+// Initialise a buffer
 void
 init_buffer (Buffer bp)
 {
@@ -333,9 +321,25 @@ init_buffer (Buffer bp)
     set_buffer_autofill (bp, true);
 }
 
-/*
- * Get filename, or buffer name if NULL.
- */
+// Unchain the buffer's markers.
+void
+destroy_buffer (Buffer bp)
+{
+  while (bp->markers)
+    unchain_marker (bp->markers);
+}
+
+void
+insert_buffer (Buffer bp)
+{
+  /* Copy text to avoid problems when bp == cur_bp. */
+  insert_estr (estr_new (get_buffer_pre_point (bp), get_buffer_eol (bp)));
+  insert_estr (estr_new (get_buffer_post_point (bp), get_buffer_eol (bp)));
+}
+
+// ========================================================
+
+// Get filename, or buffer name if NULL.
 const char *
 get_buffer_filename_or_name (Buffer bp)
 {
@@ -343,9 +347,7 @@ get_buffer_filename_or_name (Buffer bp)
   return fname ? fname : get_buffer_name (bp);
 }
 
-/*
- * Set a new filename, and from it a name, for the buffer.
- */
+// Set a new filename, and from it a name, for the buffer.
 void
 set_buffer_names (Buffer bp, const char *filename)
 {
@@ -361,9 +363,7 @@ set_buffer_names (Buffer bp, const char *filename)
   set_buffer_name (bp, name);
 }
 
-/*
- * Search for a buffer named `name'.
- */
+// Search for a buffer named `name'.
 Buffer
 find_buffer (const char *name)
 {
@@ -377,64 +377,29 @@ find_buffer (const char *name)
   return NULL;
 }
 
-/*
- * Move the given buffer to head.
- */
-static void
-move_buffer_to_head (Buffer bp)
-{
-  Buffer prev = NULL;
-  for (Buffer it = head_bp; it != bp; prev = it, it = it->next)
-    ;
-  if (prev)
-    {
-      prev->next = bp->next;
-      bp->next = head_bp;
-      head_bp = bp;
-    }
-}
-
-/*
- * Switch to the specified buffer.
- */
+// Switch to the specified buffer.
 void
 switch_to_buffer (Buffer bp)
 {
   assert (get_window_bp (cur_wp) == cur_bp);
 
-  /* The buffer is the current buffer; return safely.  */
+  // The buffer is the current buffer; return safely.
   if (cur_bp == bp)
     return;
 
-  /* Set current buffer.  */
+  // Set current buffer.
   cur_bp = bp;
   set_window_bp (cur_wp, cur_bp);
 
-  /* Move the buffer to head.  */
+  // Move the buffer to head.
   move_buffer_to_head (bp);
 
-  /* Change to buffer's default directory.  */
+  // Change to buffer's default directory.
   if (chdir (astr_cstr (bp->dir))) {
-    /* Avoid compiler warning for ignoring return value. */
+    // Avoid compiler warning for ignoring return value.
   }
 
   thisflag |= FLAG_NEED_RESYNC;
-}
-
-/*
- * Print an error message into the echo area and return true
- * if the current buffer is readonly; otherwise return false.
- */
-bool
-warn_if_readonly_buffer (void)
-{
-  if (get_buffer_readonly (cur_bp))
-    {
-      minibuf_error ("Buffer is readonly: %s", get_buffer_name (cur_bp));
-      return true;
-    }
-
-  return false;
 }
 
 bool
@@ -454,9 +419,34 @@ warn_if_no_mark (void)
 }
 
 /*
+ * Print an error message into the echo area and return true
+ * if the current buffer is readonly; otherwise return false.
+ */
+bool
+warn_if_readonly_buffer (void)
+{
+  if (get_buffer_readonly (cur_bp))
+    {
+      minibuf_error ("Buffer is readonly: %s", get_buffer_name (cur_bp));
+      return true;
+    }
+
+  return false;
+}
+
+// ========================================================
+
+/*
  * Set the specified buffer temporary flag and move the buffer
  * to the end of the buffer list.
  */
+
+Region
+calculate_the_region (void)
+{
+  return region_new (get_buffer_pt (cur_bp), get_marker_o (get_buffer_mark (cur_bp)));
+}
+
 void
 set_temporary_buffer (Buffer bp)
 {
@@ -684,28 +674,6 @@ move_char (ptrdiff_t offset)
     }
 
   return true;
-}
-
-/*
- * Go to the goal column.  Take care of expanding tabulations.
- */
-static void
-goto_goalc (void)
-{
-  size_t i, col = 0, t = tab_width (cur_bp);
-
-  for (i = get_buffer_line_o (cur_bp);
-       i < get_buffer_line_o (cur_bp) + buffer_line_len (cur_bp, get_buffer_pt (cur_bp));
-       i++)
-    if (col == get_buffer_goalc (cur_bp))
-      break;
-    else if (get_buffer_char (cur_bp, i) == '\t')
-      for (size_t w = t - col % t; w > 0 && ++col < get_buffer_goalc (cur_bp); w--)
-        ;
-    else
-      ++col;
-
-  set_buffer_pt (cur_bp, i);
 }
 
 bool

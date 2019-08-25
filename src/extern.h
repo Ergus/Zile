@@ -44,68 +44,6 @@ void get_and_run_command (void);
 void init_default_bindings (void);
 
 /* buffer.c --------------------------------------------------------------- */
-bool insert_char (int c);
-bool delete_char (void);
-bool replace_estr (size_t del, const_estr es);
-bool insert_estr (const_estr as);
-#define FIELD(ty, field)                                \
-  ty get_buffer_ ## field (const Buffer bp);           \
-  void set_buffer_ ## field (Buffer bp, ty field);
-#define FIELD_STR(field)                                                \
-  char *get_buffer_ ## field (const Buffer cp);                        \
-  void set_buffer_ ## field (Buffer cp, const char *field);
-#include "buffer.h"
-#undef FIELD
-#undef FIELD_STR
-void set_buffer_text (Buffer bp, estr es);
-const_astr get_buffer_pre_point (Buffer bp);
-const_astr get_buffer_post_point (Buffer bp);
-_GL_ATTRIBUTE_PURE size_t get_buffer_pt (Buffer bp);
-_GL_ATTRIBUTE_PURE size_t get_buffer_size (Buffer bp);
-void set_buffer_pt (Buffer bp, size_t o);
-_GL_ATTRIBUTE_PURE const char *get_buffer_eol (Buffer bp);
-_GL_ATTRIBUTE_PURE size_t buffer_prev_line (Buffer bp, size_t o);
-_GL_ATTRIBUTE_PURE size_t buffer_next_line (Buffer bp, size_t o);
-_GL_ATTRIBUTE_PURE size_t buffer_start_of_line (Buffer bp, size_t o);
-_GL_ATTRIBUTE_PURE size_t buffer_end_of_line (Buffer bp, size_t o);
-_GL_ATTRIBUTE_PURE size_t buffer_line_len (Buffer bp, size_t o);
-_GL_ATTRIBUTE_PURE size_t get_region_size (const Region r);
-_GL_ATTRIBUTE_PURE size_t get_buffer_line_o (Buffer bp);
-_GL_ATTRIBUTE_PURE char get_buffer_char (Buffer bp, size_t o);
-void destroy_buffer (Buffer bp);
-void init_buffer (Buffer bp);
-void insert_buffer (Buffer bp);
-Buffer buffer_new (void);
-_GL_ATTRIBUTE_PURE const char *get_buffer_filename_or_name (Buffer bp);
-void set_buffer_names (Buffer bp, const char *filename);
-_GL_ATTRIBUTE_PURE Buffer find_buffer (const char *name);
-void switch_to_buffer (Buffer bp);
-bool warn_if_no_mark (void);
-bool warn_if_readonly_buffer (void);
-#define FIELD(ty, field)                                \
-  ty get_region_ ## field (const Region cp);            \
-  void set_region_ ## field (Region cp, ty field);
-#include "region.h"
-#undef FIELD
-_GL_ATTRIBUTE_PURE Region region_new (size_t o1, size_t o2);
-void region_free (Region in);
-Region calculate_the_region (void);
-bool delete_region (const Region r);
-_GL_ATTRIBUTE_PURE bool region_contains (Region r, size_t o);
-void set_temporary_buffer (Buffer bp);
-void activate_mark (void);
-void deactivate_mark (void);
-size_t tab_width (Buffer bp);
-estr get_buffer_region (Buffer bp, Region r);
-Buffer create_auto_buffer (const char *name);
-Buffer create_scratch_buffer (void);
-void kill_buffer (Buffer kill_bp);
-Completion make_buffer_completion (void);
-bool check_modified_buffer (Buffer bp);
-bool move_char (ptrdiff_t dir);
-bool move_line (ptrdiff_t n);
-_GL_ATTRIBUTE_PURE size_t offset_to_line (Buffer bp, size_t offset);
-void goto_offset (size_t o);
 
 /* completion.c ----------------------------------------------------------- */
 #define FIELD(ty, field)                                        \

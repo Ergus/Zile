@@ -1,4 +1,5 @@
-#include <config.h>
+
+#include "config.h"
 
 #ifdef MOUSE_ON
 
@@ -20,6 +21,10 @@
 
 #include "main.h"
 #include "extern.h"
+
+#include "mouse.h"
+
+#include "buffer.h"
 
 static MEVENT mouse_event;
 

@@ -30,6 +30,9 @@
 #include "main.h"
 #include "extern.h"
 
+#include "buffer.h"
+#include "mouse.h"
+
 /*
  * Convert a key chord into its ASCII representation
  */

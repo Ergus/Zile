@@ -28,6 +28,8 @@
 #include "main.h"
 #include "extern.h"
 
+#include "buffer.h"
+
 static estr kill_ring_text;
 
 static void

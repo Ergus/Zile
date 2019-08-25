@@ -29,6 +29,7 @@
 #include "main.h"
 #include "extern.h"
 
+#include "buffer.h"
 
 static void
 insert_expanded_tab (void)

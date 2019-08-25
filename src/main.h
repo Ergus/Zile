@@ -74,7 +74,7 @@ typedef enum
  *--------------------------------------------------------------------------*/
 
 #define GETTER(Obj, name, ty, field)            \
-  _GL_ATTRIBUTE_PURE ty                         \
+  _GL_ATTRIBUTE_PURE ty			\
   get_ ## name ## _ ## field (const Obj p)      \
   {                                             \
     return p->field;                            \
@@ -93,6 +93,30 @@ typedef enum
   {                                                             \
     p->field = field ? xstrdup (field) : NULL;                  \
   }
+
+// The previous will go away
+
+#define IGETTER(Obj, name, ty, field)            \
+  inline _GL_ATTRIBUTE_PURE ty			\
+  get_ ## name ## _ ## field (const Obj p)      \
+  {                                             \
+    return p->field;                            \
+  }                                             \
+
+#define ISETTER(Obj, name, ty, field)            \
+  inline void					\
+  set_ ## name ## _ ## field (Obj p, ty field)  \
+  {                                             \
+    p->field = field;                           \
+  }
+
+#define ISTR_SETTER(Obj, name, field)                            \
+  inline void							\
+  set_ ## name ## _ ## field (Obj p, const char *field)         \
+  {                                                             \
+    p->field = field ? xstrdup (field) : NULL;                  \
+  }
+
 
 /*--------------------------------------------------------------------------
  * Zile commands to C bindings.

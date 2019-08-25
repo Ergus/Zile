@@ -30,6 +30,8 @@
 #include "main.h"
 #include "extern.h"
 
+#include "buffer.h"
+
 /*
  * Variable type.
  */

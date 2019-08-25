@@ -29,6 +29,8 @@
 #include "main.h"
 #include "extern.h"
 
+#include "buffer.h"
+
 #define NUM_REGISTERS	256
 
 static estr regs[NUM_REGISTERS] = {};

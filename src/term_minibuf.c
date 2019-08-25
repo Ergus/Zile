@@ -28,6 +28,8 @@
 #include "main.h"
 #include "extern.h"
 
+#include "buffer.h"
+
 void
 term_minibuf_write (const char *s)
 {

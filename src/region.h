@@ -1,3 +1,6 @@
+#ifndef REGION_H
+#define REGION_H
+
 /* Region fields
 
    Copyright (c) 2014 Free Software Foundation, Inc.
@@ -19,5 +22,29 @@
    Free Software Foundation, Fifth Floor, 51 Franklin Street, Boston,
    MA 02111-1301, USA.  */
 
-FIELD(size_t, start)
-FIELD(size_t, end)
+#include "main.h"
+
+#define REGION_FIELDS				\
+  FIELD(size_t, start)				\
+  FIELD(size_t, end)
+
+struct Region
+{
+#define FIELD(ty, name) ty name;
+  REGION_FIELDS
+#undef FIELD
+};
+
+#define FIELD(ty, field)                         \
+  IGETTER(Region, region, ty, field)             \
+  ISETTER(Region, region, ty, field)
+
+REGION_FIELDS
+#undef FIELD
+
+_GL_ATTRIBUTE_PURE Region region_new (size_t o1, size_t o2);
+bool delete_region (const Region r);
+_GL_ATTRIBUTE_PURE size_t get_region_size (const Region r);
+_GL_ATTRIBUTE_PURE bool region_contains (Region r, size_t o);
+
+#endif
