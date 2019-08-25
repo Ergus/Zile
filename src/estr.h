@@ -1,3 +1,6 @@
+#ifndef ESTR_H
+#define ESTR_H
+
 /* Dynamically allocated encoded strings
 
    Copyright (c) 2011-2014 Free Software Foundation, Inc.
@@ -20,7 +23,13 @@
    MA 02111-1301, USA.  */
 
 /* String with encoding */
-typedef struct estr *estr;
+
+typedef struct estr
+{
+  astr as;			/* String. */
+  const char *eol;		/* EOL type. */
+} *estr;
+
 typedef struct estr const *const_estr;
 
 extern estr estr_empty;
@@ -53,3 +62,5 @@ estr estr_cat (estr es, const_estr src);
 /* Read file contents into an estr.
  * The `as' member is NULL if the file doesn't exist, or other error. */
 estr estr_readf (const char *filename);
+
+#endif

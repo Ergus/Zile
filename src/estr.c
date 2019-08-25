@@ -30,20 +30,12 @@
 #include "estr.h"
 #include "memrmem.h"
 
-
-struct estr
-{
-  astr as;			/* String. */
-  const char *eol;		/* EOL type. */
-};
-
+estr estr_empty;
 
 /* Formats of end-of-line. */
 const char *coding_eol_lf = "\n";
 const char *coding_eol_crlf = "\r\n";
 const char *coding_eol_cr = "\r";
-
-estr estr_empty;
 
 void
 estr_init (void)

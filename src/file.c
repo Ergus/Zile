@@ -44,6 +44,7 @@
 #include "getkey.h"
 #include "minibuf.h"
 #include "undo.h"
+#include "astr.h"
 
 bool
 exist_file (const char *filename)
