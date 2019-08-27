@@ -81,27 +81,6 @@ typedef enum
  * Object field getter and setter generators.
  *--------------------------------------------------------------------------*/
 
-#define GETTER(Obj, name, ty, field)            \
-  _GL_ATTRIBUTE_PURE ty			\
-  get_ ## name ## _ ## field (const Obj p)      \
-  {                                             \
-    return p->field;                            \
-  }                                             \
-
-#define SETTER(Obj, name, ty, field)            \
-  void                                          \
-  set_ ## name ## _ ## field (Obj p, ty field)  \
-  {                                             \
-    p->field = field;                           \
-  }
-
-#define STR_SETTER(Obj, name, field)                            \
-  void                                                          \
-  set_ ## name ## _ ## field (Obj p, const char *field)         \
-  {                                                             \
-    p->field = field ? xstrdup (field) : NULL;                  \
-  }
-
 // The previous will go away
 
 #define IGETTER(Obj, name, ty, field)            \
@@ -270,30 +249,6 @@ typedef enum
                                            with no number. */
 #define FLAG_DEFINING_MACRO	0020	/* We are defining a macro. */
 
-enum tria {
-  unset = -1,
-  no_set,
-  set
-};
-
-/* Zile font codes */
-enum default_faces {
-  FONT_NORMAL = 0,
-  FONT_REGION,
-  FONT_STATUS,
-  FONT_REVERSE,
-  FONT_LINUM,
-  FONT_INDICATOR,
-  FONT_GUARD
-};
-
-struct face {
-  char name;
-  int id, fg, bg, attr;
-  enum tria underline;
-};
-
-struct face faces_list[FONT_GUARD];
 
 /* Custom exit code */
 #define EXIT_CRASH	2

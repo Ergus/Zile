@@ -64,6 +64,7 @@ src_zile_base_SOURCE_FILES =				\
 	src/estr.c					\
 	src/estr.h					\
 	src/extern.h					\
+	src/face.c					\
 	src/main.h					\
 	src/tbl_vars.h					\
 	src/lists.c					\

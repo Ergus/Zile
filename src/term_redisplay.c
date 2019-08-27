@@ -36,6 +36,7 @@
 #include "variables.h"
 #include "term_curses.h"
 
+#include "face.h"
 
 static int
 make_char_printable (char *out, char c, int x, int cur_tab_width)
@@ -48,10 +49,10 @@ make_char_printable (char *out, char c, int x, int cur_tab_width)
   return snprintf (out, STR_SIZE, "\\%o", c & 0xff) - 1; // The -1 is because it converts 2 elements
 }
 
-static int
+static size_t
 get_face_region (int highlight, Region region, size_t i)
 {
-  return highlight && region_contains (region, i) ? FONT_REGION : FONT_NORMAL;
+  return highlight && region_contains (region, i) ? FACE_REGION : FACE_NORMAL;
 }
 
 static void
@@ -78,18 +79,17 @@ draw_line (size_t line, Window wp,
       ++i;
     }
 
-  size_t cur_font = get_face_region (highlight, region, o + i);
+  size_t cur_face_id = get_face_region (highlight, region, o + i);
   // Change face;
-  term_attron (cur_font);
+  term_attrset (cur_face_id);
 
   while (i < line_len && x < window_ewidth_wp)
     {
-      const size_t new_font = get_face_region (highlight, region, o + i);
-      if (cur_font != new_font)
+      const size_t new_face = get_face_region (highlight, region, o + i);
+      if (cur_face_id != new_face)
 	{
-	  term_attroff (cur_font);
-	  term_attron (new_font);
-	  cur_font = new_font;
+	  term_attrset (cur_face_id);
+	  cur_face_id = new_face;
 	}
 
       char c = get_buffer_char (get_window_bp (wp), o + i);
@@ -109,6 +109,7 @@ draw_line (size_t line, Window wp,
       ++i;
     }
 
+  // Rest of the line or $ at the end.
   if (first_column_wp + x >= term_width ()) // We filled the whole visible line
     {
       term_move (line, term_width () - 1);
@@ -131,7 +132,10 @@ draw_line (size_t line, Window wp,
 	    }
           if (x == indicator_column_x)            // Set indicator
 	    {
+	      const size_t cur_face = cur_face_id;
+	      term_attrset (FACE_INDICATOR);
 	      term_addch ('|');
+	      term_attrset (cur_face);
 	      ++x;
 	    }
 	}
@@ -192,7 +196,7 @@ static void
 draw_status_line (size_t line, Window wp)
 {
   Buffer bp = get_window_bp (wp);
-  term_attron (FONT_STATUS);
+  term_attrset (FACE_STATUS);
 
   term_move (line, 0);
   for (size_t i = 0; i < get_window_ewidth (wp); ++i)
@@ -216,7 +220,8 @@ draw_status_line (size_t line, Window wp)
   snprintf(line_col, STR_SIZE, "(%zu,%zu)", n + 1, get_goalc_bp (bp, window_o (wp)));
 
   astr as = astr_fmt ("--%s%2s  %-15s   %s %-9s (Fundamental",
-                      eol_type, make_mode_line_flags (wp), get_buffer_name (bp),
+                      eol_type, make_mode_line_flags (wp),
+                      get_buffer_name (bp),
                       screen_pos, line_col);
 
   if (get_buffer_autofill (bp))
@@ -289,10 +294,12 @@ draw_window (size_t topline, Window wp)
 
       if (linum_mode)
 	{
+	  term_attrset(FACE_LINUM);
 	  char buff[STR_SIZE];
 	  snprintf (buff, STR_SIZE, "%*lu",
 	            first_column - 1, buffer_first_line + j);
 	  term_addstr(buff);
+	  term_attr_reset();
 	}
 
       draw_line (line, wp, o, region, highlight, cur_tab_width, fill_column_indicator);

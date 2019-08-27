@@ -18,11 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+
 size_t term_buf_len (void);
 void term_init (void);
 
-void term_attron (int pair);
-void term_attroff (int pair);
+int term_attrset (int pair);
+int term_attron (int pair);
+int term_attroff (int pair);
 void term_attr_reset ();
 
 void term_close (void);
@@ -32,7 +35,6 @@ void term_refresh (void);
 void term_clear (void);
 void term_addch (char c);
 void term_addstr (const char *s);
-void term_attrset (size_t attr);
 void term_beep (void);
 _GL_ATTRIBUTE_PURE size_t term_width (void);
 _GL_ATTRIBUTE_PURE size_t term_height (void);

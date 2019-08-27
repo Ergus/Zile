@@ -47,7 +47,7 @@
 #include "minibuf.h"
 #include "term_curses.h"
 
-#define ZILE_COPYRIGHT_STRING \
+#define ZILE_COPYRIGHT_STRING				\
   "Copyright (C) 2014 Free Software Foundation, Inc."
 
 /* The current window; the first window in list. */
@@ -112,7 +112,7 @@ signal_init (void)
 /* Options table */
 struct option longopts[] = {
 #define D(text)
-#define O(longname, shortname, arg, argstring, docstring) \
+#define O(longname, shortname, arg, argstring, docstring)	\
   {longname, arg, NULL, shortname},
 #define A(argstring, docstring)
 #include "tbl_opts.h"
@@ -141,7 +141,7 @@ main (int argc, char **argv)
   gl_list_t arg_type = gl_list_create_empty (GL_LINKED_LIST,
                                              NULL, NULL, NULL, false);
   gl_list_t arg_arg = gl_list_create_empty (GL_LINKED_LIST,
-                                             NULL, NULL, NULL, false);
+                                            NULL, NULL, NULL, false);
   gl_list_t arg_line = gl_list_create_empty (GL_LINKED_LIST,
                                              NULL, NULL, NULL, false);
   size_t line = 1;
@@ -166,7 +166,7 @@ main (int argc, char **argv)
       else if (c == ':') /* Missing argument */
         {
           fprintf (stderr, "%s: Option `%s' requires an argument\n",
-                   program_name, argv[this_optind]);
+	           program_name, argv[this_optind]);
           exit (EXIT_FAILURE);
         }
       else if (c == 'q')
@@ -197,32 +197,32 @@ main (int argc, char **argv)
           }
         case 3:
           printf ("Usage: %s [OPTION-OR-FILENAME]...\n"
-                  "\n"
-                  "Run " PACKAGE_NAME ", the lightweight Emacs clone.\n"
-                  "\n",
-                  argv[0]);
+	          "\n"
+	          "Run " PACKAGE_NAME ", the lightweight Emacs clone.\n"
+	          "\n",
+	          argv[0]);
 #define D(text)                                 \
           printf (text "\n");
 #define O(longname, shortname, arg, argstring, docstring)               \
           shortopt = xasprintf (", -%c", shortname);                    \
           buf = xasprintf ("--%s%s %s", longname, shortname ? shortopt : "", argstring); \
           printf ("%-24s%s\n", buf, docstring);
-#define A(argstring, docstring) \
+#define A(argstring, docstring)				\
           printf ("%-24s%s\n", argstring, docstring);
 #include "tbl_opts.h"
 #undef D
 #undef O
 #undef A
           printf ("\n"
-                  "Report bugs to " PACKAGE_BUGREPORT ".\n");
+	          "Report bugs to " PACKAGE_BUGREPORT ".\n");
           exit (EXIT_SUCCESS);
         case 4:
           printf (ZILE_VERSION_STRING "\n"
-                  ZILE_COPYRIGHT_STRING "\n"
-                  "GNU " PACKAGE_NAME " comes with ABSOLUTELY NO WARRANTY.\n"
-                  "You may redistribute copies of " PACKAGE_NAME "\n"
-                  "under the terms of the GNU General Public License.\n"
-                  "For more information about these matters, see the file named COPYING.\n");
+	          ZILE_COPYRIGHT_STRING "\n"
+	          "GNU " PACKAGE_NAME " comes with ABSOLUTELY NO WARRANTY.\n"
+	          "You may redistribute copies of " PACKAGE_NAME "\n"
+	          "under the terms of the GNU General Public License.\n"
+	          "For more information about these matters, see the file named COPYING.\n");
           exit (EXIT_SUCCESS);
         case 5:
           if (*optarg == '+')

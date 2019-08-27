@@ -27,13 +27,13 @@
 #include "buffer.h"
 #include "window.h"
 
+#include "minibuf.h"
 static MEVENT mouse_event;
 
 void
 mouse_enable ()
 {
-  if (has_mouse ())
-    mousemask(ALL_MOUSE_EVENTS, NULL);
+  mousemask(ALL_MOUSE_EVENTS, NULL);
 }
 
 void
