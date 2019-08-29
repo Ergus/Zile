@@ -57,7 +57,7 @@ draw_minibuf_read (const char *prompt, const char *value,
 
   if (prompt_len + pointo + 1 >= term_width ())
     {
-      margin++;
+      ++margin;
       term_addstr ("$");
       n = pointo - pointo % (term_width () - prompt_len - 2);
     }

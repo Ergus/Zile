@@ -20,34 +20,70 @@
 
 #include <config.h>
 
-#include <stdlib.h>
-#if defined HAVE_NCURSESW_CURSES_H
-#  include <ncursesw/curses.h>
-#elif defined HAVE_NCURSESW_H
-#  include <ncursesw.h>
-#elif defined HAVE_NCURSES_CURSES_H
-#  include <ncurses/curses.h>
-#elif defined HAVE_NCURSES_H
-#  include <ncurses.h>
-#elif defined HAVE_CURSES_H
-#  include <curses.h>
-#else
-#  error "SysV or X/Open-compatible Curses header file required"
-#endif
+#define CREATE_FIND(array_type)						\
+  array_type *								\
+  find_ ## array_type ## _by_name (const_astr name,			\
+                                   array_type *array,			\
+                                   int asize)				\
+  {									\
+    for (int i = 0; i < asize; ++i) {					\
+      if (strcmp (astr_cstr(name), array[i].name) == 0)			\
+	return &array[i];						\
+    }									\
+    return NULL;							\
+  }									\
+									\
+  const_astr								\
+  minibuf_read_ ##array_type## _name (const array_type *array,		\
+                                      int asize,			\
+                                      const char *fmt, ...)		\
+  {									\
+    Completion cp = completion_new (false);				\
+									\
+    for (int i = 0; i < asize; ++i)					\
+      gl_sortedlist_add (get_completion_completions (cp),		\
+                         completion_strcmp,				\
+                         xstrdup (array[i].name));			\
+									\
+    va_list ap;								\
+    va_start (ap, fmt);							\
+									\
+    const_astr ms = minibuf_vread_completion (fmt, "", cp, NULL,	\
+                                              "No valid name given",	\
+                                              minibuf_test_in_completions, \
+                                              "Undefined name `%s'",	\
+                                              ap);			\
+    va_end (ap);							\
+    									\
+    return ms;								\
+  }
 
+#define DECLARE_FIND(array_type)				\
+  array_type *							\
+  find_ ## array_type ## _by_name (const_astr name,		\
+                                   array_type *array,		\
+                                   int asize);			\
+								\
+  const_astr							\
+  minibuf_read_ ##array_type## _name (const array_type *array,	\
+                                      int asize,		\
+                                      const char *fmt, ...);
 
 #include <astr.h>
 
-#define NPROPS 6
 
 // Attributes ==============================================
+#define NATTS 8
 
 typedef struct attrib_t {
   const char name[ALLOCATION_CHUNK_SIZE];
   const int value;
 } attrib_t;
 
-extern const attrib_t atts [NPROPS];
+extern attrib_t attribs [NATTS];
+
+#define A_BACKGROUND -1
+#define A_FOREGROUND -2
 
 #define DEFAULT_ATTS					\
   FIELD(STANDOUT)					\
@@ -55,7 +91,31 @@ extern const attrib_t atts [NPROPS];
   FIELD(REVERSE)					\
   FIELD(BLINK)						\
   FIELD(DIM)						\
-  FIELD(BOLD)
+  FIELD(BOLD)						\
+  FIELD(BACKGROUND)					\
+  FIELD(FOREGROUND)
+
+
+// Attributes ==============================================
+#define NCOLORS 8
+
+typedef struct color_t {
+  const char name[ALLOCATION_CHUNK_SIZE];
+  const int value;
+} color_t;
+
+extern color_t colors [NCOLORS];
+
+#define DEFAULT_COLORS				\
+  FIELD(BLACK)					\
+  FIELD(RED)					\
+  FIELD(GREEN)					\
+  FIELD(YELLOW)					\
+  FIELD(BLUE)					\
+  FIELD(MAGENTA)				\
+  FIELD(CYAN)					\
+  FIELD(WHITE)
+
 
 // Faces ===================================================
 
@@ -81,11 +141,12 @@ enum default_faces {
   FACE_GUARD
 };
 
+
 extern face_t faces_list[FACE_GUARD];
 
 // Functions ===============================================
 
-void face_set_attribute (const char prop[], int value);
+void face_set_attribute (face_t *face, attrib_t *attrib, int value);
 
 void term_init_attrs ();
 
@@ -96,4 +157,11 @@ get_face_value(int id)
   return faces_list[id].value;
 }
 
+DECLARE_FIND(attrib_t);
+DECLARE_FIND(color_t);
+DECLARE_FIND(face_t);
+
+#undef DECLARE_FIND
+
 #endif
+

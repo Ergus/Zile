@@ -88,7 +88,7 @@ draw_line (size_t line, Window wp,
       const size_t new_face = get_face_region (highlight, region, o + i);
       if (cur_face_id != new_face)
 	{
-	  term_attrset (cur_face_id);
+	  term_attrset (new_face);
 	  cur_face_id = new_face;
 	}
 

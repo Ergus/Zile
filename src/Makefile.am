@@ -40,6 +40,7 @@ src_zile_function_SOURCE_FILES =			\
 	src/buffer.c					\
 	src/eval.c					\
 	src/file.c					\
+	src/face.c					\
 	src/funcs.c					\
 	src/help.c					\
 	src/killring.c					\
@@ -64,7 +65,6 @@ src_zile_base_SOURCE_FILES =				\
 	src/estr.c					\
 	src/estr.h					\
 	src/extern.h					\
-	src/face.c					\
 	src/main.h					\
 	src/tbl_vars.h					\
 	src/lists.c					\
