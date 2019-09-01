@@ -52,7 +52,11 @@ make_char_printable (char *out, char c, int x, int cur_tab_width)
 static size_t
 get_face_region (int highlight, Region region, size_t i)
 {
-  return highlight && region_contains (region, i) ? FACE_REGION : FACE_NORMAL;
+  if (highlight && region_contains (region, i))
+    return FACE_REGION;
+  if (region_contains (get_buffer_overlay(cur_bp), i))
+    return FACE_OVERLAY;
+  return FACE_NORMAL;
 }
 
 static void

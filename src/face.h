@@ -128,6 +128,7 @@ typedef struct face_t {
 #define DEFAULT_FACES				\
   FIELD(FACE_NORMAL)				\
   FIELD(FACE_REGION)				\
+  FIELD(FACE_OVERLAY)				\
   FIELD(FACE_STATUS)				\
   FIELD(FACE_REVERSE)				\
   FIELD(FACE_LINUM)				\

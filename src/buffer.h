@@ -53,7 +53,7 @@
     FIELD(bool, isearch)      /* The buffer is in Isearch loop. */	\
     FIELD(bool, mark_active)  /* The mark is active. */			\
     FIELD(astr, dir)          /* The default directory. */		\
-    FIELD(estr, text)          /* The default directory. */
+    FIELD(estr, text)          /* The default directory. */             \
 
 #define MIN_GAP 1024 /* Minimum gap size after resize. */
 #define MAX_GAP 4096 /* Maximum permitted gap size. */
@@ -67,13 +67,14 @@ typedef struct Buffer
 #undef FIELD_STR
   size_t pt;         /* The point. */
   size_t gap;        /* Size of gap after point. */
+  struct Region overlay; /* The default directory. */
 } *Buffer;
 
-#define FIELD(ty, field)                         \
+#define FIELD(ty, field)			  \
   IGETTER (Buffer, buffer, ty, field)             \
   ISETTER (Buffer, buffer, ty, field)
 
-#define FIELD_STR(field)                         \
+#define FIELD_STR(field)			  \
   IGETTER (Buffer, buffer, char *, field)         \
   ISTR_SETTER (Buffer, buffer, field)
 
@@ -134,4 +135,6 @@ void goto_offset (size_t o);
 
 void write_temp_buffer (const char *name, bool show, void (*func) (va_list ap), ...);
 
+Region get_buffer_overlay (Buffer bp);
+void reset_buffer_overlay (Buffer bp);
 #endif

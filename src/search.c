@@ -56,13 +56,9 @@ no_upper (const char *s, size_t len, int regex)
 
 static const char *re_find_err = NULL;
 
-struct re_pair {
-  int beg, end;
-};
-
-static struct re_pair
+static int
 find_substr (const_astr as, const char *n, size_t nsize,
-             bool forward, bool notbol, bool noteol, bool regex, bool icase)
+             bool forward, bool notbol, bool noteol, bool regex, bool icase, Region out)
 {
   int re_ret = -1;
   struct re_pattern_buffer pattern;
@@ -86,12 +82,18 @@ find_substr (const_astr as, const char *n, size_t nsize,
     re_ret = re_search (&pattern, astr_cstr (as), (int) len,
                         forward ? 0 : len, forward ? len : -len, &search_regs);
 
-  struct re_pair ret = {-1, -1};
+  if (re_ret < 0)
+    {
+      *out = (struct Region){.start=-1, .end=-1};
+      return re_ret;
+    }
 
-  if (re_ret >= 0)
-    ret = (struct re_pair){search_regs.start[0], search_regs.end[0]};
+  const int delay = forward ? get_buffer_pt (cur_bp) : 0;
 
-  return ret;
+  out->start = delay + search_regs.start[0];
+  out->end = delay + search_regs.end[0];
+
+  return re_ret;
 }
 
 static bool
@@ -103,15 +105,17 @@ search (const char *s, int forward, int regexp)
 
   /* Attempt match. */
   size_t o = get_buffer_pt (cur_bp);
+  Region overlay = get_buffer_overlay (cur_bp);
   bool notbol = forward ? o > 0 : false;
   bool noteol = forward ? false : o < get_buffer_size (cur_bp);
-  struct re_pair ret = find_substr (forward ? get_buffer_post_point (cur_bp) : get_buffer_pre_point (cur_bp),
-                                    s, ssize, forward, notbol, noteol, regexp,
-                                    get_variable_bool ("case-fold-search") && no_upper (s, ssize, regexp));
-  if (ret.beg < 0 | ret.end < 0)
+  const int ret = find_substr (forward ? get_buffer_post_point (cur_bp) : get_buffer_pre_point (cur_bp),
+                               s, ssize, forward, notbol, noteol, regexp,
+                               get_variable_bool ("case-fold-search") && no_upper (s, ssize, regexp),
+                               overlay);
+  if (ret < 0)
     return false;
 
-  goto_offset (forward ? ret.end + get_buffer_pt (cur_bp) : ret.beg);
+  goto_offset (forward ? overlay->end : overlay->start);
 
   thisflag |= FLAG_NEED_RESYNC;
   return true;
@@ -290,7 +294,6 @@ isearch (int forward, int regexp)
 
                   /* Save search string. */
                   last_search = astr_cpy (astr_new (), pattern);
-
                   minibuf_write ("Mark saved when search started");
                 }
               else
@@ -317,6 +320,8 @@ isearch (int forward, int regexp)
           term_redisplay ();
         }
     }
+
+  reset_buffer_overlay (cur_bp);
 
   /* done */
   set_buffer_isearch (get_window_bp (cur_wp), false);

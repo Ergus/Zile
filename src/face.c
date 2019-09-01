@@ -108,6 +108,7 @@ term_init_attrs ()
 
       init_pair(FACE_NORMAL, COLOR_WHITE, COLOR_BLACK);
       init_pair(FACE_REGION, COLOR_WHITE, COLOR_BLUE);
+      init_pair(FACE_OVERLAY, COLOR_WHITE, COLOR_CYAN);
       init_pair(FACE_STATUS, COLOR_WHITE, COLOR_BLUE);
       init_pair(FACE_REVERSE, COLOR_BLACK, COLOR_WHITE);
       init_pair(FACE_LINUM, COLOR_CYAN, COLOR_BLACK);
@@ -116,6 +117,7 @@ term_init_attrs ()
 
   faces_list[FACE_NORMAL].value = (colors ? COLOR_PAIR(FACE_NORMAL) : FACE_NORMAL);
   faces_list[FACE_REGION].value = (colors ? COLOR_PAIR(FACE_REGION) : A_STANDOUT);
+  faces_list[FACE_OVERLAY].value = (colors ? COLOR_PAIR(FACE_OVERLAY) : A_STANDOUT);
   faces_list[FACE_STATUS].value = (colors ? COLOR_PAIR(FACE_STATUS) : A_REVERSE);
   faces_list[FACE_REVERSE].value = (faces_list[FACE_NORMAL].value | A_REVERSE);
   faces_list[FACE_LINUM].value = (colors ? COLOR_PAIR(FACE_LINUM) | A_DIM : A_DIM);

@@ -800,3 +800,13 @@ write_temp_buffer (const char *name, bool show, void (*func) (va_list ap), ...)
   if (!show)
     switch_to_buffer (old_bp);
 }
+
+Region get_buffer_overlay (Buffer bp)
+{
+  return &bp->overlay;
+};
+
+void reset_buffer_overlay (Buffer bp)
+{
+  bp->overlay = (struct Region) {.start = -1, .end = -1};
+};

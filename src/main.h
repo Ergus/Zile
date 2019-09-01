@@ -95,7 +95,6 @@ typedef enum
   void set_ ## name ## _ ## field (Obj p, const char *field);
 
 
-
 #define DGETTER(Obj, name, ty, field)            \
   _GL_ATTRIBUTE_PURE ty				 \
   get_ ## name ## _ ## field (const Obj p)      \
