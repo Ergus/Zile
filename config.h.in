@@ -13,3 +13,10 @@
 #cmakedefine CURSES_HAVE_NCURSES_H @CURSES_HAVE_NCURSES_H@
 #cmakedefine CURSES_HAVE_NCURSES_NCURSES_H @CURSES_HAVE_NCURSES_NCURSES_H@
 #cmakedefine CURSES_HAVE_NCURSES_CURSES_H @CURSES_HAVE_NCURSES_CURSES_H@
+
+#define malloc GC_malloc
+#define realloc GC_realloc
+#define free GC_free
+#define strdup GC_strdup
+#define strndup GC_strndup
+#define calloc zile_calloc

@@ -88,14 +88,14 @@ set (gnulib_modules
 include (ExternalProject)
 
 ExternalProject_Add(gnulib
-  DOWNLOAD_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gnulib/gnulib-tool --create-testdir --dir=${CMAKE_CURRENT_BINARY_DIR}/gnulib ${gnulib_modules}
+  DOWNLOAD_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gnulib/gnulib-tool -s --create-testdir --dir=${CMAKE_CURRENT_BINARY_DIR}/gnulib ${gnulib_modules}
   BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/gnulib # where ./configure is executed
   CONFIGURE_COMMAND ./configure
   PREFIX gnulib
   BUILD_COMMAND ${MAKE}
   )
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/gnulib/gllib)
+include_directories (${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/gnulib/gllib)
 
 include (GNUInstallDirs)
 

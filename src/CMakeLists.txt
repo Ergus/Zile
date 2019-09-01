@@ -12,9 +12,11 @@ set (SRC_FUNCTION
   help.c
   killring.c
   line.c
+  face.c
   gc_veneer.c
   lisp.c
   macro.c
+  mouse.c
   redisplay.c
   registers.c
   search.c
@@ -31,7 +33,6 @@ set(SRC_BASE
   estr.c
   estr.h
   extern.h
-  face.c
   main.h
   tbl_vars.h
   lists.c
@@ -47,7 +48,6 @@ set(SRC_BASE
   marker.h
   marker.c
   minibuf.c
-  mouse.c
   region.h
   region.c
   window.h

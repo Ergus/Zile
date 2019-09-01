@@ -48,12 +48,6 @@ astr astr_new (void)
   return as;
 }
 
-void astr_free(astr in)
-{
-  free(in->text);
-  free(in);
-}
-
 _GL_ATTRIBUTE_PURE const char *
 astr_cstr (const_astr as)
 {

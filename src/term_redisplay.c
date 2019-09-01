@@ -235,8 +235,6 @@ draw_status_line (size_t line, Window wp)
   term_addstr (astr_cstr (as));
 
   term_attr_reset ();
-
-  astr_free(as);
 }
 
 static void

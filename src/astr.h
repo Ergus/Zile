@@ -73,9 +73,6 @@ void astr_set_len (astr as, size_t len);
 // Allocate a new string with zero length.
 astr astr_new (void);
 
-// Release string memory.
-void astr_free(astr in);
-
 // Make a new constant string from a counted C string.
 const_astr const_astr_new_nstr (const char *s, size_t n);
 

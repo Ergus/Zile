@@ -316,7 +316,6 @@ keyvectodesc (gl_list_t keys)
       astr_cat (as, key);
       if (i < gl_list_size (keys) - 1)
         astr_cat_char (as, ' ');
-      astr_free (key);
     }
   return as;
 }
