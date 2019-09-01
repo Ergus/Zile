@@ -121,8 +121,6 @@ delete_window (Window del_wp)
 
   if (del_wp->saved_pt)
     unchain_marker (del_wp->saved_pt);
-
-  free(del_wp);
 }
 
 DEFUN ("delete-window", delete_window)
