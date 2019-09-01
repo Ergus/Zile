@@ -27,9 +27,16 @@
 #include "buffer.h"
 #include "marker.h"
 
-/*
- * Make a region from two offsets.
- */
+
+#define FIELD(ty, field)                         \
+  DGETTER(Region, region, ty, field)             \
+  DSETTER(Region, region, ty, field)
+
+REGION_FIELDS
+#undef FIELD
+
+
+// Make a region from two offsets.
 Region
 region_new (size_t o1, size_t o2)
 {

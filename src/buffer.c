@@ -44,6 +44,20 @@
 #include "file.h"
 #include "minibuf.h"
 #include "undo.h"
+
+#define FIELD(ty, field)                         \
+  DGETTER (Buffer, buffer, ty, field)             \
+  DSETTER (Buffer, buffer, ty, field)
+
+#define FIELD_STR(field)                         \
+  DGETTER (Buffer, buffer, char *, field)         \
+  DSTR_SETTER (Buffer, buffer, field)
+
+BUFFER_FIELDS
+#undef FIELD
+#undef FIELD_STR
+
+
 // ================ Static ================================
 
 static inline size_t

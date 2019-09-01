@@ -43,7 +43,7 @@ _GL_ATTRIBUTE_PURE Function get_function (const char *name);
 _GL_ATTRIBUTE_PURE const char *get_function_doc (const char *name);
 _GL_ATTRIBUTE_PURE bool get_function_interactive (const char *name);
 _GL_ATTRIBUTE_PURE const char *get_function_name (Function p);
-_GL_ATTRIBUTE_FORMAT_PRINTF(1, 2) const_astr minibuf_read_function_name (const char *fmt, ...);
+const_astr minibuf_read_function_name (const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 void init_eval (void);
 
 #endif

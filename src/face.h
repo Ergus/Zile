@@ -69,7 +69,7 @@
                                       int asize,		\
                                       const char *fmt, ...);
 
-#include <astr.h>
+#include "astr.h"
 
 
 // Attributes ==============================================
@@ -150,12 +150,7 @@ void face_set_attribute (face_t *face, attrib_t *attrib, int value);
 
 void term_init_attrs ();
 
-inline int
-get_face_value(int id)
-{
-  assert (id < FACE_GUARD);
-  return faces_list[id].value;
-}
+int get_face_value(int id);
 
 DECLARE_FIND(attrib_t);
 DECLARE_FIND(color_t);

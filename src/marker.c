@@ -32,6 +32,15 @@
 #include "marker.h"
 #include "buffer.h"
 
+#define FIELD(ty, field)                         \
+  DGETTER (Marker, marker, ty, field)		 \
+  DSETTER (Marker, marker, ty, field)
+
+MARKER_FIELDS
+#undef FIELD
+
+
+
 Marker
 marker_new (void)
 {

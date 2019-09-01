@@ -25,9 +25,9 @@
 #  include <ncursesw.h>
 #elif defined HAVE_NCURSES_CURSES_H
 #  include <ncurses/curses.h>
-#elif defined HAVE_NCURSES_H
+#elif defined CURSES_HAVE_NCURSES_H
 #  include <ncurses.h>
-#elif defined HAVE_CURSES_H
+#elif defined CURSES_HAVE_CURSES_H
 #  include <curses.h>
 #else
 #  error "SysV or X/Open-compatible Curses header file required"
@@ -122,6 +122,12 @@ term_init_attrs ()
   faces_list[FACE_INDICATOR].value = (colors ? COLOR_PAIR(FACE_INDICATOR) | A_DIM : A_DIM);
 }
 
+int
+get_face_value(int id)
+{
+  assert (id < FACE_GUARD);
+  return faces_list[id].value;
+}
 
 DEFUN ("set-face-attribute", set_face_attribute)
 /*+

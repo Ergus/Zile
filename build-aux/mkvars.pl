@@ -21,8 +21,8 @@
 
 use Zile;
 
-open VARS, ">src/tbl_vars.h" or die;
-open SAMPLE, ">src/dotzile.sample" or die;
+open VARS, ">tbl_vars.h" or die;
+open SAMPLE, ">dotzile.sample" or die;
 
 print SAMPLE <<EOF;
 ;;;; .$ENV{PACKAGE} configuration

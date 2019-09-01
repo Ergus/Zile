@@ -35,6 +35,15 @@
 #include "minibuf.h"
 #include "term_curses.h"
 
+
+#define FIELD(ty, field)			 \
+  DGETTER (Window, window, ty, field)            \
+  DSETTER (Window, window, ty, field)
+
+WINDOW_FIELDS
+#undef FIELD
+
+
 /*
  * Set the current window and his buffer as the current buffer.
  */

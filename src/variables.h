@@ -19,7 +19,7 @@
  */
 
 void init_variables (void);
-_GL_ATTRIBUTE_FORMAT_PRINTF(1, 2) const_astr minibuf_read_variable_name (const char *fmt, ...);
+const_astr minibuf_read_variable_name (const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 void set_variable (const char *var, const char *val);
 const char *get_variable_doc (const char *var, const char **defval);
 const char *get_variable (const char *var);

@@ -26,6 +26,87 @@
 #include "xvasprintf.h"
 
 
+void
+astr_set_len (astr as, size_t len)
+{
+  if (len > as->maxlen || len < as->maxlen / 2)
+    {
+      as->maxlen = len + ALLOCATION_CHUNK_SIZE;
+      as->text = xrealloc (as->text, as->maxlen + 1);
+    }
+  as->len = len;
+  as->text[as->len] = '\0';
+}
+
+astr astr_new (void)
+{
+  astr as;
+  as = (astr) XZALLOC (struct astr);
+  as->maxlen = ALLOCATION_CHUNK_SIZE;
+  as->len = 0;
+  as->text = (char *) xzalloc (as->maxlen + 1);
+  return as;
+}
+
+void astr_free(astr in)
+{
+  free(in->text);
+  free(in);
+}
+
+_GL_ATTRIBUTE_PURE const char *
+astr_cstr (const_astr as)
+{
+  return (const char *) (as->text);
+}
+
+_GL_ATTRIBUTE_PURE size_t
+astr_len (const_astr as)
+{
+  return as->len;
+}
+
+// Return the `pos'th character of `as'.
+_GL_ATTRIBUTE_PURE char
+astr_get (const_astr as, size_t pos)
+{
+  assert (pos <= astr_len (as));
+  return (astr_cstr (as))[pos];
+}
+
+astr
+astr_cat_nstr (astr as, const char *s, size_t csize)
+{
+  assert (as != NULL);
+  size_t oldlen = as->len;
+  astr_set_len (as, as->len + csize);
+  memmove (as->text + oldlen, s, csize);
+  return as;
+}
+
+astr
+astr_substr (const_astr as, size_t pos, size_t size)
+{
+  assert (pos + size <= astr_len (as));
+  return astr_cat_nstr (astr_new (), astr_cstr (as) + pos, size);
+}
+
+
+astr
+astr_cat (astr as, const_astr src)
+{
+  return astr_cat_nstr (as, astr_cstr (src), astr_len (src));
+}
+
+
+astr
+astr_cat_char (astr as, int c)
+{
+  char c2 = c;
+  return astr_cat_nstr (as, &c2, 1);
+}
+
+
 astr
 astr_cat_cstr (astr as, const char *s)
 {
@@ -33,6 +114,119 @@ astr_cat_cstr (astr as, const char *s)
   return astr_cat_nstr (as, s, len);
 }
 
+
+astr
+astr_replace_nstr (astr as, size_t pos, const char *s, size_t size)
+{
+  assert (as != NULL);
+  assert (pos <= as->len);
+  assert (size <= as->len - pos);
+  memmove (as->text + pos, s, size);
+  return as;
+}
+
+astr
+astr_remove (astr as, size_t pos, size_t size)
+{
+  assert (as != NULL);
+  assert (pos <= as->len);
+  assert (size <= as->len - pos);
+  memmove (as->text + pos, as->text + pos + size, as->len - (pos + size));
+  astr_set_len (as, as->len - size);
+  return as;
+}
+
+astr
+astr_insert (astr as, size_t pos, size_t size)
+{
+  assert (as != NULL);
+  assert (pos <= as->len);
+  assert (pos + size >= MAX (pos, size));    /* Check for overflow. */
+  astr_set_len (as, as->len + size);
+  memmove (as->text + pos + size, as->text + pos, as->len - (pos + size));
+  memset (as->text + pos, '\0', size);
+  return as;
+}
+
+astr
+astr_move (astr as, size_t to, size_t from, size_t n)
+{
+  assert (as != NULL);
+  assert (to <= as->len);
+  assert (from <= as->len);
+  assert (n <= as->len - MAX (from, to));
+  memmove (as->text + to, as->text + from, n);
+  return as;
+}
+
+astr
+astr_set (astr as, size_t pos, int c, size_t n)
+{
+  assert (as != NULL);
+  assert (pos <= as->len);
+  assert (n <= as->len - pos);
+  memset (as->text + pos, c, n);
+  return as;
+}
+
+astr
+astr_truncate (astr as, size_t pos)
+{
+  return astr_remove (as, pos, astr_len (as) - pos);
+}
+
+
+astr
+astr_ncpy_cstr (astr as, const char *s, size_t len)
+{
+  astr_truncate (as, 0);
+  return astr_cat_nstr (as, s, len);
+}
+
+// Assign the contents of the argument string to the string `as'.
+astr
+astr_cpy (astr as, const_astr src)
+{
+  return astr_ncpy_cstr (as, astr_cstr (src), astr_len (src));
+}
+
+astr
+astr_cpy_cstr (astr as, const char *s)
+{
+  return astr_ncpy_cstr (as, s, strlen (s));
+}
+
+astr
+astr_readf (const char *filename)
+{
+  astr as = NULL;
+  struct stat st;
+  if (stat (filename, &st) == 0)
+    {
+      size_t size = st.st_size;
+      int fd = open (filename, O_RDONLY);
+      if (fd >= 0)
+        {
+          char buf[BUFSIZ];
+          as = astr_new ();
+          while ((size = read (fd, buf, BUFSIZ)) > 0)
+            astr_cat_nstr (as, buf, size);
+          close (fd);
+        }
+    }
+  return as;
+}
+
+// Make a new constant string from a counted C string.
+const_astr
+const_astr_new_nstr (const char *s, size_t n)
+{
+  astr as;
+  as = (astr) XZALLOC (struct astr);
+  as->len = n;
+  as->text = (char *) s;
+  return as;
+}
 
 // Make a new string from a C null-terminated string.
 astr
@@ -72,6 +266,7 @@ astr_recase (astr as, casing newcase)
 
   return astr_cpy (as, bs);
 }
+
 
 
 #ifdef TEST

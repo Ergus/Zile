@@ -23,6 +23,6 @@
 bool insert_newline (void);
 bool intercalate_newline (void);
 int fill_break_line (void);
-_GL_ATTRIBUTE_FORMAT_PRINTF(1, 2) void bprintf (const char *fmt, ...);
+void bprintf (const char *fmt, ...) __attribute__((format(printf, 1, 2))) ;
 
 #endif

@@ -56,19 +56,23 @@ no_upper (const char *s, size_t len, int regex)
 
 static const char *re_find_err = NULL;
 
-static int
+struct re_pair {
+  int beg, end;
+};
+
+static struct re_pair
 find_substr (const_astr as, const char *n, size_t nsize,
              bool forward, bool notbol, bool noteol, bool regex, bool icase)
 {
-  int ret = -1;
+  int re_ret = -1;
   struct re_pattern_buffer pattern;
   struct re_registers search_regs;
   reg_syntax_t syntax = RE_SYNTAX_EMACS;
 
   memset (&pattern, 0, sizeof (pattern));
 
-  if (!regex)
-    syntax |= RE_PLAIN;
+  //if (!regex)
+  // syntax |= RE_PLAIN;
   if (icase)
     syntax |= RE_ICASE;
   re_set_syntax (syntax);
@@ -79,11 +83,13 @@ find_substr (const_astr as, const char *n, size_t nsize,
   pattern.not_eol = noteol;
   size_t len = astr_len (as);
   if (!re_find_err)
-    ret = re_search (&pattern, astr_cstr (as), (int) len,
-                     forward ? 0 : len, forward ? len : -len, &search_regs);
+    re_ret = re_search (&pattern, astr_cstr (as), (int) len,
+                        forward ? 0 : len, forward ? len : -len, &search_regs);
 
-  if (ret >= 0)
-    ret = forward ? search_regs.end[0] : ret;
+  struct re_pair ret = {-1, -1};
+
+  if (re_ret >= 0)
+    ret = (struct re_pair){search_regs.start[0], search_regs.end[0]};
 
   return ret;
 }
@@ -99,13 +105,14 @@ search (const char *s, int forward, int regexp)
   size_t o = get_buffer_pt (cur_bp);
   bool notbol = forward ? o > 0 : false;
   bool noteol = forward ? false : o < get_buffer_size (cur_bp);
-  int pos = find_substr (forward ? get_buffer_post_point (cur_bp) : get_buffer_pre_point (cur_bp),
-                         s, ssize, forward, notbol, noteol, regexp,
-                         get_variable_bool ("case-fold-search") && no_upper (s, ssize, regexp));
-  if (pos < 0)
+  struct re_pair ret = find_substr (forward ? get_buffer_post_point (cur_bp) : get_buffer_pre_point (cur_bp),
+                                    s, ssize, forward, notbol, noteol, regexp,
+                                    get_variable_bool ("case-fold-search") && no_upper (s, ssize, regexp));
+  if (ret.beg < 0 | ret.end < 0)
     return false;
 
-  goto_offset (pos + (forward ? get_buffer_pt (cur_bp) : 0));
+  goto_offset (forward ? ret.end + get_buffer_pt (cur_bp) : ret.beg);
+
   thisflag |= FLAG_NEED_RESYNC;
   return true;
 }

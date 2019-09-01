@@ -22,6 +22,8 @@
 #ifndef ZILE_H
 #define ZILE_H
 
+#include <config.h>
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include <limits.h>
@@ -83,22 +85,33 @@ typedef enum
 
 // The previous will go away
 
-#define IGETTER(Obj, name, ty, field)            \
-  inline _GL_ATTRIBUTE_PURE ty			\
+#define IGETTER(Obj, name, ty, field)		\
+  _GL_ATTRIBUTE_PURE ty get_ ## name ## _ ## field (const Obj p);
+
+#define ISETTER(Obj, name, ty, field)		\
+  void set_ ## name ## _ ## field (Obj p, ty field);
+
+#define ISTR_SETTER(Obj, name, field)				\
+  void set_ ## name ## _ ## field (Obj p, const char *field);
+
+
+
+#define DGETTER(Obj, name, ty, field)            \
+  _GL_ATTRIBUTE_PURE ty				 \
   get_ ## name ## _ ## field (const Obj p)      \
   {                                             \
     return p->field;                            \
   }                                             \
 
-#define ISETTER(Obj, name, ty, field)            \
-  inline void					\
+#define DSETTER(Obj, name, ty, field)            \
+  void						 \
   set_ ## name ## _ ## field (Obj p, ty field)  \
   {                                             \
     p->field = field;                           \
   }
 
-#define ISTR_SETTER(Obj, name, field)                            \
-  inline void							\
+#define DSTR_SETTER(Obj, name, field)			\
+  void							\
   set_ ## name ## _ ## field (Obj p, const char *field)         \
   {                                                             \
     p->field = field ? xstrdup (field) : NULL;                  \

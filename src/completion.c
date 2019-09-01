@@ -41,6 +41,21 @@
 #include "buffer.h"
 #include "line.h"
 
+
+#define FIELD(ty, field)                        \
+  DGETTER (Completion, completion, ty, field)    \
+  DSETTER (Completion, completion, ty, field)
+
+#define FIELD_STR(field)                                  \
+  DGETTER (Completion, completion, char *, field)          \
+  DSTR_SETTER (Completion, completion, field)
+
+COMPLETION_FIELDS
+#undef FIELD
+#undef FIELD_STR
+
+
+
 // ================ Static ================================
 
 static bool

@@ -25,8 +25,9 @@ use Zile;
 
 my $dir = shift;
 
-my $output = "src/tbl_funcs.h";
-open OUT, ">$output.new" or die;
+my $output = "tbl_funcs.h";
+
+open (OUT, '>', "$output.new") or die "Could not open file. $tmpout $!";
 
 print OUT <<END;
 /*
@@ -38,6 +39,7 @@ print OUT <<END;
 END
 
 foreach my $file (@ARGV) {
+    print "parsing $dir/$file\n";
   open IN, "<$dir/$file" or die;
   while (<IN>) {
     if (/^DEFUN/) {
