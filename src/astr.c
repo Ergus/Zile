@@ -261,8 +261,6 @@ astr_recase (astr as, casing newcase)
   return astr_cpy (as, bs);
 }
 
-
-
 #ifdef TEST
 
 #include <stdio.h>

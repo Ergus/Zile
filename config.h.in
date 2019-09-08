@@ -2,6 +2,8 @@
 
 #include "${CMAKE_CURRENT_BINARY_DIR}/gnulib/config.h"
 
+#define _XOPEN_SOURCE_EXTENDED
+
 #undef PACKAGE_NAME
 #define PACKAGE_NAME "@CMAKE_PROJECT_NAME@"
 #define PATH_DOCDIR "@CMAKE_INSTALL_DOCDIR@"

@@ -36,9 +36,9 @@
 #include "completion.h"
 #include "minibuf.h"
 
-/*
- * Variable type.
- */
+#include "utils.h"
+
+// Variable type.
 struct var_entry
 {
   char *var;			/* Variable name. */
@@ -72,6 +72,7 @@ init_builtin_var (const char *var, const char *defval, bool local, const char *d
   p->val = xstrdup (defval);
   p->local = local;
   p->doc = doc;
+  dbprintf ("Defining %s %s\n", var, defval);
   assert (hash_insert (main_vars, p));
 }
 
