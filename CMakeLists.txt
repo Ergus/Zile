@@ -33,16 +33,18 @@ if (NOT PERL)
   message (FATAL_ERROR "Cannot find perl executable in the path.")
 endif ()
 
-find_program (EMACS emacs)
-if (EMACS)
-  execute_process(
-    COMMAND ${EMACS} --version 2>&1
-    OUTPUT_VARIABLE EMACS_VERSION)
+option (enable-emacs-tests "Enable run tests in emacs.")
+if (enable-emacs-tests)
+  if (EMACS)
+    execute_process(
+      COMMAND ${EMACS} --version 2>&1
+      OUTPUT_VARIABLE EMACS_VERSION)
+  endif ()
+  string (REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+)" EMACS_VERSION ${EMACS_VERSION})
+  message ("-- Emacs version: ${EMACS_VERSION}")
 endif ()
 
-string (REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+)" EMACS_VERSION ${EMACS_VERSION})
 
-message ("-- Emacs version: ${EMACS_VERSION}")
 
 include_directories(lib)
 

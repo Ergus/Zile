@@ -43,7 +43,7 @@
 #include "estr.h"
 #include "lists.h"
 
-#define ZILE_VERSION_STRING	"GNU " PACKAGE_NAME " " VERSION
+#define ZILE_VERSION_STRING	"GNU " ZILE_PACKAGE_NAME " " ZILE_VERSION
 
 /*--------------------------------------------------------------------------
  * Main editor structures.

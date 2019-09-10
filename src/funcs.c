@@ -1012,7 +1012,7 @@ pipe_command (const_astr cmd, astr input, bool do_insert, bool do_replace)
 {
   const char *prog_argv[] = { "/bin/sh", "-c", astr_cstr (cmd), NULL };
   pipe_data inout = { .in = input, .out = astr_new (), .done = 0 };
-  if (pipe_filter_ii_execute (PACKAGE_NAME, "/bin/sh", prog_argv, true, false,
+  if (pipe_filter_ii_execute (ZILE_PACKAGE_NAME, "/bin/sh", prog_argv, true, false,
                               prepare_write, done_write, prepare_read, done_read,
                               &inout) != 0)
     return leNIL;

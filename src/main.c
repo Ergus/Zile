@@ -61,9 +61,9 @@ int thisflag = 0, lastflag = 0;
 int last_uniarg = 1;
 
 static const char splash_str[] = "\
-Welcome to GNU " PACKAGE_NAME ".\n\
+Welcome to GNU " ZILE_PACKAGE_NAME ".\n\
 \n\
-Undo changes       C-x u        Exit " PACKAGE_NAME "         C-x C-c\n\
+Undo changes       C-x u        Exit " ZILE_PACKAGE_NAME "         C-x C-c\n\
 (`C-' means use the CTRL key.  `M-' means hold the Meta (or Alt) key.\n\
 If you have no Meta key, you may type ESC followed by the character.)\n\
 Combinations like `C-x u' mean first press `C-x', then `u'.\n\
@@ -73,9 +73,9 @@ Keys not working properly?  See file://" PATH_DOCDIR "/FAQ\n\
 " ZILE_VERSION_STRING "\n\
 " ZILE_COPYRIGHT_STRING "\n\
 \n\
-GNU " PACKAGE_NAME " comes with ABSOLUTELY NO WARRANTY.\n\
-" PACKAGE_NAME " is Free Software--Free as in Freedom--so you can redistribute copies\n\
-of " PACKAGE_NAME " and modify it; see the file COPYING.  Otherwise, a copy can be\n\
+GNU " ZILE_PACKAGE_NAME " comes with ABSOLUTELY NO WARRANTY.\n\
+" ZILE_PACKAGE_NAME " is Free Software--Free as in Freedom--so you can redistribute copies\n\
+of " ZILE_PACKAGE_NAME " and modify it; see the file COPYING.  Otherwise, a copy can be\n\
 downloaded from http://www.gnu.org/licenses/gpl.html.\n\
 ";
 
@@ -83,7 +83,7 @@ static _Noreturn void
 segv_sig_handler (int signo _GL_UNUSED_PARAMETER)
 {
   fprintf (stderr,
-           "%s: " PACKAGE_NAME
+           "%s: " ZILE_PACKAGE_NAME
            " crashed.  Please send a bug report to <"
            PACKAGE_BUGREPORT ">.\r\n",
            program_name);
@@ -198,7 +198,7 @@ main (int argc, char **argv)
         case 3:
           printf ("Usage: %s [OPTION-OR-FILENAME]...\n"
 	          "\n"
-	          "Run " PACKAGE_NAME ", the lightweight Emacs clone.\n"
+	          "Run " ZILE_PACKAGE_NAME ", the lightweight Emacs clone.\n"
 	          "\n",
 	          argv[0]);
 #define D(text)                                 \
@@ -219,8 +219,8 @@ main (int argc, char **argv)
         case 4:
           printf (ZILE_VERSION_STRING "\n"
 	          ZILE_COPYRIGHT_STRING "\n"
-	          "GNU " PACKAGE_NAME " comes with ABSOLUTELY NO WARRANTY.\n"
-	          "You may redistribute copies of " PACKAGE_NAME "\n"
+	          "GNU " ZILE_PACKAGE_NAME " comes with ABSOLUTELY NO WARRANTY.\n"
+	          "You may redistribute copies of " ZILE_PACKAGE_NAME "\n"
 	          "under the terms of the GNU General Public License.\n"
 	          "For more information about these matters, see the file named COPYING.\n");
           exit (EXIT_SUCCESS);
@@ -275,7 +275,7 @@ main (int argc, char **argv)
   if (gl_list_size (arg_arg) == 0 && minibuf_no_error () &&
       !get_variable_bool ("inhibit-splash-screen"))
     {
-      Buffer bp = create_auto_buffer ("*GNU " PACKAGE_NAME "*");
+      Buffer bp = create_auto_buffer ("*GNU " ZILE_PACKAGE_NAME "*");
       switch_to_buffer (bp);
       bprintf ("%s", splash_str);
       set_buffer_readonly (bp, true);
