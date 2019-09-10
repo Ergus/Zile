@@ -777,8 +777,7 @@ zile_exit (bool doabort)
     exit (EXIT_CRASH);
 }
 
-DEFUN_ARGS ("cd", cd,
-       STR_ARG (dir))
+DEFUN_ARGS ("cd", cd, STR_ARG (dir))
 /*+
 Make DIR become the current buffer's default directory.
 +*/

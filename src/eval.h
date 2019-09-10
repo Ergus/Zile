@@ -27,10 +27,15 @@ typedef struct fentry
 {
   const char *name;		/* The function name. */
   Function func;		/* The function pointer. */
-  bool interactive;             /* Whether function can be used interactively. */
+  bool interactive;             /* Whether function is interactively. */
   const char *doc;		/* Documentation string. */
 } fentry;
 
+
+#define X(zile_name, c_name, interactive, doc)			\
+  le *F_ ## c_name (long uniarg, bool is_uniarg, le * l);
+#include "tbl_funcs.h"
+#undef X
 
 le *leNIL, *leT;
 

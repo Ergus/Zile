@@ -44,17 +44,16 @@ static fentry fentry_table[] = {
   {zile_name, F_ ## c_name, interactive, doc},
 #include "tbl_funcs.h"
 #undef X
+  {NULL, NULL, false, NULL}
 };
-
-#define fentry_table_size (sizeof (fentry_table) / sizeof (fentry_table[0]))
 
 static _GL_ATTRIBUTE_PURE fentry *
 get_fentry (const char *name)
 {
   assert (name);
-  for (size_t i = 0; i < fentry_table_size; ++i)
-    if (STREQ (name, fentry_table[i].name))
-      return &fentry_table[i];
+  for (fentry *it = fentry_table; it->name != NULL; ++it)
+    if (STREQ (name, it->name))
+      return it;
   return NULL;
 }
 
@@ -83,9 +82,9 @@ get_function_doc (const char *name)
 const char *
 get_function_name (Function p)
 {
-  for (size_t i = 0; i < fentry_table_size; ++i)
-    if (fentry_table[i].func == p)
-      return fentry_table[i].name;
+  for (fentry *it = fentry_table; it->name != NULL; ++it)
+    if (it->func == p)
+      return it->name;
   return NULL;
 }
 
@@ -245,10 +244,10 @@ minibuf_read_function_name (const char *fmt, ...)
   va_list ap;
   Completion cp = completion_new (false);
 
-  for (size_t i = 0; i < fentry_table_size; ++i)
-    if (fentry_table[i].interactive)
+  for (fentry *it = fentry_table; it->name != NULL; ++it)
+    if (it->interactive)
       gl_sortedlist_add (get_completion_completions (cp), completion_strcmp,
-                         xstrdup (fentry_table[i].name));
+                         xstrdup (it->name));
 
   va_start (ap, fmt);
   const_astr ms = minibuf_vread_completion (fmt, "", cp, functions_history,

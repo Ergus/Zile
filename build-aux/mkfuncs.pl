@@ -40,38 +40,38 @@ END
 
 foreach my $file (@ARGV) {
     print "parsing $dir/$file\n";
-  open IN, "<$dir/$file" or die;
-  while (<IN>) {
-    if (/^DEFUN/) {
-      /"(.+?)"/;
-      my $name = $1;
-      die "invalid DEFUN syntax `$_'\n" unless $name;
+    open IN, "<$dir/$file" or die;
+    while (<IN>) {
+	if (/^DEFUN/) {
+	    /"(.+?)"/;
+	    my $name = $1;
+	    die "invalid DEFUN syntax `$_'\n" unless $name;
 
-      my $interactive = !/^DEFUN_NONINTERACTIVE/;
-      my $doc = "";
-      my $state = 0;
-      while (<IN>) {
-        if ($state == 1) {
-          if (m|^\+\*/|) {
-            $state = 0;
-            last;
-          }
-          $doc .= $_;
-        } elsif (m|^/\*\+|) {
-          $state = 1;
-        }
-      }
+	    my $interactive = (/^DEFUN_NONINTERACTIVE/ ? "false" : "true");
+	    my $doc = "";
+	    my $state = 0;
+	    while (<IN>) {
+		if ($state == 1) {
+		    if (m|^\+\*/|) {
+			$state = 0;
+			last;
+		    }
+		    $doc .= $_;
+		} elsif (m|^/\*\+|) {
+		    $state = 1;
+		}
+	    }
 
-      die "no docstring for $name\n" if $doc eq "";
-      die "unterminated docstring for $name\n" if $state == 1;
+	    die "no docstring for $name\n" if $doc eq "";
+	    die "unterminated docstring for $name\n" if $state == 1;
 
-      my $cname = $name;
-      $cname =~ s/-/_/g;
-      $doc = texi($doc);
-      $doc =~ s/\n/\\n\\\n/g;
-      print OUT "X(\"$name\", $cname, " . ($interactive ? "true" : "false") . ", \"\\\n$doc\")\n";
+	    my $cname = $name;
+	    $cname =~ s/-/_/g;
+	    $doc = texi($doc);
+	    $doc =~ s/\n/\\n\\\n/g;
+	    print OUT "X(\"$name\", $cname, " . $interactive . ", \"\\\n$doc\")\n";
+	}
     }
-  }
 }
 
 # Only replace the output file if it changed, to avoid pointless rebuilds
