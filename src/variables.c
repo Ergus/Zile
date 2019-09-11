@@ -104,9 +104,9 @@ set_variable (const char *var, const char *val)
      create a buffer-local variable list. */
   key->var = xstrdup (var);
   ent = hash_lookup (main_vars, key);
-  if (ent && ent->local && get_buffer_vars (cur_bp) == NULL)
-    set_buffer_vars (cur_bp, new_varlist ());
-  var_list = (ent && ent->local) ? get_buffer_vars (cur_bp) : main_vars;
+  if (ent && ent->local && get_buffer_vars (global.cur_bp) == NULL)
+    set_buffer_vars (global.cur_bp, new_varlist ());
+  var_list = (ent && ent->local) ? get_buffer_vars (global.cur_bp) : main_vars;
 
   /* Insert variable if it doesn't already exist. */
   p->var = xstrdup (var);
@@ -161,7 +161,7 @@ get_variable_bp (Buffer bp, const char *var)
 const char *
 get_variable (const char *var)
 {
-  return get_variable_bp (cur_bp, var);
+  return get_variable_bp (global.cur_bp, var);
 }
 
 bool

@@ -61,10 +61,14 @@ typedef struct Completion *Completion;
 
 
 /* Opaque types. */
-extern char *prog_name;
-extern Window cur_wp, head_wp;
-extern Buffer cur_bp, head_bp;
-extern int thisflag, lastflag, last_uniarg;
+typedef struct global_t {
+  const char *prog_name;
+  Window cur_wp, head_wp;
+  Buffer cur_bp, head_bp;
+  int thisflag, lastflag, last_uniarg;
+} global_t;
+
+extern global_t global;
 
 typedef enum
 {
@@ -178,7 +182,7 @@ typedef enum
   INT_INIT (name)                                            \
   else                                                       \
     {                                                        \
-      if (!(lastflag & FLAG_SET_UNIARG) && !is_uniarg &&     \
+      if (!(global.lastflag & FLAG_SET_UNIARG) && !is_uniarg &&     \
           (arglist == NULL || arglist->next == NULL))        \
         noarg = true;                                        \
       name = uniarg;                                         \

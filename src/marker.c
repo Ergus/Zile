@@ -106,7 +106,7 @@ Marker
 point_marker (void)
 {
   Marker marker = marker_new ();
-  move_marker (marker, cur_bp, get_buffer_pt (cur_bp));
+  move_marker (marker, global.cur_bp, get_buffer_pt (global.cur_bp));
   return marker;
 }
 
@@ -126,12 +126,12 @@ push_mark (void)
                                       NULL, NULL, NULL, true);
 
   /* Save the mark.  */
-  if (get_buffer_mark (cur_bp))
-    gl_list_add_last (mark_ring, copy_marker (get_buffer_mark (cur_bp)));
+  if (get_buffer_mark (global.cur_bp))
+    gl_list_add_last (mark_ring, copy_marker (get_buffer_mark (global.cur_bp)));
   else
     { /* Save an invalid mark.  */
       Marker m = marker_new ();
-      move_marker (m, cur_bp, 0);
+      move_marker (m, global.cur_bp, 0);
       gl_list_add_last (mark_ring, m);
     }
 
@@ -159,8 +159,8 @@ pop_mark (void)
 void
 set_mark (void)
 {
-  if (!get_buffer_mark (cur_bp))
-    set_buffer_mark (cur_bp, point_marker ());
+  if (!get_buffer_mark (global.cur_bp))
+    set_buffer_mark (global.cur_bp, point_marker ());
   else
-    move_marker (get_buffer_mark (cur_bp), cur_bp, get_buffer_pt (cur_bp));
+    move_marker (get_buffer_mark (global.cur_bp), global.cur_bp, get_buffer_pt (global.cur_bp));
 }

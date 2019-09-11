@@ -56,11 +56,11 @@ kill_ring_push (estr es)
 static bool
 copy_or_kill_region (bool kill, Region r)
 {
-  kill_ring_push (get_buffer_region (cur_bp, r));
+  kill_ring_push (get_buffer_region (global.cur_bp, r));
 
   if (kill)
     {
-      if (get_buffer_readonly (cur_bp))
+      if (get_buffer_readonly (global.cur_bp))
         minibuf_error ("Read only text copied to kill ring");
       else
         assert (delete_region (r));
@@ -77,14 +77,14 @@ kill_line (bool whole_line)
 {
   bool ok = true;
   bool only_blanks_to_end_of_line = false;
-  size_t cur_line_len = buffer_line_len (cur_bp, get_buffer_pt (cur_bp));
+  size_t cur_line_len = buffer_line_len (global.cur_bp, get_buffer_pt (global.cur_bp));
 
   if (!whole_line)
     {
       size_t i;
-      for (i = get_buffer_pt (cur_bp) - get_buffer_line_o (cur_bp); i < cur_line_len; i++)
+      for (i = get_buffer_pt (global.cur_bp) - get_buffer_line_o (global.cur_bp); i < cur_line_len; i++)
         {
-          char c = get_buffer_char (cur_bp, get_buffer_line_o (cur_bp) + i);
+          char c = get_buffer_char (global.cur_bp, get_buffer_line_o (global.cur_bp) + i);
           if (!(c == ' ' || c == '\t'))
             break;
         }
@@ -99,7 +99,7 @@ kill_line (bool whole_line)
     }
 
   if (!eolp ())
-    ok = copy_or_kill_region (true, region_new (get_buffer_pt (cur_bp), get_buffer_line_o (cur_bp) + cur_line_len));
+    ok = copy_or_kill_region (true, region_new (get_buffer_pt (global.cur_bp), get_buffer_line_o (global.cur_bp) + cur_line_len));
 
   if (ok && (whole_line || only_blanks_to_end_of_line) && !eobp ())
     {
@@ -148,7 +148,7 @@ with no argument.
     {
       if (arg <= 0)
         ok = bool_to_lisp (bolp () ||
-                           copy_or_kill_region (true, region_new (get_buffer_line_o (cur_bp), get_buffer_pt (cur_bp))));
+                           copy_or_kill_region (true, region_new (get_buffer_line_o (global.cur_bp), get_buffer_pt (global.cur_bp))));
       if (arg != 0 && ok == leT)
         ok = execute_with_uniarg (arg, kill_whole_line, kill_line_backward);
     }

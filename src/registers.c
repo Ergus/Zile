@@ -65,7 +65,7 @@ Copy region into register @i{register}.
       if (warn_if_no_mark ())
         ok = leNIL;
       else
-        regs[reg] = get_buffer_region (cur_bp, calculate_the_region ());
+        regs[reg] = get_buffer_region (global.cur_bp, calculate_the_region ());
     }
 }
 END_DEFUN
@@ -129,7 +129,7 @@ write_registers_list (va_list ap _GL_UNUSED_PARAMETER)
         const char *s = astr_cstr (estr_get_as (regs[i]));
         while (*s == ' ' || *s == '\t' || *s == '\n')
           s++;
-        int len = MIN (20, MAX (0, ((int) get_window_ewidth (cur_wp)) - 6)) + 1;
+        int len = MIN (20, MAX (0, ((int) get_window_ewidth (global.cur_wp)) - 6)) + 1;
 
 	char buff[STR_SIZE];
 	snprintf(buff, STR_SIZE, "%s", (isprint (i) ? "%c" : "\\%o", (int) i));

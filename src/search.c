@@ -88,7 +88,7 @@ find_substr (const_astr as, const char *n, size_t nsize,
       return re_ret;
     }
 
-  const int delay = forward ? get_buffer_pt (cur_bp) : 0;
+  const int delay = forward ? get_buffer_pt (global.cur_bp) : 0;
 
   out->start = delay + search_regs.start[0];
   out->end = delay + search_regs.end[0];
@@ -104,11 +104,11 @@ search (const char *s, int forward, int regexp)
     return false;
 
   /* Attempt match. */
-  size_t o = get_buffer_pt (cur_bp);
-  Region overlay = get_buffer_overlay (cur_bp);
+  size_t o = get_buffer_pt (global.cur_bp);
+  Region overlay = get_buffer_overlay (global.cur_bp);
   bool notbol = forward ? o > 0 : false;
-  bool noteol = forward ? false : o < get_buffer_size (cur_bp);
-  const int ret = find_substr (forward ? get_buffer_post_point (cur_bp) : get_buffer_pre_point (cur_bp),
+  bool noteol = forward ? false : o < get_buffer_size (global.cur_bp);
+  const int ret = find_substr (forward ? get_buffer_post_point (global.cur_bp) : get_buffer_pre_point (global.cur_bp),
                                s, ssize, forward, notbol, noteol, regexp,
                                get_variable_bool ("case-fold-search") && no_upper (s, ssize, regexp),
                                overlay);
@@ -117,7 +117,7 @@ search (const char *s, int forward, int regexp)
 
   goto_offset (forward ? overlay->end : overlay->start);
 
-  thisflag |= FLAG_NEED_RESYNC;
+  global.thisflag |= FLAG_NEED_RESYNC;
   return true;
 }
 
@@ -197,13 +197,14 @@ END_DEFUN
 static le *
 isearch (int forward, int regexp)
 {
-  Marker old_mark = copy_marker (get_buffer_mark (get_window_bp (cur_wp)));
+  Marker old_mark =
+    copy_marker (get_buffer_mark (get_window_bp (global.cur_wp)));
 
-  set_buffer_isearch (get_window_bp (cur_wp), true);
+  set_buffer_isearch (get_window_bp (global.cur_wp), true);
 
   int last = true;
   astr pattern = astr_new ();
-  size_t start = get_buffer_pt (cur_bp), cur = start;
+  size_t start = get_buffer_pt (global.cur_bp), cur = start;
   for (;;)
     {
       /* Make the minibuf message. */
@@ -234,16 +235,16 @@ isearch (int forward, int regexp)
       if (c == KBD_CANCEL)
         {
           goto_offset (start);
-          thisflag |= FLAG_NEED_RESYNC;
+          global.thisflag |= FLAG_NEED_RESYNC;
 
           /* Quit. */
           FUNCALL (keyboard_quit);
 
           /* Restore old mark position. */
-          if (get_buffer_mark (cur_bp))
-            unchain_marker (get_buffer_mark (cur_bp));
+          if (get_buffer_mark (global.cur_bp))
+            unchain_marker (get_buffer_mark (global.cur_bp));
 
-          set_buffer_mark (cur_bp, copy_marker (old_mark));
+          set_buffer_mark (global.cur_bp, copy_marker (old_mark));
           break;
         }
       else if (c == KBD_BS)
@@ -253,7 +254,7 @@ isearch (int forward, int regexp)
               astr_truncate (pattern, astr_len (pattern) - 1);
               cur = start;
               goto_offset (start);
-              thisflag |= FLAG_NEED_RESYNC;
+              global.thisflag |= FLAG_NEED_RESYNC;
             }
           else
             ding ();
@@ -273,7 +274,7 @@ isearch (int forward, int regexp)
           if (astr_len (pattern) > 0)
             {
               /* Find next match. */
-              cur = get_buffer_pt (cur_bp);
+              cur = get_buffer_pt (global.cur_bp);
               /* Save search string. */
               last_search = astr_cpy (astr_new (), pattern);
             }
@@ -290,7 +291,7 @@ isearch (int forward, int regexp)
                 {
                   /* Save mark. */
                   set_mark ();
-                  set_marker_o (get_buffer_mark (cur_bp), start);
+                  set_marker_o (get_buffer_mark (global.cur_bp), start);
 
                   /* Save search string. */
                   last_search = astr_cpy (astr_new (), pattern);
@@ -314,17 +315,17 @@ isearch (int forward, int regexp)
       else
         last = true;
 
-      if (thisflag & FLAG_NEED_RESYNC)
+      if (global.thisflag & FLAG_NEED_RESYNC)
         {
-          window_resync (cur_wp);
+          window_resync (global.cur_wp);
           term_redisplay ();
         }
     }
 
-  reset_buffer_overlay (cur_bp);
+  reset_buffer_overlay (global.cur_bp);
 
   /* done */
-  set_buffer_isearch (get_window_bp (cur_wp), false);
+  set_buffer_isearch (get_window_bp (global.cur_wp), false);
 
   if (old_mark)
     unchain_marker (old_mark);
@@ -342,7 +343,7 @@ Type @kbd{C-s} to search again forward, @kbd{C-r} to search again backward.
 @kbd{C-g} when search is successful aborts and moves point to starting point.
 +*/
 {
-  ok = isearch (true, lastflag & FLAG_SET_UNIARG);
+  ok = isearch (true, global.lastflag & FLAG_SET_UNIARG);
 }
 END_DEFUN
 
@@ -356,7 +357,7 @@ Type @kbd{C-r} to search again backward, @kbd{C-s} to search again forward.
 @kbd{C-g} when search is successful aborts and moves point to starting point.
 +*/
 {
-  ok = isearch (false, lastflag & FLAG_SET_UNIARG);
+  ok = isearch (false, global.lastflag & FLAG_SET_UNIARG);
 }
 END_DEFUN
 
@@ -368,7 +369,7 @@ Like ordinary incremental search except that your input
 is treated as a regexp.  See @kbd{M-x isearch-forward} for more info.
 +*/
 {
-  ok = isearch (true, !(lastflag & FLAG_SET_UNIARG));
+  ok = isearch (true, !(global.lastflag & FLAG_SET_UNIARG));
 }
 END_DEFUN
 
@@ -380,7 +381,7 @@ Like ordinary incremental search except that your input
 is treated as a regexp.  See @kbd{M-x isearch-backward} for more info.
 +*/
 {
-  ok = isearch (false, !(lastflag & FLAG_SET_UNIARG));
+  ok = isearch (false, !(global.lastflag & FLAG_SET_UNIARG));
 }
 END_DEFUN
 
@@ -429,8 +430,8 @@ what to do with it.
 
       if (!noask)
         {
-          if (thisflag & FLAG_NEED_RESYNC)
-            window_resync (cur_wp);
+          if (global.thisflag & FLAG_NEED_RESYNC)
+            window_resync (global.cur_wp);
 
           minibuf_write ("Query replacing `%s' with `%s' (y, n, !, ., q)? ", astr_cstr (find),
                          astr_cstr (repl));
@@ -452,10 +453,10 @@ what to do with it.
         { /* Perform replacement. */
           ++count;
           const_astr case_repl = repl;
-          Region r = region_new (get_buffer_pt (cur_bp) - astr_len (find), get_buffer_pt (cur_bp));
+          Region r = region_new (get_buffer_pt (global.cur_bp) - astr_len (find), get_buffer_pt (global.cur_bp));
           if (find_no_upper && get_variable_bool ("case-replace"))
             {
-              int case_type = check_case (estr_get_as (get_buffer_region (cur_bp, r)));
+              int case_type = check_case (estr_get_as (get_buffer_region (global.cur_bp, r)));
               if (case_type != 0)
                 case_repl = astr_recase (astr_cpy (astr_new (), repl),
                                          case_type == 1 ? case_capitalized : case_upper);
@@ -478,8 +479,8 @@ what to do with it.
         }
     }
 
-  if (thisflag & FLAG_NEED_RESYNC)
-    window_resync (cur_wp);
+  if (global.thisflag & FLAG_NEED_RESYNC)
+    window_resync (global.cur_wp);
 
   if (ok)
     minibuf_write ("Replaced %zu occurrences", count);

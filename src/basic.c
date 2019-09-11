@@ -38,8 +38,8 @@ DEFUN ("beginning-of-line", beginning_of_line)
 Move point to beginning of current line.
 +*/
 {
-  goto_offset (get_buffer_line_o (cur_bp));
-  set_buffer_goalc (cur_bp, 0);
+  goto_offset (get_buffer_line_o (global.cur_bp));
+  set_buffer_goalc (global.cur_bp, 0);
 }
 END_DEFUN
 
@@ -48,8 +48,8 @@ DEFUN ("end-of-line", end_of_line)
 Move point to end of current line.
 +*/
 {
-  goto_offset (get_buffer_line_o (cur_bp) + buffer_line_len (cur_bp, get_buffer_pt (cur_bp)));
-  set_buffer_goalc (cur_bp, SIZE_MAX);
+  goto_offset (get_buffer_line_o (global.cur_bp) + buffer_line_len (global.cur_bp, get_buffer_pt (global.cur_bp)));
+  set_buffer_goalc (global.cur_bp, SIZE_MAX);
 }
 END_DEFUN
 
@@ -72,7 +72,7 @@ get_goalc_bp (Buffer bp, size_t o)
 size_t
 get_goalc (void)
 {
-  return get_goalc_bp (cur_bp, get_buffer_pt (cur_bp));
+  return get_goalc_bp (global.cur_bp, get_buffer_pt (global.cur_bp));
 }
 
 bool
@@ -125,7 +125,7 @@ Beginning of buffer is position 1.
   if (ok == leNIL || n >= LONG_MAX - 1)
     return leNIL;
 
-  goto_offset (MIN (get_buffer_size (cur_bp), (size_t)MAX (n, 1) - 1));
+  goto_offset (MIN (get_buffer_size (global.cur_bp), (size_t)MAX (n, 1) - 1));
 }
 END_DEFUN
 
@@ -142,7 +142,7 @@ Goto @i{line}, counting from line 1 at beginning of buffer.
   if (ok == leNIL || n >= LONG_MAX - 1)
     return leNIL;
 
-  move_line ((MAX (n, 1) - 1) - offset_to_line (cur_bp, get_buffer_pt (cur_bp)));
+  move_line ((MAX (n, 1) - 1) - offset_to_line (global.cur_bp, get_buffer_pt (global.cur_bp)));
   FUNCALL (beginning_of_line);
 }
 END_DEFUN
@@ -161,7 +161,7 @@ DEFUN ("end-of-buffer", end_of_buffer)
 Move point to the end of the buffer; leave mark at previous position.
 +*/
 {
-  goto_offset (get_buffer_size (cur_bp));
+  goto_offset (get_buffer_size (global.cur_bp));
 }
 END_DEFUN
 
@@ -192,8 +192,8 @@ END_DEFUN
 static bool
 scroll_down (void)
 {
-  if (!window_top_visible (cur_wp))
-    return move_line (-get_window_eheight (cur_wp));
+  if (!window_top_visible (global.cur_wp))
+    return move_line (-get_window_eheight (global.cur_wp));
 
   minibuf_error ("Beginning of buffer");
   return false;
@@ -202,8 +202,8 @@ scroll_down (void)
 static bool
 scroll_up (void)
 {
-  if (!window_bottom_visible (cur_wp))
-    return move_line (get_window_eheight (cur_wp));
+  if (!window_bottom_visible (global.cur_wp))
+    return move_line (get_window_eheight (global.cur_wp));
 
   minibuf_error ("End of buffer");
   return false;

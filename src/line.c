@@ -41,7 +41,7 @@
 static void
 insert_expanded_tab (void)
 {
-  size_t t = tab_width (cur_bp);
+  size_t t = tab_width (global.cur_bp);
   bprintf ("%*s", (int) (t - get_goalc () % t), "");
 }
 
@@ -90,7 +90,7 @@ int
 fill_break_line (void)
 {
   long n;
-  if (!lisp_to_number (get_variable_bp (cur_bp, "fill-column"), &n) || n < 0)
+  if (!lisp_to_number (get_variable_bp (global.cur_bp, "fill-column"), &n) || n < 0)
     {
       minibuf_error ("Wrong type argument: number-or-markerp, nil");
       return -1;
@@ -108,14 +108,14 @@ fill_break_line (void)
       Marker m = point_marker ();
 
       /* Move cursor back to fill column */
-      size_t old_col = get_buffer_pt (cur_bp) - get_buffer_line_o (cur_bp);
+      size_t old_col = get_buffer_pt (global.cur_bp) - get_buffer_line_o (global.cur_bp);
       while (get_goalc () > fillcol + 1)
         move_char (-1);
 
       /* Find break point moving left from fill-column. */
-      for (size_t i = get_buffer_pt (cur_bp) - get_buffer_line_o (cur_bp); i > 0; i--)
+      for (size_t i = get_buffer_pt (global.cur_bp) - get_buffer_line_o (global.cur_bp); i > 0; i--)
         {
-          if (isspace (get_buffer_char (cur_bp, get_buffer_line_o (cur_bp) + i - 1)))
+          if (isspace (get_buffer_char (global.cur_bp, get_buffer_line_o (global.cur_bp) + i - 1)))
             {
               break_col = i;
               break;
@@ -125,25 +125,25 @@ fill_break_line (void)
       /* If no break point moving left from fill-column, find first
          possible moving right. */
       if (break_col == 0)
-        for (size_t i = get_buffer_pt (cur_bp) + 1;
-             i < buffer_end_of_line (cur_bp, get_buffer_line_o (cur_bp));
+        for (size_t i = get_buffer_pt (global.cur_bp) + 1;
+             i < buffer_end_of_line (global.cur_bp, get_buffer_line_o (global.cur_bp));
              i++)
-          if (isspace (get_buffer_char (cur_bp, i - 1)))
+          if (isspace (get_buffer_char (global.cur_bp, i - 1)))
             {
-              break_col = i - get_buffer_line_o (cur_bp);
+              break_col = i - get_buffer_line_o (global.cur_bp);
               break;
             }
 
       if (break_col >= 1) /* Break line. */
         {
-          goto_offset (get_buffer_line_o (cur_bp) + break_col);
+          goto_offset (get_buffer_line_o (global.cur_bp) + break_col);
           FUNCALL (delete_horizontal_space);
           insert_newline ();
           goto_offset (get_marker_o (m));
           break_made = true;
         }
       else /* Undo fiddling with point. */
-        goto_offset (get_buffer_line_o (cur_bp) + old_col);
+        goto_offset (get_buffer_line_o (global.cur_bp) + old_col);
 
       unchain_marker (m);
     }
@@ -155,7 +155,7 @@ static bool
 newline (void)
 {
   bool ret = true;
-  if (get_buffer_autofill (cur_bp))
+  if (get_buffer_autofill (global.cur_bp))
     ret = fill_break_line () != -1;
   return ret ? insert_newline () : false;
 }
@@ -298,7 +298,7 @@ does nothing.
 +*/
 {
   size_t target_goalc = 0, cur_goalc = get_goalc ();
-  size_t t = tab_width (cur_bp);
+  size_t t = tab_width (global.cur_bp);
 
   ok = leNIL;
 
@@ -308,7 +308,7 @@ does nothing.
   deactivate_mark ();
 
   /* If we're on the first line, set target to 0. */
-  if (get_buffer_line_o (cur_bp) == 0)
+  if (get_buffer_line_o (global.cur_bp) == 0)
     target_goalc = 0;
   else
     { /* Find goalc in previous non-blank line. */

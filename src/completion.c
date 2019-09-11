@@ -84,7 +84,7 @@ write_completion (va_list ap)
 {
   gl_list_t l = va_arg (ap, gl_list_t);
   size_t max = calculate_max_length (l) + 5;
-  size_t numcols = (get_window_ewidth (cur_wp) - 1) / max;
+  size_t numcols = (get_window_ewidth (global.cur_wp) - 1) / max;
 
   bprintf ("Possible completions are:\n");
   for (size_t i = 0, col = 0; i < gl_list_size (l); i++)
@@ -104,13 +104,13 @@ static void
 popup_completion (Completion cp, int allflag)
 {
   cp->flags |= CFLAG_POPPEDUP;
-  if (get_window_next (head_wp) == NULL)
+  if (get_window_next (global.head_wp) == NULL)
     cp->flags |= CFLAG_CLOSE;
 
   write_temp_buffer ("*Completions*", true, write_completion, allflag ? cp->completions : cp->matches);
 
   if (!(cp->flags & CFLAG_CLOSE))
-    cp->old_bp = cur_bp;
+    cp->old_bp = global.cur_bp;
 
   term_redisplay ();
 }
@@ -207,14 +207,14 @@ completion_new (bool fileflag)
 void
 completion_scroll_up (void)
 {
-  Window old_wp = cur_wp;
+  Window old_wp = global.cur_wp;
   Window wp = find_window ("*Completions*");
   assert (wp != NULL);
   set_current_window (wp);
   if (FUNCALL (scroll_up) == leNIL)
     {
       FUNCALL (beginning_of_buffer);
-      window_resync (cur_wp);
+      window_resync (global.cur_wp);
     }
   set_current_window (old_wp);
 
@@ -227,14 +227,14 @@ completion_scroll_up (void)
 void
 completion_scroll_down (void)
 {
-  Window old_wp = cur_wp;
+  Window old_wp = global.cur_wp;
   Window wp = find_window ("*Completions*");
   assert (wp != NULL);
   set_current_window (wp);
   if (FUNCALL (scroll_down) == leNIL)
     {
       FUNCALL (end_of_buffer);
-      window_resync (cur_wp);
+      window_resync (global.cur_wp);
     }
   set_current_window (old_wp);
 

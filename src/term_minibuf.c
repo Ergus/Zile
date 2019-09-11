@@ -81,7 +81,7 @@ draw_minibuf_read (const char *prompt, const char *value,
 static void
 maybe_close_popup (Completion cp)
 {
-  Window wp, old_wp = cur_wp;
+  Window wp, old_wp = global.cur_wp;
   if (cp != NULL && (get_completion_flags (cp) & CFLAG_POPPEDUP)
       && (wp = find_window ("*Completions*")) != NULL)
     {

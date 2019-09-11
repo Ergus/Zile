@@ -35,9 +35,8 @@
 #include "variables.h"
 #include "minibuf.h"
 #include "history.h"
-/*
- * Zile Lisp functions.
- */
+
+// Zile Lisp functions.
 
 static fentry fentry_table[] = {
 #define X(zile_name, c_name, interactive, doc)   \
@@ -217,9 +216,9 @@ Read function name, then read its arguments and call it.
 {
   astr msg = astr_new ();
 
-  if (lastflag & FLAG_SET_UNIARG)
+  if (global.lastflag & FLAG_SET_UNIARG)
     {
-      if (lastflag & FLAG_UNIARG_EMPTY)
+      if (global.lastflag & FLAG_UNIARG_EMPTY)
         msg = astr_fmt ("C-u ");
       else
         msg = astr_fmt ("%ld ", uniarg);
@@ -230,7 +229,7 @@ Read function name, then read its arguments and call it.
   if (name == NULL)
     return false;
 
-  ok = bool_to_lisp (execute_function (astr_cstr (name), uniarg, lastflag & FLAG_SET_UNIARG) == leT);
+  ok = bool_to_lisp (execute_function (astr_cstr (name), uniarg, global.lastflag & FLAG_SET_UNIARG) == leT);
 }
 END_DEFUN
 
@@ -238,6 +237,7 @@ END_DEFUN
  * Read a function name from the minibuffer.
  */
 static History functions_history = NULL;
+
 const_astr
 minibuf_read_function_name (const char *fmt, ...)
 {
@@ -246,14 +246,16 @@ minibuf_read_function_name (const char *fmt, ...)
 
   for (fentry *it = fentry_table; it->name != NULL; ++it)
     if (it->interactive)
-      gl_sortedlist_add (get_completion_completions (cp), completion_strcmp,
+      gl_sortedlist_add (get_completion_completions (cp),
+                         completion_strcmp,
                          xstrdup (it->name));
 
   va_start (ap, fmt);
   const_astr ms = minibuf_vread_completion (fmt, "", cp, functions_history,
-                                       "No function name given",
-                                       minibuf_test_in_completions,
-                                       "Undefined function name `%s'", ap);
+                                            "No function name given",
+                                            minibuf_test_in_completions,
+                                            "Undefined function name `%s'",
+                                            ap);
   va_end (ap);
 
   return ms;

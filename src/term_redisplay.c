@@ -54,7 +54,7 @@ get_face_region (int highlight, Region region, size_t i)
 {
   if (highlight && region_contains (region, i))
     return FACE_REGION;
-  if (region_contains (get_buffer_overlay(cur_bp), i))
+  if (region_contains (get_buffer_overlay (global.cur_bp), i))
     return FACE_OVERLAY;
   return FACE_NORMAL;
 }
@@ -155,7 +155,7 @@ draw_line (size_t line, Window wp,
 static int
 calculate_highlight_region (Window wp, Region *rp)
 {
-  if ((wp != cur_wp
+  if ((wp != global.cur_wp
        && !get_variable_bool ("highlight-nonselected-windows"))
       || get_buffer_mark (get_window_bp (wp)) == NULL
       || !get_buffer_mark_active (get_window_bp (wp)))
@@ -207,9 +207,9 @@ draw_status_line (size_t line, Window wp)
     term_addstr ("-");
 
   const char *eol_type;
-  if (get_buffer_eol (cur_bp) == coding_eol_cr)
+  if (get_buffer_eol  (global.cur_bp) == coding_eol_cr)
     eol_type = "(Mac)";
-  else if (get_buffer_eol (cur_bp) == coding_eol_crlf)
+  else if (get_buffer_eol  (global.cur_bp) == coding_eol_crlf)
     eol_type = "(DOS)";
   else
     eol_type = ":";
@@ -230,7 +230,7 @@ draw_status_line (size_t line, Window wp)
 
   if (get_buffer_autofill (bp))
     astr_cat_cstr (as, " Fill");
-  if (thisflag & FLAG_DEFINING_MACRO)
+  if (global.thisflag & FLAG_DEFINING_MACRO)
     astr_cat_cstr (as, " Def");
   if (get_buffer_isearch (bp))
     astr_cat_cstr (as, " Isearch");
@@ -323,17 +323,17 @@ void
 term_redisplay (void)
 {
   /* Calculate the start column if the line at point has to be truncated. */
-  Buffer bp = get_window_bp (cur_wp);
+  Buffer bp = get_window_bp (global.cur_wp);
 
   const size_t tab_width_bp = tab_width (bp);
-  const size_t ew = get_window_ewidth (cur_wp) - get_window_first_column (cur_wp);
+  const size_t ew = get_window_ewidth (global.cur_wp) - get_window_first_column (global.cur_wp);
 
-  size_t o = window_o (cur_wp);
+  size_t o = window_o (global.cur_wp);
   const size_t lineo = o - get_buffer_line_o (bp);
   size_t lastcol = 0;
   col = 0;
   o -= lineo;
-  set_window_start_column (cur_wp, 0);
+  set_window_start_column (global.cur_wp, 0);
 
   for (size_t lp = lineo; lp != SIZE_MAX; --lp)
     {
@@ -356,7 +356,7 @@ term_redisplay (void)
       if (col >= ew - 1 ||        // Col crosses window border
           (lp / (ew / 3)) + 2 < lineo / (ew / 3))
         {
-          set_window_start_column (cur_wp, lp + 1);
+          set_window_start_column (global.cur_wp, lp + 1);
           col = lastcol;
           break;
         }
@@ -367,9 +367,9 @@ term_redisplay (void)
   /* Draw the windows. */
   cur_topline = 0;
   size_t topline = 0;
-  for (Window wp = head_wp; wp != NULL; wp = get_window_next (wp))
+  for (Window wp = global.head_wp; wp != NULL; wp = get_window_next (wp))
     {
-      if (wp == cur_wp)
+      if (wp == global.cur_wp)
         cur_topline = topline;
 
       draw_window (topline, wp);
@@ -383,8 +383,8 @@ term_redisplay (void)
 void
 term_redraw_cursor (void)
 {
-  term_move (cur_topline + get_window_topdelta (cur_wp),
-             get_window_first_column(cur_wp) + col);
+  term_move (cur_topline + get_window_topdelta (global.cur_wp),
+             get_window_first_column(global.cur_wp) + col);
 }
 
 /*

@@ -40,12 +40,12 @@
 static void
 undo_save (void *type, size_t o, size_t osize, size_t size)
 {
-  if (get_buffer_noundo (cur_bp))
+  if (get_buffer_noundo (global.cur_bp))
     return;
 
   Undo up = (Undo) XZALLOC (struct Undo);
   *up = (struct Undo) {
-    .next = get_buffer_last_undop (cur_bp),
+    .next = get_buffer_last_undop (global.cur_bp),
     .type = type,
   };
 
@@ -54,37 +54,37 @@ undo_save (void *type, size_t o, size_t osize, size_t size)
   if (type == undo_save_block)
     {
       up->size = size;
-      up->text = get_buffer_region (cur_bp, region_new (o, o + osize));
-      up->unchanged = !get_buffer_modified (cur_bp);
+      up->text = get_buffer_region (global.cur_bp, region_new (o, o + osize));
+      up->unchanged = !get_buffer_modified (global.cur_bp);
     }
 
-  set_buffer_last_undop (cur_bp, up);
+  set_buffer_last_undop (global.cur_bp, up);
 }
 
 void
 undo_start_sequence (void)
 {
-  if (cur_bp)
-    undo_save (undo_start_sequence, get_buffer_pt (cur_bp), 0, 0);
+  if (global.cur_bp)
+    undo_save (undo_start_sequence, get_buffer_pt (global.cur_bp), 0, 0);
 }
 
 void
 undo_end_sequence (void)
 {
-  if (cur_bp)
+  if (global.cur_bp)
     {
-      Undo up = get_buffer_last_undop (cur_bp);
+      Undo up = get_buffer_last_undop (global.cur_bp);
       if (up)
         {
           if (up->type == undo_start_sequence)
-            set_buffer_last_undop (cur_bp, up->next);
+            set_buffer_last_undop (global.cur_bp, up->next);
           else
             undo_save (undo_end_sequence, 0, 0, 0);
         }
 
       /* Update list pointer */
       if (last_command () != F_undo)
-        set_buffer_next_undop (cur_bp, get_buffer_last_undop (cur_bp));
+        set_buffer_next_undop (global.cur_bp, get_buffer_last_undop (global.cur_bp));
     }
 }
 
@@ -109,7 +109,7 @@ revert_action (Undo up)
   if (up->type == undo_save_block)
     replace_estr (up->size, up->text);
   if (up->unchanged)
-    set_buffer_modified (cur_bp, false);
+    set_buffer_modified (global.cur_bp, false);
 
   return up->next;
 }
@@ -120,7 +120,7 @@ Undo some previous changes.
 Repeat this command to undo more changes.
 +*/
 {
-  if (get_buffer_noundo (cur_bp))
+  if (get_buffer_noundo (global.cur_bp))
     {
       minibuf_error ("Undo disabled in this buffer");
       return leNIL;
@@ -129,14 +129,14 @@ Repeat this command to undo more changes.
   if (warn_if_readonly_buffer ())
     return leNIL;
 
-  if (get_buffer_next_undop (cur_bp) == NULL)
+  if (get_buffer_next_undop (global.cur_bp) == NULL)
     {
       minibuf_error ("No further undo information");
-      set_buffer_next_undop (cur_bp, get_buffer_last_undop (cur_bp));
+      set_buffer_next_undop (global.cur_bp, get_buffer_last_undop (global.cur_bp));
       return leNIL;
     }
 
-  set_buffer_next_undop (cur_bp, revert_action (get_buffer_next_undop (cur_bp)));
+  set_buffer_next_undop (global.cur_bp, revert_action (get_buffer_next_undop (global.cur_bp)));
   minibuf_write ("Undo!");
 }
 END_DEFUN

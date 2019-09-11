@@ -49,7 +49,7 @@ getkeystroke (int delay)
 {
   _last_key = term_getkey (delay);
 
-  if (_last_key != KBD_NOKEY && (thisflag & FLAG_DEFINING_MACRO))
+  if (_last_key != KBD_NOKEY && (global.thisflag & FLAG_DEFINING_MACRO))
     add_key_to_cmd (_last_key);
 
   return _last_key;
@@ -91,7 +91,7 @@ getkey_unfiltered (int mode)
   assert (key >= 0);
 
   _last_key = (size_t) key;
-  if (thisflag & FLAG_DEFINING_MACRO)
+  if (global.thisflag & FLAG_DEFINING_MACRO)
     add_key_to_cmd (key);
 
   return key;
@@ -123,6 +123,6 @@ void ungetkey (size_t key)
 {
   pushkey (key);
 
-  if (thisflag & FLAG_DEFINING_MACRO)
+  if (global.thisflag & FLAG_DEFINING_MACRO)
     remove_key_from_cmd ();
 }

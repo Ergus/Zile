@@ -82,7 +82,7 @@ void
 cancel_kbd_macro (void)
 {
   cmd_mp = cur_mp = NULL;
-  thisflag &= ~FLAG_DEFINING_MACRO;
+  global.thisflag &= ~FLAG_DEFINING_MACRO;
 }
 
 DEFUN ("start-kbd-macro", start_kbd_macro)
@@ -92,7 +92,7 @@ The commands are recorded even as they are executed.
 Use @kbd{C-x )} to finish recording and make the macro available.
 +*/
 {
-  if (thisflag & FLAG_DEFINING_MACRO)
+  if (global.thisflag & FLAG_DEFINING_MACRO)
     {
       minibuf_error ("Already defining a keyboard macro");
       return leNIL;
@@ -103,7 +103,7 @@ Use @kbd{C-x )} to finish recording and make the macro available.
 
   minibuf_write ("Defining keyboard macro...");
 
-  thisflag |= FLAG_DEFINING_MACRO;
+  global.thisflag |= FLAG_DEFINING_MACRO;
   cur_mp = macro_new ();
 }
 END_DEFUN
@@ -115,13 +115,13 @@ The definition was started by @kbd{C-x (}.
 The macro is now available for use via @kbd{C-x e}.
 +*/
 {
-  if (!(thisflag & FLAG_DEFINING_MACRO))
+  if (!(global.thisflag & FLAG_DEFINING_MACRO))
     {
       minibuf_error ("Not defining a keyboard macro");
       return leNIL;
     }
 
-  thisflag &= ~FLAG_DEFINING_MACRO;
+  global.thisflag &= ~FLAG_DEFINING_MACRO;
 }
 END_DEFUN
 

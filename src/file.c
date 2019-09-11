@@ -213,7 +213,7 @@ bool
 find_file (const char *filename)
 {
   Buffer bp;
-  for (bp = head_bp; bp != NULL; bp = get_buffer_next (bp))
+  for (bp = global.head_bp; bp != NULL; bp = get_buffer_next (bp))
     if (get_buffer_filename (bp) != NULL &&
         STREQ (get_buffer_filename (bp), filename))
       break;
@@ -246,7 +246,7 @@ find_file (const char *filename)
     }
 
   switch_to_buffer (bp);
-  thisflag |= FLAG_NEED_RESYNC;
+  global.thisflag |= FLAG_NEED_RESYNC;
   return true;
 }
 
@@ -262,7 +262,7 @@ creating one if none already exists.
   else
     {
       filename = minibuf_read_filename ("Find file: ",
-                                        astr_cstr (get_buffer_dir (cur_bp)), NULL);
+                                        astr_cstr (get_buffer_dir (global.cur_bp)), NULL);
 
       if (filename == NULL)
         ok = FUNCALL (keyboard_quit);
@@ -285,7 +285,7 @@ Use @kbd{M-x toggle-read-only} to permit editing.
 {
   ok = F_find_file (uniarg, is_uniarg, arglist);
   if (ok == leT)
-    set_buffer_readonly (cur_bp, true);
+    set_buffer_readonly (global.cur_bp, true);
 }
 END_DEFUN
 
@@ -296,11 +296,11 @@ If the current buffer now contains an empty file that you just visited
 (presumably by mistake), use this command to visit the file you really want.
 +*/
 {
-  const char *buf = get_buffer_filename (cur_bp);
+  const char *buf = get_buffer_filename (global.cur_bp);
   char *base = NULL;
 
   if (buf == NULL)
-    buf = astr_cstr (get_buffer_dir (cur_bp));
+    buf = astr_cstr (get_buffer_dir (global.cur_bp));
   else
     base = base_name (buf);
   const_astr ms = minibuf_read_filename ("Find alternate: ", buf, base);
@@ -308,9 +308,9 @@ If the current buffer now contains an empty file that you just visited
   ok = leNIL;
   if (ms == NULL)
     ok = FUNCALL (keyboard_quit);
-  else if (astr_len (ms) > 0 && check_modified_buffer (cur_bp))
+  else if (astr_len (ms) > 0 && check_modified_buffer (global.cur_bp))
     {
-      kill_buffer (cur_bp);
+      kill_buffer (global.cur_bp);
       ok = bool_to_lisp (find_file (astr_cstr (ms)));
     }
 }
@@ -322,7 +322,7 @@ DEFUN_ARGS ("switch-to-buffer", switch_to_buffer,
 Select buffer @i{buffer} in the current window.
 +*/
 {
-  Buffer bp = ((get_buffer_next (cur_bp) != NULL) ? get_buffer_next (cur_bp) : head_bp);
+  Buffer bp = ((get_buffer_next (global.cur_bp) != NULL) ? get_buffer_next (global.cur_bp) : global.head_bp);
 
   STR_INIT (buf)
   else
@@ -361,7 +361,7 @@ Insert after point the contents of BUFFER.
 Puts mark after the inserted text.
 +*/
 {
-  Buffer def_bp = ((get_buffer_next (cur_bp) != NULL) ? get_buffer_next (cur_bp) : head_bp);
+  Buffer def_bp = ((get_buffer_next (global.cur_bp) != NULL) ? get_buffer_next (global.cur_bp) : global.head_bp);
 
   if (warn_if_readonly_buffer ())
     return leNIL;
@@ -415,7 +415,7 @@ Set mark after the inserted text.
   else
     {
       file = minibuf_read_filename ("Insert file: ",
-                                    astr_cstr (get_buffer_dir (cur_bp)), NULL);
+                                    astr_cstr (get_buffer_dir (global.cur_bp)), NULL);
       if (file == NULL)
         ok = FUNCALL (keyboard_quit);
     }
@@ -631,7 +631,7 @@ Save current buffer in visited file if modified.  By default, makes the
 previous version into a backup file if this is the first save.
 +*/
 {
-  ok = save_buffer (cur_bp);
+  ok = save_buffer (global.cur_bp);
 }
 END_DEFUN
 
@@ -643,8 +643,8 @@ This makes the buffer visit that file, and marks it as not modified.
 Interactively, confirmation is required unless you supply a prefix argument.
 +*/
 {
-  ok = write_buffer (cur_bp, true,
-                     arglist && !(lastflag & FLAG_SET_UNIARG),
+  ok = write_buffer (global.cur_bp, true,
+                     arglist && !(global.lastflag & FLAG_SET_UNIARG),
                      NULL, "Write file: ");
 }
 END_DEFUN
@@ -655,7 +655,7 @@ save_some_buffers (void)
   bool none_to_save = true;
   bool noask = false;
 
-  for (Buffer bp = head_bp; bp != NULL; bp = get_buffer_next (bp))
+  for (Buffer bp = global.head_bp; bp != NULL; bp = get_buffer_next (bp))
     {
       if (get_buffer_modified (bp) && !get_buffer_nosave (bp))
         {
@@ -731,7 +731,7 @@ Offer to save each buffer, then kill this Zile process.
   if (!save_some_buffers ())
     return leNIL;
 
-  for (Buffer bp = head_bp; bp != NULL; bp = get_buffer_next (bp))
+  for (Buffer bp = global.head_bp; bp != NULL; bp = get_buffer_next (bp))
     if (get_buffer_modified (bp) && !get_buffer_needname (bp))
       {
         for (;;)
@@ -747,7 +747,7 @@ Offer to save each buffer, then kill this Zile process.
         break; /* We have found a modified buffer, so stop. */
       }
 
-  thisflag |= FLAG_QUIT;
+  global.thisflag |= FLAG_QUIT;
 }
 END_DEFUN
 
@@ -761,7 +761,7 @@ void
 zile_exit (bool doabort)
 {
   fprintf (stderr, "Trying to save modified buffers (if any)...\r\n");
-  for (Buffer bp = head_bp; bp != NULL; bp = get_buffer_next (bp))
+  for (Buffer bp = global.head_bp; bp != NULL; bp = get_buffer_next (bp))
     if (get_buffer_modified (bp) && !get_buffer_nosave (bp))
       {
         astr buf = astr_fmt ("%s.%sSAVE",
@@ -784,7 +784,7 @@ Make DIR become the current buffer's default directory.
 {
   if (arglist == NULL)
     dir = minibuf_read_filename ("Change default directory: ",
-                                 astr_cstr (get_buffer_dir (cur_bp)), NULL);
+                                 astr_cstr (get_buffer_dir (global.cur_bp)), NULL);
 
   if (dir == NULL)
     ok = FUNCALL (keyboard_quit);

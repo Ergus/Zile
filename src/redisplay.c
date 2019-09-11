@@ -35,7 +35,7 @@ resize_windows (void)
 {
   /* Resize windows horizontally. */
   Window wp;
-  for (wp = head_wp; wp != NULL; wp = get_window_next (wp))
+  for (wp = global.head_wp; wp != NULL; wp = get_window_next (wp))
     {
       set_window_fwidth (wp, term_width ());
       set_window_ewidth (wp, get_window_fwidth (wp));
@@ -44,16 +44,16 @@ resize_windows (void)
   /* Work out difference in window height; windows may be taller than
      terminal if the terminal was very short. */
   int hdelta;
-  for (hdelta = term_height () - 1, wp = head_wp;
+  for (hdelta = term_height () - 1, wp = global.head_wp;
        wp != NULL; hdelta -= get_window_fheight (wp), wp = get_window_next (wp));
 
   /* Resize windows vertically. */
   if (hdelta > 0)
     { /* Increase windows height. */
-      for (wp = head_wp; hdelta > 0; wp = get_window_next (wp))
+      for (wp = global.head_wp; hdelta > 0; wp = get_window_next (wp))
         {
           if (wp == NULL)
-            wp = head_wp;
+            wp = global.head_wp;
           set_window_fheight (wp, get_window_fheight (wp) + 1);
           set_window_eheight (wp, get_window_eheight (wp) + 1);
           --hdelta;
@@ -64,7 +64,7 @@ resize_windows (void)
       for (int decreased = true; decreased;)
         {
           decreased = false;
-          for (wp = head_wp; wp != NULL && hdelta < 0; wp = get_window_next (wp))
+          for (wp = global.head_wp; wp != NULL && hdelta < 0; wp = get_window_next (wp))
             {
               if (get_window_fheight (wp) > 2)
                 {
@@ -73,7 +73,8 @@ resize_windows (void)
                   ++hdelta;
                   decreased = true;
                 }
-              else if (cur_wp != head_wp || get_window_next (cur_wp) != NULL)
+              else if (global.cur_wp != global.head_wp ||
+	               get_window_next (global.cur_wp) != NULL)
                 {
                   Window new_wp = get_window_next (wp);
                   delete_window (wp);
@@ -103,7 +104,7 @@ DEFUN ("recenter", recenter)
 Center point in selected window and redisplay frame.
 +*/
 {
-  recenter (cur_wp);
+  recenter (global.cur_wp);
   term_clear ();
   term_redisplay ();
   term_refresh ();

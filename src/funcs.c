@@ -82,7 +82,7 @@ write_buffers_list (va_list ap)
     {
       /* Print all buffers whose names don't start with space except
          this one (the *Buffer List*). */
-      if (cur_bp != bp && get_buffer_name (bp)[0] != ' ')
+      if (global.cur_bp != bp && get_buffer_name (bp)[0] != ' ')
         {
           bprintf ("%c%c%c %-19s %6zu  %-17s",
                    get_window_bp (old_wp) == bp ? '.' : ' ',
@@ -95,7 +95,7 @@ write_buffers_list (va_list ap)
         }
       bp = get_buffer_next (bp);
       if (bp == NULL)
-        bp = head_bp;
+        bp = global.head_bp;
     }
   while (bp != get_window_bp (old_wp));
 }
@@ -112,7 +112,7 @@ The @samp{R} column contains a @samp{%} for buffers that are read-only.
 @end itemize
 +*/
 {
-  write_temp_buffer ("*Buffer List*", true, write_buffers_list, cur_wp);
+  write_temp_buffer ("*Buffer List*", true, write_buffers_list, global.cur_wp);
 }
 END_DEFUN
 
@@ -121,7 +121,7 @@ DEFUN ("toggle-read-only", toggle_read_only)
 Change whether this buffer is visiting its file read-only.
 +*/
 {
-  set_buffer_readonly (cur_bp, !get_buffer_readonly (cur_bp));
+  set_buffer_readonly (global.cur_bp, !get_buffer_readonly (global.cur_bp));
 }
 END_DEFUN
 
@@ -132,7 +132,7 @@ In Auto Fill mode, inserting a space at a column beyond `fill-column'
 automatically breaks the line at a previous space.
 +*/
 {
-  set_buffer_autofill (cur_bp, !get_buffer_autofill (cur_bp));
+  set_buffer_autofill (global.cur_bp, !get_buffer_autofill (global.cur_bp));
 }
 END_DEFUN
 
@@ -143,11 +143,11 @@ Use C-u followed by a number to specify a column.
 Just C-u as argument means to use the current column.
 +*/
 {
-  size_t o = get_buffer_pt (cur_bp) - get_buffer_line_o (cur_bp);
-  long fill_col = (lastflag & FLAG_UNIARG_EMPTY) ? o : (unsigned long) uniarg;
+  size_t o = get_buffer_pt (global.cur_bp) - get_buffer_line_o (global.cur_bp);
+  long fill_col = (global.lastflag & FLAG_UNIARG_EMPTY) ? o : (unsigned long) uniarg;
   char *buf = NULL;
 
-  if (!(lastflag & FLAG_SET_UNIARG) && arglist == NULL)
+  if (!(global.lastflag & FLAG_SET_UNIARG) && arglist == NULL)
     {
       fill_col = minibuf_read_number ("Set fill-column to (default %zu): ", o);
       if (fill_col == LONG_MAX)
@@ -223,17 +223,17 @@ DEFUN ("exchange-point-and-mark", exchange_point_and_mark)
 Put the mark where point is now, and point where the mark is now.
 +*/
 {
-  if (get_buffer_mark (cur_bp) == NULL)
+  if (get_buffer_mark (global.cur_bp) == NULL)
     {
       minibuf_error ("No mark set in this buffer");
       return leNIL;
     }
 
-  size_t o = get_buffer_pt (cur_bp);
-  goto_offset (get_marker_o (get_buffer_mark (cur_bp)));
-  set_marker_o (get_buffer_mark (cur_bp), o);
+  size_t o = get_buffer_pt (global.cur_bp);
+  goto_offset (get_marker_o (get_buffer_mark (global.cur_bp)));
+  set_marker_o (get_buffer_mark (global.cur_bp), o);
   activate_mark ();
-  thisflag |= FLAG_NEED_RESYNC;
+  global.thisflag |= FLAG_NEED_RESYNC;
 }
 END_DEFUN
 
@@ -276,7 +276,7 @@ by 4 each time.
   /* Need to process key used to invoke universal-argument. */
   pushkey (lastkey ());
 
-  thisflag |= FLAG_UNIARG_EMPTY;
+  global.thisflag |= FLAG_UNIARG_EMPTY;
 
   for (;;)
     {
@@ -292,7 +292,7 @@ by 4 each time.
       else if (isdigit (key & 0xff))
         {
           int digit = (key & 0xff) - '0';
-          thisflag &= ~FLAG_UNIARG_EMPTY;
+          global.thisflag &= ~FLAG_UNIARG_EMPTY;
 
           if (key & KBD_META)
             {
@@ -326,7 +326,7 @@ by 4 each time.
               astr_cat_cstr (as, " -");
               /* The default negative arg is -1, not -4. */
               arg = 1;
-              thisflag &= ~FLAG_UNIARG_EMPTY;
+              global.thisflag &= ~FLAG_UNIARG_EMPTY;
             }
         }
       else
@@ -338,8 +338,8 @@ by 4 each time.
 
   if (ok == leT)
     {
-      last_uniarg = arg * sgn;
-      thisflag |= FLAG_SET_UNIARG;
+      global.last_uniarg = arg * sgn;
+      global.thisflag |= FLAG_SET_UNIARG;
       minibuf_clear ();
     }
 }
@@ -350,7 +350,7 @@ DEFUN ("back-to-indentation", back_to_indentation)
 Move point to the first non-whitespace character on this line.
 +*/
 {
-  goto_offset (get_buffer_line_o (cur_bp));
+  goto_offset (get_buffer_line_o (global.cur_bp));
   while (!eolp () && isspace (following_char ()))
     move_char (1);
 }
@@ -373,7 +373,7 @@ move_word (ptrdiff_t dir)
     {
       for (; !(dir > 0 ? eolp () : bolp ()); move_char (dir))
         {
-          if (iswordchar (get_buffer_char (cur_bp, get_buffer_pt (cur_bp) - (dir < 0))))
+          if (iswordchar (get_buffer_char (global.cur_bp, get_buffer_pt (global.cur_bp) - (dir < 0))))
             gotword = true;
           else if (gotword)
             break;
@@ -433,12 +433,12 @@ move_sexp (ptrdiff_t dir)
     {
       while (dir > 0 ? !eolp () : !bolp ())
         {
-          size_t o = get_buffer_pt (cur_bp) - (dir < 0 ? 1 : 0);
-          char c = get_buffer_char (cur_bp, o);
+          size_t o = get_buffer_pt (global.cur_bp) - (dir < 0 ? 1 : 0);
+          char c = get_buffer_char (global.cur_bp, o);
 
           /* Skip escaped quotes. */
-          if ((c == '\"' || c == '\'') && o > get_buffer_line_o (cur_bp) &&
-              get_buffer_char (cur_bp, o - 1) == '\\')
+          if ((c == '\"' || c == '\'') && o > get_buffer_line_o (global.cur_bp) &&
+              get_buffer_char (global.cur_bp, o - 1) == '\\')
             {
               move_char (dir);
               /* Treat escaped ' and " like word chars. */
@@ -537,7 +537,7 @@ static void
 astr_append_region (astr s)
 {
   activate_mark ();
-  astr_cat (s, estr_get_as (get_buffer_region (cur_bp, calculate_the_region ())));
+  astr_cat (s, estr_get_as (get_buffer_region (global.cur_bp, calculate_the_region ())));
 }
 
 static bool
@@ -548,7 +548,7 @@ transpose_subr (bool (*move_func) (ptrdiff_t dir))
     move_func (-1);
 
   /* For transpose-lines. */
-  if (move_func == move_line && get_buffer_line_o (cur_bp) == 0)
+  if (move_func == move_line && get_buffer_line_o (global.cur_bp) == 0)
     move_func (1);
 
   /* Backward. */
@@ -827,7 +827,7 @@ Fill paragraph at or after point.
     /* Move to next line if between two paragraphs. */
     next_line ();
 
-  while (buffer_end_of_line (cur_bp, get_buffer_pt (cur_bp)) < get_marker_o (m_end))
+  while (buffer_end_of_line (global.cur_bp, get_buffer_pt (global.cur_bp)) < get_marker_o (m_end))
     {
       FUNCALL (end_of_line);
       delete_char ();
@@ -856,9 +856,9 @@ setcase_word (int rcase)
 
   astr as = astr_new ();
   char c;
-  for (size_t i = get_buffer_pt (cur_bp) - get_buffer_line_o (cur_bp);
-       i < buffer_line_len (cur_bp, get_buffer_pt (cur_bp)) &&
-         iswordchar ((int) (c = get_buffer_char (cur_bp, get_buffer_line_o (cur_bp) + i)));
+  for (size_t i = get_buffer_pt (global.cur_bp) - get_buffer_line_o (global.cur_bp);
+       i < buffer_line_len (global.cur_bp, get_buffer_pt (global.cur_bp)) &&
+         iswordchar ((int) (c = get_buffer_char (global.cur_bp, get_buffer_line_o (global.cur_bp) + i)));
        i++)
     astr_cat_char (as, c);
 
@@ -868,7 +868,7 @@ setcase_word (int rcase)
       replace_estr (astr_len (as), estr_new_astr (as));
     }
 
-  set_buffer_modified (cur_bp, true);
+  set_buffer_modified (global.cur_bp, true);
 
   return true;
 }
@@ -1086,7 +1086,7 @@ says to insert the output in the current buffer.
     cmd = minibuf_read_shell_command ();
   BOOL_INIT (insert)
   else
-    insert = lastflag & FLAG_SET_UNIARG;
+    insert = global.lastflag & FLAG_SET_UNIARG;
 
   if (cmd != NULL)
     ok = pipe_command (cmd, astr_new (), insert, false);
@@ -1124,14 +1124,14 @@ The output is available in that buffer in both cases.
     cmd = minibuf_read_shell_command ();
   BOOL_INIT (insert)
   else
-    insert = lastflag & FLAG_SET_UNIARG;
+    insert = global.lastflag & FLAG_SET_UNIARG;
 
   if (cmd != NULL)
     {
       if (warn_if_no_mark ())
         ok = leNIL;
       else
-        ok = pipe_command (cmd, estr_get_as (get_buffer_region (cur_bp, calculate_the_region ())), insert, true);
+        ok = pipe_command (cmd, estr_get_as (get_buffer_region (global.cur_bp, calculate_the_region ())), insert, true);
     }
 }
 END_DEFUN
@@ -1156,16 +1156,16 @@ On nonblank line, delete any immediately following blank lines.
 +*/
 {
   Marker m = point_marker ();
-  Region r = region_new (get_buffer_line_o (cur_bp), get_buffer_line_o (cur_bp));
+  Region r = region_new (get_buffer_line_o (global.cur_bp), get_buffer_line_o (global.cur_bp));
 
   /* Find following blank lines.  */
   if (FUNCALL (forward_line) == leT && is_blank_line ())
     {
-      set_region_start (r, get_buffer_pt (cur_bp));
+      set_region_start (r, get_buffer_pt (global.cur_bp));
       do
-        set_region_end (r, buffer_next_line (cur_bp, get_buffer_pt (cur_bp)));
+        set_region_end (r, buffer_next_line (global.cur_bp, get_buffer_pt (global.cur_bp)));
       while (FUNCALL (forward_line) == leT && is_blank_line ());
-      set_region_end (r, MIN (get_region_end (r), get_buffer_size (cur_bp)));
+      set_region_end (r, MIN (get_region_end (r), get_buffer_size (global.cur_bp)));
     }
   goto_offset (get_marker_o (m));
 
@@ -1173,21 +1173,21 @@ On nonblank line, delete any immediately following blank lines.
   bool singleblank = true;
   if (is_blank_line ())
     {
-      set_region_end (r, MAX (get_region_end (r), buffer_next_line (cur_bp, get_buffer_pt (cur_bp))));
+      set_region_end (r, MAX (get_region_end (r), buffer_next_line (global.cur_bp, get_buffer_pt (global.cur_bp))));
       do
-        set_region_start (r, get_buffer_line_o (cur_bp));
+        set_region_start (r, get_buffer_line_o (global.cur_bp));
       while (FUNCALL_ARG (forward_line, -1) == leT && is_blank_line ());
       goto_offset (get_marker_o (m));
-      if (get_region_start (r) != get_buffer_line_o (cur_bp) ||
-          get_region_end (r) > buffer_next_line (cur_bp, get_buffer_pt (cur_bp)))
+      if (get_region_start (r) != get_buffer_line_o (global.cur_bp) ||
+          get_region_end (r) > buffer_next_line (global.cur_bp, get_buffer_pt (global.cur_bp)))
         singleblank = false;
-      set_region_end (r, MIN (get_region_end (r), get_buffer_size (cur_bp)));
+      set_region_end (r, MIN (get_region_end (r), get_buffer_size (global.cur_bp)));
     }
 
   /* If we are deleting to EOB, need to fudge extra line. */
-  bool at_eob = get_region_end (r) == get_buffer_size (cur_bp) && get_region_start (r) > 0;
+  bool at_eob = get_region_end (r) == get_buffer_size (global.cur_bp) && get_region_start (r) > 0;
   if (at_eob)
-    set_region_start (r, get_region_start (r) - strlen (get_buffer_eol (cur_bp)));
+    set_region_start (r, get_region_start (r) - strlen (get_buffer_eol (global.cur_bp)));
 
   /* Delete any blank lines found. */
   if (get_region_start (r) < get_region_end (r))

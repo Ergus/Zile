@@ -51,21 +51,21 @@ void
 set_current_window (Window wp)
 {
   /* Save buffer's point in a new marker.  */
-  if (cur_wp->saved_pt)
-    unchain_marker (cur_wp->saved_pt);
+  if (global.cur_wp->saved_pt)
+    unchain_marker (global.cur_wp->saved_pt);
 
-  cur_wp->saved_pt = point_marker ();
+  global.cur_wp->saved_pt = point_marker ();
 
-  cur_wp = wp;
-  cur_bp = wp->bp;
+  global.cur_wp = wp;
+  global.cur_bp = wp->bp;
 
   /* Update the buffer point with the window's saved point
      marker.  */
-  if (cur_wp->saved_pt)
+  if (global.cur_wp->saved_pt)
     {
-      goto_offset (get_marker_o (cur_wp->saved_pt));
-      unchain_marker (cur_wp->saved_pt);
-      cur_wp->saved_pt = NULL;
+      goto_offset (get_marker_o (global.cur_wp->saved_pt));
+      unchain_marker (global.cur_wp->saved_pt);
+      global.cur_wp->saved_pt = NULL;
     }
 }
 
@@ -76,24 +76,24 @@ Both windows display the same buffer now current.
 +*/
 {
   /* Windows smaller than 4 lines cannot be split. */
-  if (cur_wp->fheight < 4)
+  if (global.cur_wp->fheight < 4)
     {
       minibuf_error ("Window height %zu too small (after splitting)",
-                     cur_wp->fheight);
+                     global.cur_wp->fheight);
       return leNIL;
     }
 
   Window newwp = (Window) XZALLOC (struct Window);
-  *newwp = *cur_wp;
-  newwp->fheight = cur_wp->fheight / 2 + cur_wp->fheight % 2;
+  *newwp = *global.cur_wp;
+  newwp->fheight = global.cur_wp->fheight / 2 + global.cur_wp->fheight % 2;
   newwp->eheight = newwp->fheight - 1;
   newwp->saved_pt = point_marker ();
 
-  cur_wp->next = newwp;
-  cur_wp->fheight = cur_wp->fheight / 2;
-  cur_wp->eheight = cur_wp->fheight - 1;
-  if (cur_wp->topdelta >= cur_wp->eheight)
-    recenter (cur_wp);
+  global.cur_wp->next = newwp;
+  global.cur_wp->fheight = global.cur_wp->fheight / 2;
+  global.cur_wp->eheight = global.cur_wp->fheight - 1;
+  if (global.cur_wp->topdelta >= global.cur_wp->eheight)
+    recenter (global.cur_wp);
 }
 END_DEFUN
 
@@ -102,10 +102,10 @@ delete_window (Window del_wp)
 {
   Window wp;
 
-  if (del_wp == head_wp)
-    wp = head_wp = head_wp->next;
+  if (del_wp == global.head_wp)
+    wp = global.head_wp = global.head_wp->next;
   else
-    for (wp = head_wp; wp != NULL; wp = wp->next)
+    for (wp = global.head_wp; wp != NULL; wp = wp->next)
       if (wp->next == del_wp)
         {
           wp->next = wp->next->next;
@@ -128,13 +128,13 @@ DEFUN ("delete-window", delete_window)
 Remove the current window from the screen.
 +*/
 {
-  if (cur_wp == head_wp && cur_wp->next == NULL)
+  if (global.cur_wp == global.head_wp && global.cur_wp->next == NULL)
     {
       minibuf_error ("Attempt to delete sole ordinary window");
       return leNIL;
     }
 
-  delete_window (cur_wp);
+  delete_window (global.cur_wp);
 }
 END_DEFUN
 
@@ -143,14 +143,14 @@ DEFUN ("enlarge-window", enlarge_window)
 Make current window one line bigger.
 +*/
 {
-  if (cur_wp == head_wp && (cur_wp->next == NULL ||
-                            cur_wp->next->fheight < 3))
+  if (global.cur_wp == global.head_wp && (global.cur_wp->next == NULL ||
+                            global.cur_wp->next->fheight < 3))
     return leNIL;
 
-  Window wp = cur_wp->next;
+  Window wp = global.cur_wp->next;
   if (wp == NULL || wp->fheight < 3)
-    for (wp = head_wp; wp != NULL; wp = wp->next)
-      if (wp->next == cur_wp)
+    for (wp = global.head_wp; wp != NULL; wp = wp->next)
+      if (wp->next == global.cur_wp)
         {
           if (wp->fheight < 3)
             return leNIL;
@@ -161,8 +161,8 @@ Make current window one line bigger.
   --wp->eheight;
   if (wp->topdelta >= wp->eheight)
     recenter (wp);
-  ++cur_wp->fheight;
-  ++cur_wp->eheight;
+  ++global.cur_wp->fheight;
+  ++global.cur_wp->eheight;
 }
 END_DEFUN
 
@@ -172,36 +172,36 @@ Make current window one line smaller.
 +*/
 {
 
-  if ((cur_wp == head_wp && cur_wp->next == NULL) || cur_wp->fheight < 3)
+  if ((global.cur_wp == global.head_wp && global.cur_wp->next == NULL) || global.cur_wp->fheight < 3)
     return leNIL;
 
-  Window wp = cur_wp->next;
+  Window wp = global.cur_wp->next;
   if (wp == NULL)
-    for (wp = head_wp; wp != NULL; wp = wp->next)
-      if (wp->next == cur_wp)
+    for (wp = global.head_wp; wp != NULL; wp = wp->next)
+      if (wp->next == global.cur_wp)
         break;
 
-  ++wp->fheight;
-  ++wp->eheight;
-  --cur_wp->fheight;
-  --cur_wp->eheight;
-  if (cur_wp->topdelta >= cur_wp->eheight)
-    recenter (cur_wp);
+  ++(wp->fheight);
+  ++(wp->eheight);
+  --(global.cur_wp->fheight);
+  --(global.cur_wp->eheight);
+  if (global.cur_wp->topdelta >= global.cur_wp->eheight)
+    recenter (global.cur_wp);
 }
 END_DEFUN
 
 Window
 popup_window (void)
 {
-  if (head_wp && head_wp->next == NULL)
+  if (global.head_wp && global.head_wp->next == NULL)
     {
       /* There is only one window on the screen, so split it. */
       FUNCALL (split_window);
-      return cur_wp->next;
+      return global.cur_wp->next;
     }
 
   /* Use the window after the current one, or first window if none. */
-  return cur_wp->next ? cur_wp->next : head_wp;
+  return global.cur_wp->next ? global.cur_wp->next : global.head_wp;
 }
 
 DEFUN ("delete-other-windows", delete_other_windows)
@@ -209,10 +209,10 @@ DEFUN ("delete-other-windows", delete_other_windows)
 Make the selected window fill the screen.
 +*/
 {
-  for (Window wp = head_wp, nextwp; wp != NULL; wp = nextwp)
+  for (Window wp = global.head_wp, nextwp; wp != NULL; wp = nextwp)
     {
       nextwp = wp->next;
-      if (wp != cur_wp)
+      if (wp != global.cur_wp)
         delete_window (wp);
     }
 }
@@ -225,7 +225,7 @@ All windows are arranged in a cyclic order.
 This command selects the window one step away in that order.
 +*/
 {
-  set_current_window ((cur_wp->next != NULL) ? cur_wp->next : head_wp);
+  set_current_window ((global.cur_wp->next != NULL) ? global.cur_wp->next : global.head_wp);
 }
 END_DEFUN
 
@@ -238,7 +238,7 @@ get_window_in_position (int x, int y, int *rx, int *ry)
   int first_line = 0;
   int last_line = 0;
   int cont = 0;
-  for (Window wp = head_wp; wp != NULL; wp = get_window_next (wp)) {
+  for (Window wp = global.head_wp; wp != NULL; wp = get_window_next (wp)) {
     last_line += get_window_fheight(wp);
 
     if (last_line >= y) {
@@ -265,19 +265,19 @@ create_scratch_window (void)
 {
   Buffer bp = create_scratch_buffer ();
   Window wp = (Window) XZALLOC (struct Window);
-  cur_wp = head_wp = wp;
+  global.cur_wp = global.head_wp = wp;
   wp->fwidth = wp->ewidth = term_width ();
   /* Save space for minibuffer. */
   wp->fheight = term_height () - 1;
   /* Save space for status line. */
   wp->eheight = wp->fheight - 1;
-  wp->bp = cur_bp = bp;
+  wp->bp = global.cur_bp = bp;
 }
 
 Window
 find_window (const char *name)
 {
-  for (Window wp = head_wp; wp != NULL; wp = wp->next)
+  for (Window wp = global.head_wp; wp != NULL; wp = wp->next)
     if (STREQ (get_buffer_name (wp->bp), name))
       return wp;
 
@@ -291,12 +291,12 @@ window_o (Window wp)
      windows have a saved point, except that if a window has just been
      killed, it needs to use its new buffer's current point. */
   assert (wp != NULL);
-  if (wp == cur_wp)
+  if (wp == global.cur_wp)
     {
-      assert (wp->bp == cur_bp);
+      assert (wp->bp == global.cur_bp);
       assert (wp->saved_pt == NULL);
-      assert (cur_bp);
-      return get_buffer_pt (cur_bp);
+      assert (global.cur_bp);
+      return get_buffer_pt (global.cur_bp);
     }
   else
     {

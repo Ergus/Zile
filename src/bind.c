@@ -131,9 +131,9 @@ do_binding_completion (astr as)
 {
   astr bs = astr_new ();
 
-  if (lastflag & FLAG_SET_UNIARG)
+  if (global.lastflag & FLAG_SET_UNIARG)
     {
-      unsigned arg = abs (last_uniarg);
+      unsigned arg = abs (global.last_uniarg);
       do
         {
           astr tmp = astr_fmt ("%c %s", arg % 10 + '0', astr_cstr (bs));
@@ -143,12 +143,12 @@ do_binding_completion (astr as)
         }
       while (arg != 0);
 
-      if (last_uniarg < 0)
+      if (global.last_uniarg < 0)
         bs = astr_fmt ("- %s", astr_cstr (bs));
     }
 
   minibuf_write ("%s%s%s-",
-                 lastflag & (FLAG_SET_UNIARG | FLAG_UNIARG_EMPTY) ? "C-u " : "",
+                 global.lastflag & (FLAG_SET_UNIARG | FLAG_UNIARG_EMPTY) ? "C-u " : "",
                  astr_cstr (bs),
                  astr_cstr (as));
   size_t key = getkey (GETKEY_DEFAULT);
@@ -212,7 +212,7 @@ self_insert_command (void)
   deactivate_mark ();
   if (key <= 0xff)
     {
-      if (isspace (key) && get_buffer_autofill (cur_bp))
+      if (isspace (key) && get_buffer_autofill (global.cur_bp))
         ret = fill_break_line () != -1;
       insert_char (key);
     }
@@ -253,13 +253,13 @@ set_this_command (Function cmd)
 le *
 call_command (Function f, int uniarg, bool uniflag, le *branch)
 {
-  thisflag = lastflag & FLAG_DEFINING_MACRO;
+  global.thisflag = global.lastflag & FLAG_DEFINING_MACRO;
   undo_start_sequence ();
 
-  /* Reset last_uniarg before function call, so recursion (e.g. in
+  /* Reset global.last_uniarg before function call, so recursion (e.g. in
      macros) works. */
-  if (!(thisflag & FLAG_SET_UNIARG))
-    last_uniarg = 1;
+  if (!(global.thisflag & FLAG_SET_UNIARG))
+    global.last_uniarg = 1;
 
   /* Execute the command. */
   _this_command = f;
@@ -268,11 +268,11 @@ call_command (Function f, int uniarg, bool uniflag, le *branch)
 
   /* Only add keystrokes if we were already in macro defining mode
      before the function call, to cope with start-kbd-macro. */
-  if (lastflag & FLAG_DEFINING_MACRO && thisflag & FLAG_DEFINING_MACRO)
+  if (global.lastflag & FLAG_DEFINING_MACRO && global.thisflag & FLAG_DEFINING_MACRO)
     add_cmd_to_macro ();
 
   undo_end_sequence ();
-  lastflag = thisflag;
+  global.lastflag = global.thisflag;
 
   return ok;
 }
@@ -286,7 +286,7 @@ get_and_run_command (void)
   minibuf_clear ();
 
   if (f != NULL)
-    call_command (f, last_uniarg, (lastflag & FLAG_SET_UNIARG) != 0, NULL);
+    call_command (f, global.last_uniarg, (global.lastflag & FLAG_SET_UNIARG) != 0, NULL);
   else
     minibuf_error ("%s is undefined", astr_cstr (keyvectodesc (keys)));
 }

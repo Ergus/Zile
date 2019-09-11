@@ -82,13 +82,13 @@ static void
 move_buffer_to_head (Buffer bp)
 {
   Buffer prev = NULL;
-  for (Buffer it = head_bp; it != bp; prev = it, it = it->next)
+  for (Buffer it = global.head_bp; it != bp; prev = it, it = it->next)
     ;
   if (prev)
     {
       prev->next = bp->next;
-      bp->next = head_bp;
-      head_bp = bp;
+      bp->next = global.head_bp;
+      global.head_bp = bp;
     }
 }
 
@@ -96,20 +96,20 @@ move_buffer_to_head (Buffer bp)
 static void
 goto_goalc (void)
 {
-  size_t i, col = 0, t = tab_width (cur_bp);
+  size_t i, col = 0, t = tab_width (global.cur_bp);
 
-  for (i = get_buffer_line_o (cur_bp);
-       i < get_buffer_line_o (cur_bp) + buffer_line_len (cur_bp, get_buffer_pt (cur_bp));
+  for (i = get_buffer_line_o (global.cur_bp);
+       i < get_buffer_line_o (global.cur_bp) + buffer_line_len (global.cur_bp, get_buffer_pt (global.cur_bp));
        i++)
-    if (col == get_buffer_goalc (cur_bp))
+    if (col == get_buffer_goalc (global.cur_bp))
       break;
-    else if (get_buffer_char (cur_bp, i) == '\t')
-      for (size_t w = t - col % t; w > 0 && ++col < get_buffer_goalc (cur_bp); w--)
+    else if (get_buffer_char (global.cur_bp, i) == '\t')
+      for (size_t w = t - col % t; w > 0 && ++col < get_buffer_goalc (global.cur_bp); w--)
         ;
     else
       ++col;
 
-  set_buffer_pt (cur_bp, i);
+  set_buffer_pt (global.cur_bp, i);
 }
 
 
@@ -139,13 +139,13 @@ delete_char (void)
 
   if (eolp ())
     {
-      replace_estr (strlen (get_buffer_eol (cur_bp)), estr_empty);
-      thisflag |= FLAG_NEED_RESYNC;
+      replace_estr (strlen (get_buffer_eol (global.cur_bp)), estr_empty);
+      global.thisflag |= FLAG_NEED_RESYNC;
     }
   else
     replace_estr (1, estr_empty);
 
-  set_buffer_modified (cur_bp, true);
+  set_buffer_modified (global.cur_bp, true);
 
   return true;
 }
@@ -157,41 +157,41 @@ replace_estr (size_t del, const_estr es)
   if (warn_if_readonly_buffer ())
     return false;
 
-  size_t newlen = estr_len (es, get_buffer_eol (cur_bp));
-  undo_save_block (cur_bp->pt, del, newlen);
+  size_t newlen = estr_len (es, get_buffer_eol (global.cur_bp));
+  undo_save_block (global.cur_bp->pt, del, newlen);
 
   /* Adjust gap. */
-  size_t oldgap = cur_bp->gap;
+  size_t oldgap = global.cur_bp->gap;
   size_t added_gap = oldgap + del < newlen ? MIN_GAP : 0;
   if (added_gap > 0)
     { /* If gap would vanish, open it to MIN_GAP. */
-      astr_insert (estr_get_as (cur_bp->text), cur_bp->pt, (newlen + MIN_GAP) - (oldgap + del));
-      cur_bp->gap = MIN_GAP;
+      astr_insert (estr_get_as (global.cur_bp->text), global.cur_bp->pt, (newlen + MIN_GAP) - (oldgap + del));
+      global.cur_bp->gap = MIN_GAP;
     }
   else if (oldgap + del > MAX_GAP + newlen)
     { /* If gap would be larger than MAX_GAP, restrict it to MAX_GAP. */
-      astr_remove (estr_get_as (cur_bp->text), cur_bp->pt + newlen + MAX_GAP, (oldgap + del) - (MAX_GAP + newlen));
-      cur_bp->gap = MAX_GAP;
+      astr_remove (estr_get_as (global.cur_bp->text), global.cur_bp->pt + newlen + MAX_GAP, (oldgap + del) - (MAX_GAP + newlen));
+      global.cur_bp->gap = MAX_GAP;
     }
   else
-    cur_bp->gap = oldgap + del - newlen;
+    global.cur_bp->gap = oldgap + del - newlen;
 
   /* Zero any new bit of gap not produced by astr_insert. */
-  if (MAX (oldgap, newlen) + added_gap < cur_bp->gap + newlen)
-    astr_set (estr_get_as (cur_bp->text), cur_bp->pt + MAX (oldgap, newlen) + added_gap, '\0', newlen + cur_bp->gap - MAX (oldgap, newlen) - added_gap);
+  if (MAX (oldgap, newlen) + added_gap < global.cur_bp->gap + newlen)
+    astr_set (estr_get_as (global.cur_bp->text), global.cur_bp->pt + MAX (oldgap, newlen) + added_gap, '\0', newlen + global.cur_bp->gap - MAX (oldgap, newlen) - added_gap);
 
   /* Insert `newlen' chars. */
-  estr_replace_estr (cur_bp->text, cur_bp->pt, es);
-  cur_bp->pt += newlen;
+  estr_replace_estr (global.cur_bp->text, global.cur_bp->pt, es);
+  global.cur_bp->pt += newlen;
 
   /* Adjust markers. */
-  for (Marker m = get_buffer_markers (cur_bp); m != NULL; m = get_marker_next (m))
-    if (get_marker_o (m) > cur_bp->pt - newlen)
-      set_marker_o (m, MAX (cur_bp->pt - newlen, get_marker_o (m) + newlen - del));
+  for (Marker m = get_buffer_markers (global.cur_bp); m != NULL; m = get_marker_next (m))
+    if (get_marker_o (m) > global.cur_bp->pt - newlen)
+      set_marker_o (m, MAX (global.cur_bp->pt - newlen, get_marker_o (m) + newlen - del));
 
-  set_buffer_modified (cur_bp, true);
+  set_buffer_modified (global.cur_bp, true);
   if (estr_next_line (es, 0) != SIZE_MAX)
-    thisflag |= FLAG_NEED_RESYNC;
+    global.thisflag |= FLAG_NEED_RESYNC;
   return true;
 }
 
@@ -329,8 +329,8 @@ buffer_new (void)
   bp->dir = agetcwd ();
 
   /* Insert into buffer list. */
-  bp->next = head_bp;
-  head_bp = bp;
+  bp->next = global.head_bp;
+  global.head_bp = bp;
 
   init_buffer (bp);
 
@@ -356,7 +356,7 @@ destroy_buffer (Buffer bp)
 void
 insert_buffer (Buffer bp)
 {
-  /* Copy text to avoid problems when bp == cur_bp. */
+  /* Copy text to avoid problems when bp == global.cur_bp. */
   insert_estr (estr_new (get_buffer_pre_point (bp), get_buffer_eol (bp)));
   insert_estr (estr_new (get_buffer_post_point (bp), get_buffer_eol (bp)));
 }
@@ -391,7 +391,7 @@ set_buffer_names (Buffer bp, const char *filename)
 Buffer
 find_buffer (const char *name)
 {
-  for (Buffer bp = head_bp; bp != NULL; bp = bp->next)
+  for (Buffer bp = global.head_bp; bp != NULL; bp = bp->next)
     {
       const char *bname = get_buffer_name (bp);
       if (bname && STREQ (bname, name))
@@ -405,15 +405,15 @@ find_buffer (const char *name)
 void
 switch_to_buffer (Buffer bp)
 {
-  assert (get_window_bp (cur_wp) == cur_bp);
+  assert (get_window_bp (global.cur_wp) == global.cur_bp);
 
   // The buffer is the current buffer; return safely.
-  if (cur_bp == bp)
+  if (global.cur_bp == bp)
     return;
 
   // Set current buffer.
-  cur_bp = bp;
-  set_window_bp (cur_wp, cur_bp);
+  global.cur_bp = bp;
+  set_window_bp (global.cur_wp, global.cur_bp);
 
   // Move the buffer to head.
   move_buffer_to_head (bp);
@@ -423,18 +423,18 @@ switch_to_buffer (Buffer bp)
     // Avoid compiler warning for ignoring return value.
   }
 
-  thisflag |= FLAG_NEED_RESYNC;
+  global.thisflag |= FLAG_NEED_RESYNC;
 }
 
 bool
 warn_if_no_mark (void)
 {
-  if (!cur_bp->mark)
+  if (!global.cur_bp->mark)
     {
       minibuf_error ("The mark is not set now");
       return true;
     }
-  else if (!get_buffer_mark_active (cur_bp))
+  else if (!get_buffer_mark_active (global.cur_bp))
     {
       minibuf_error ("The mark is not active now");
       return true;
@@ -449,9 +449,9 @@ warn_if_no_mark (void)
 bool
 warn_if_readonly_buffer (void)
 {
-  if (get_buffer_readonly (cur_bp))
+  if (get_buffer_readonly (global.cur_bp))
     {
-      minibuf_error ("Buffer is readonly: %s", get_buffer_name (cur_bp));
+      minibuf_error ("Buffer is readonly: %s", get_buffer_name (global.cur_bp));
       return true;
     }
 
@@ -468,7 +468,7 @@ warn_if_readonly_buffer (void)
 Region
 calculate_the_region (void)
 {
-  return region_new (get_buffer_pt (cur_bp), get_marker_o (get_buffer_mark (cur_bp)));
+  return region_new (get_buffer_pt (global.cur_bp), get_marker_o (get_buffer_mark (global.cur_bp)));
 }
 
 void
@@ -478,23 +478,23 @@ set_temporary_buffer (Buffer bp)
 
   set_buffer_temporary (bp, true);
 
-  if (bp == head_bp)
+  if (bp == global.head_bp)
     {
-      if (head_bp->next == NULL)
+      if (global.head_bp->next == NULL)
         return;
-      head_bp = head_bp->next;
+      global.head_bp = global.head_bp->next;
     }
   else if (bp->next == NULL)
     return;
 
-  for (bp0 = head_bp; bp0 != NULL; bp0 = bp0->next)
+  for (bp0 = global.head_bp; bp0 != NULL; bp0 = bp0->next)
     if (bp0->next == bp)
       {
         bp0->next = bp0->next->next;
         break;
       }
 
-  for (bp0 = head_bp; bp0->next != NULL; bp0 = bp0->next)
+  for (bp0 = global.head_bp; bp0->next != NULL; bp0 = bp0->next)
     ;
 
   bp0->next = bp;
@@ -504,13 +504,13 @@ set_temporary_buffer (Buffer bp)
 void
 activate_mark (void)
 {
-  set_buffer_mark_active (cur_bp, true);
+  set_buffer_mark_active (global.cur_bp, true);
 }
 
 void
 deactivate_mark (void)
 {
-  set_buffer_mark_active (cur_bp, false);
+  set_buffer_mark_active (global.cur_bp, false);
 }
 
 /*
@@ -555,10 +555,10 @@ kill_buffer (Buffer kill_bp)
   if (get_buffer_next (kill_bp) != NULL)
     next_bp = get_buffer_next (kill_bp);
   else
-    next_bp = (head_bp == kill_bp) ? NULL : head_bp;
+    next_bp = (global.head_bp == kill_bp) ? NULL : global.head_bp;
 
   /* Search for windows displaying the buffer to kill. */
-  for (Window wp = head_wp; wp != NULL; wp = get_window_next (wp))
+  for (Window wp = global.head_wp; wp != NULL; wp = get_window_next (wp))
     if (get_window_bp (wp) == kill_bp)
       {
         set_window_bp (wp, next_bp);
@@ -567,11 +567,11 @@ kill_buffer (Buffer kill_bp)
       }
 
   /* Remove the buffer from the buffer list. */
-  if (cur_bp == kill_bp)
-    cur_bp = next_bp;
-  if (head_bp == kill_bp)
-    head_bp = get_buffer_next (head_bp);
-  for (Buffer bp = head_bp; bp != NULL && get_buffer_next (bp) != NULL; bp = get_buffer_next (bp))
+  if (global.cur_bp == kill_bp)
+    global.cur_bp = next_bp;
+  if (global.head_bp == kill_bp)
+    global.head_bp = get_buffer_next (global.head_bp);
+  for (Buffer bp = global.head_bp; bp != NULL && get_buffer_next (bp) != NULL; bp = get_buffer_next (bp))
     if (get_buffer_next (bp) == kill_bp)
       {
         set_buffer_next (bp, get_buffer_next (get_buffer_next (bp)));
@@ -584,13 +584,13 @@ kill_buffer (Buffer kill_bp)
      it. */
   if (next_bp == NULL)
     {
-      cur_bp = head_bp = next_bp = create_scratch_buffer ();
-      for (Window wp = head_wp; wp != NULL; wp = get_window_next (wp))
-        set_window_bp (wp, head_bp);
+      global.cur_bp = global.head_bp = next_bp = create_scratch_buffer ();
+      for (Window wp = global.head_wp; wp != NULL; wp = get_window_next (wp))
+        set_window_bp (wp, global.head_bp);
     }
 
   /* Resync windows that need it. */
-  for (Window wp = head_wp; wp != NULL; wp = get_window_next (wp))
+  for (Window wp = global.head_wp; wp != NULL; wp = get_window_next (wp))
     if (get_window_bp (wp) == next_bp)
       window_resync (wp);
 }
@@ -609,7 +609,7 @@ With a nil argument, kill the current buffer.
     {
       Completion cp = make_buffer_completion ();
       buf = minibuf_read_completion ("Kill buffer (default %s): ",
-                                     "", cp, NULL, get_buffer_name (cur_bp));
+                                     "", cp, NULL, get_buffer_name (global.cur_bp));
       if (buf == NULL)
         ok = FUNCALL (keyboard_quit);
     }
@@ -624,7 +624,7 @@ With a nil argument, kill the current buffer.
         }
     }
   else
-    bp = cur_bp;
+    bp = global.cur_bp;
 
   if (ok == leT)
     {
@@ -640,7 +640,7 @@ Completion
 make_buffer_completion (void)
 {
   Completion cp = completion_new (false);
-  for (Buffer bp = head_bp; bp != NULL; bp = get_buffer_next (bp))
+  for (Buffer bp = global.head_bp; bp != NULL; bp = get_buffer_next (bp))
     gl_sortedlist_add (get_completion_completions (cp), completion_strcmp,
                        xstrdup (get_buffer_name (bp)));
 
@@ -683,11 +683,11 @@ move_char (ptrdiff_t offset)
   for (size_t i = 0; i < (size_t) (abs (offset)); i++)
     {
       if (dir > 0 ? !eolp () : !bolp ())
-        set_buffer_pt (cur_bp, cur_bp->pt + dir);
+        set_buffer_pt (global.cur_bp, global.cur_bp->pt + dir);
       else if (dir > 0 ? !eobp () : !bobp ())
         {
-          thisflag |= FLAG_NEED_RESYNC;
-          set_buffer_pt (cur_bp, cur_bp->pt + dir * strlen (get_buffer_eol (cur_bp)));
+          global.thisflag |= FLAG_NEED_RESYNC;
+          set_buffer_pt (global.cur_bp, global.cur_bp->pt + dir * strlen (get_buffer_eol (global.cur_bp)));
           if (dir > 0)
             FUNCALL (beginning_of_line);
           else
@@ -711,18 +711,18 @@ move_line (ptrdiff_t n)
     }
 
   if (last_command () != F_next_line && last_command () != F_previous_line)
-    set_buffer_goalc (cur_bp, get_goalc ());
+    set_buffer_goalc (global.cur_bp, get_goalc ());
 
   for (; n > 0; n--)
     {
-      size_t o = func (cur_bp, cur_bp->pt);
+      size_t o = func (global.cur_bp, global.cur_bp->pt);
       if (o == SIZE_MAX)
         break;
-      set_buffer_pt (cur_bp, o);
+      set_buffer_pt (global.cur_bp, o);
     }
 
   goto_goalc ();
-  thisflag |= FLAG_NEED_RESYNC;
+  global.thisflag |= FLAG_NEED_RESYNC;
 
   return n == 0;
 }
@@ -739,12 +739,12 @@ offset_to_line (Buffer bp, size_t offset)
 void
 goto_offset (size_t o)
 {
-  size_t old_lineo = get_buffer_line_o (cur_bp);
-  set_buffer_pt (cur_bp, o);
-  if (get_buffer_line_o (cur_bp) != old_lineo)
+  size_t old_lineo = get_buffer_line_o (global.cur_bp);
+  set_buffer_pt (global.cur_bp, o);
+  if (get_buffer_line_o (global.cur_bp) != old_lineo)
     {
-      set_buffer_goalc (cur_bp, get_goalc ());
-      thisflag |= FLAG_NEED_RESYNC;
+      set_buffer_goalc (global.cur_bp, get_goalc ());
+      global.thisflag |= FLAG_NEED_RESYNC;
     }
 }
 
@@ -752,8 +752,8 @@ void
 write_temp_buffer (const char *name, bool show, void (*func) (va_list ap), ...)
 {
   /* Popup a window with the buffer "name". */
-  Window old_wp = cur_wp;
-  Buffer old_bp = cur_bp;
+  Window old_wp = global.cur_wp;
+  Buffer old_bp = global.cur_bp;
   Window wp = find_window (name);
   if (show && wp)
     set_current_window (wp);
@@ -772,16 +772,16 @@ write_temp_buffer (const char *name, bool show, void (*func) (va_list ap), ...)
 
   /* Remove the contents of that buffer. */
   Buffer new_bp = buffer_new ();
-  set_buffer_name (new_bp, get_buffer_name (cur_bp));
-  kill_buffer (cur_bp);
-  cur_bp = new_bp;
-  set_window_bp (cur_wp, cur_bp);
+  set_buffer_name (new_bp, get_buffer_name (global.cur_bp));
+  kill_buffer (global.cur_bp);
+  global.cur_bp = new_bp;
+  set_window_bp (global.cur_wp, global.cur_bp);
 
   /* Make the buffer a temporary one. */
-  set_buffer_needname (cur_bp, true);
-  set_buffer_noundo (cur_bp, true);
-  set_buffer_nosave (cur_bp, true);
-  set_temporary_buffer (cur_bp);
+  set_buffer_needname (global.cur_bp, true);
+  set_buffer_noundo (global.cur_bp, true);
+  set_buffer_nosave (global.cur_bp, true);
+  set_temporary_buffer (global.cur_bp);
 
   /* Use the "callback" routine. */
   va_list ap;
@@ -790,8 +790,8 @@ write_temp_buffer (const char *name, bool show, void (*func) (va_list ap), ...)
   va_end (ap);
 
   FUNCALL (beginning_of_buffer);
-  set_buffer_readonly (cur_bp, true);
-  set_buffer_modified (cur_bp, false);
+  set_buffer_readonly (global.cur_bp, true);
+  set_buffer_modified (global.cur_bp, false);
 
   /* Restore old current window. */
   set_current_window (old_wp);

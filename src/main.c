@@ -50,15 +50,18 @@
 #define ZILE_COPYRIGHT_STRING				\
   "Copyright (C) 2014 Free Software Foundation, Inc."
 
+
+global_t global = { "", NULL, NULL, NULL, NULL, 0, 0, 1 };
+
 /* The current window; the first window in list. */
-Window cur_wp = NULL, head_wp = NULL;
+// Window cur_wp = NULL, head_wp = NULL;
 /* The current buffer; the first buffer in list. */
-Buffer cur_bp = NULL, head_bp = NULL;
+// Buffer cur_bp = NULL, global.head_bp = NULL;
 
 /* The global editor flags. */
-int thisflag = 0, lastflag = 0;
+// int thisflag = 0, global.lastflag = 0;
 /* The universal argument repeat count. */
-int last_uniarg = 1;
+// int last_uniarg = 1;
 
 static const char splash_str[] = "\
 Welcome to GNU " ZILE_PACKAGE_NAME ".\n\
@@ -254,13 +257,13 @@ main (int argc, char **argv)
   /* Create the `*scratch*' buffer, so that initialisation commands
      that act on a buffer have something to act on. */
   create_scratch_window ();
-  Buffer scratch_bp = cur_bp;
+  Buffer scratch_bp = global.cur_bp;
   bprintf ("%s", "\
 ;; This buffer is for notes you don't want to save.\n\
 ;; If you want to create a file, visit that file with C-x C-f,\n\
 ;; then enter the text in that file's own buffer.\n\
 \n");
-  set_buffer_modified (cur_bp, false);
+  set_buffer_modified (global.cur_bp, false);
 
   if (!qflag)
     {
@@ -314,15 +317,15 @@ main (int argc, char **argv)
         default:
           break;
         }
-      if (thisflag & FLAG_QUIT)
+      if (global.thisflag & FLAG_QUIT)
         break;
     }
-  lastflag |= FLAG_NEED_RESYNC;
+  global.lastflag |= FLAG_NEED_RESYNC;
 
   /* Set up screen according to number of files loaded. */
   Buffer last_bp = NULL;
   int c = 0;
-  for (Buffer bp = head_bp; bp; bp = get_buffer_next (bp))
+  for (Buffer bp = global.head_bp; bp; bp = get_buffer_next (bp))
     {
       /* Last buffer that isn't *scratch*. */
       if (get_buffer_next (bp) && !get_buffer_next (get_buffer_next (bp)))
@@ -346,10 +349,10 @@ main (int argc, char **argv)
   minibuf_refresh ();
 
   /* Run the main loop. */
-  while (!(thisflag & FLAG_QUIT))
+  while (!(global.thisflag & FLAG_QUIT))
     {
-      if (lastflag & FLAG_NEED_RESYNC)
-        window_resync (cur_wp);
+      if (global.lastflag & FLAG_NEED_RESYNC)
+        window_resync (global.cur_wp);
       get_and_run_command ();
     }
 

@@ -60,7 +60,7 @@ minibuf_no_error (void)
 void
 minibuf_refresh (void)
 {
-  if (cur_wp)
+  if (global.cur_wp)
     {
       if (minibuf_contents)
         term_minibuf_write (minibuf_contents);
