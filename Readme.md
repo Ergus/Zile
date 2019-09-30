@@ -1,3 +1,40 @@
+
+## **IMPORTANT!: ** 
+
+I abandoned this fork because I found a more functional and complete
+alternative: [qemacs](https://github.com/Ergus/Qemacs) and I am
+working there.
+
+Qemacs has the following advantages:
+
+1. Does not depend of `gnulib` so not enforced to use autotools or
+   other hacks to make it work with cmake.
+   
+2. Does not need garbage collection, so no `libgc` is needed as a
+   dependency.
+   
+3. Modular design and easy to extend with pure C. (It can load dynamic
+   libraries at runtime as modules)
+
+4. 100% C code, no pseudo lisp processor and special macros needed to
+   expose to lisp.
+
+5. Vertical split and syntax highlight implemented.
+
+6. dired, term, org and some other modes already implemented and working.
+
+7. Optional X11 integration to provide a gui interface. But can be
+   disabled and the terminal version provides a very good experience.
+
+8. The internal buffer storage in memory and memory management is much
+   more efficient.
+   
+9. Available and easier to use in more systems (include MSWindows and
+   Haiku).
+   
+10. Faster to build (as it does not need to build `gnulib` and their
+    examples)
+
 GNU Zile
 ========
 
